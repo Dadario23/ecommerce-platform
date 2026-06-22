@@ -1,0 +1,27 @@
+{
+  "name": "admin-hub",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 3100",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@repo/database": "*",
+    "@repo/membership": "*",
+    "next": "^15.5.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "next-auth": "^4.24.11",
+    "mongoose": "^8.17.1",
+    "lucide-react": "^0.539.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "typescript": "^5"
+  }
+}

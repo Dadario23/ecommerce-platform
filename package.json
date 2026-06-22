@@ -1,0 +1,21 @@
+{
+  "name": "ecommerce-platform",
+  "private": true,
+  "packageManager": "npm@10.8.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "dev:store": "turbo dev --filter=store",
+    "dev:admin": "turbo dev --filter=admin-hub",
+    "build:store": "turbo build --filter=store"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.4",
+    "typescript": "^5"
+  }
+}
