@@ -47,15 +47,6 @@ const getCategoryAndProducts = cache(async (slug: string) => {
   };
 });
 
-export async function generateStaticParams() {
-  const { Category } = await getModels();
-  const categories = await Category.find(
-    { status: "published" },
-    "name slug",
-  ).lean<{ name: string; slug?: string }[]>();
-  return categories.map((c) => ({ slug: c.slug ?? slugify(c.name) }));
-}
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const data = await getCategoryAndProducts(slug);

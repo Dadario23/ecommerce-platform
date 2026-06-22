@@ -26,12 +26,6 @@ const getProduct = cache(async (slug: string) => {
   return doc ? (JSON.parse(JSON.stringify(doc)) as IProduct) : null;
 });
 
-export async function generateStaticParams() {
-  const { Product } = await getModels();
-  const products = await Product.find({ isActive: { $ne: false } }, "slug").lean<{ slug: string }[]>();
-  return products.map((p) => ({ slug: p.slug }));
-}
-
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
   const product = await getProduct(slug);
