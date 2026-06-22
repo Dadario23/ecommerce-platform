@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
-import { resolveTenant } from "@repo/tenant";
+import { resolveTenant } from "@repo/tenant/edge";
 
 export async function middleware(req: NextRequest) {
   // 1. Resolver tenant desde el hostname
