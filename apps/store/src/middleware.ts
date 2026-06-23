@@ -17,7 +17,7 @@ export async function middleware(req: NextRequest) {
   requestHeaders.set("x-tenant-slug", slug);
 
   // 3. Control de acceso a rutas protegidas
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET, cookieName: "store.session-token" });
   const { pathname } = req.nextUrl;
 
   const isProtectedRoute =
