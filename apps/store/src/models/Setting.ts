@@ -13,6 +13,11 @@ export interface ISetting extends Document {
   carouselImages: string[];
   homeFeaturedMode: "products" | "categories";
   shippingEnabled: boolean;
+  modules_repairs: boolean;
+  modules_budgets: boolean;
+  modules_shipping: boolean;
+  modules_coupons: boolean;
+  modules_analytics: boolean;
   updatedAt: Date;
 }
 
@@ -30,6 +35,11 @@ const SettingSchema = new Schema(
     carouselImages:        { type: [String], default: [] },
     homeFeaturedMode:      { type: String, enum: ["products", "categories"], default: "products" },
     shippingEnabled:       { type: Boolean, default: true },
+    modules_repairs:       { type: Boolean, default: false },
+    modules_budgets:       { type: Boolean, default: false },
+    modules_shipping:      { type: Boolean, default: true },
+    modules_coupons:       { type: Boolean, default: true },
+    modules_analytics:     { type: Boolean, default: true },
   },
   { timestamps: true }
 );

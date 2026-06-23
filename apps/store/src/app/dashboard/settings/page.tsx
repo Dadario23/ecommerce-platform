@@ -17,6 +17,9 @@ export default async function SettingsPage() {
     freeShippingThreshold: number; instagramUrl: string;
     facebookUrl: string; whatsappNumber: string;
     homeFeaturedMode?: "products" | "categories";
+    modules_repairs?: boolean; modules_budgets?: boolean;
+    modules_shipping?: boolean; modules_coupons?: boolean;
+    modules_analytics?: boolean;
   }>();
   if (!doc) {
     const created = await Setting.create({});
@@ -34,6 +37,11 @@ export default async function SettingsPage() {
     facebookUrl:           doc?.facebookUrl ?? "",
     whatsappNumber:        doc?.whatsappNumber ?? "",
     homeFeaturedMode:      doc?.homeFeaturedMode ?? "products",
+    modules_repairs:       doc?.modules_repairs ?? false,
+    modules_budgets:       doc?.modules_budgets ?? false,
+    modules_shipping:      doc?.modules_shipping ?? true,
+    modules_coupons:       doc?.modules_coupons ?? true,
+    modules_analytics:     doc?.modules_analytics ?? true,
   };
 
   return (

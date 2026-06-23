@@ -13,6 +13,9 @@ async function getSettings() {
     freeShippingThreshold: number; instagramUrl: string;
     facebookUrl: string; whatsappNumber: string;
     shippingEnabled: boolean;
+    modules_repairs: boolean; modules_budgets: boolean;
+    modules_shipping: boolean; modules_coupons: boolean;
+    modules_analytics: boolean;
   }>();
   if (!doc) {
     const created = await Setting.create({});
@@ -41,6 +44,8 @@ export async function PUT(req: Request) {
     "shippingCost", "freeShippingThreshold",
     "instagramUrl", "facebookUrl", "whatsappNumber",
     "carouselImages", "homeFeaturedMode", "shippingEnabled",
+    "modules_repairs", "modules_budgets", "modules_shipping",
+    "modules_coupons", "modules_analytics",
   ];
   const update: Record<string, unknown> = {};
   for (const key of allowed) {
