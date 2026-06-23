@@ -19,3 +19,5 @@ Thumbs.db
 *.tsbuildinfo
 .qodo/
 coverage/
+.vercel
+.env*
