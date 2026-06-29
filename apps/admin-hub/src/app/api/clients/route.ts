@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
+import { CLIENT_DISPLAY_NAMES } from "@/config/clients";
 
 // Lista de clientes registrados en la plataforma
 // En el futuro esto puede venir de una colección "platform_clients"
@@ -39,7 +40,7 @@ async function getClientStats(conn: mongoose.Connection, dbName: string) {
 
   return {
     slug: dbName,
-    storeName: (setting?.storeName as string | undefined) ?? dbName,
+    storeName: CLIENT_DISPLAY_NAMES[dbName] ?? (setting?.storeName as string | undefined) ?? dbName,
     orders: { total: orders, pending: pendingOrders },
     revenue: { total: revenueResult[0]?.total ?? 0, thisMonth: monthlyRevenueResult[0]?.total ?? 0 },
     membership: membership

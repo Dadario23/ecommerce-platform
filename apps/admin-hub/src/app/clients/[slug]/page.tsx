@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import mongoose from "mongoose";
+import { CLIENT_DISPLAY_NAMES } from "@/config/clients";
 
 const REGISTERED_CLIENTS = (process.env.PLATFORM_CLIENTS ?? "bitm-cel").split(",").map((s) => s.trim());
 const CLUSTER_URI = process.env.MONGODB_CLUSTER_URI!;
@@ -34,7 +35,7 @@ async function getClientModules(slug: string): Promise<{ storeName: string } & M
     },
   });
   return {
-    storeName:         (doc?.storeName as string | undefined) ?? slug,
+    storeName:         CLIENT_DISPLAY_NAMES[slug] ?? (doc?.storeName as string | undefined) ?? slug,
     modules_repairs:   Boolean(doc?.modules_repairs ?? false),
     modules_budgets:   Boolean(doc?.modules_budgets ?? false),
     modules_shipping:  Boolean(doc?.modules_shipping ?? true),
