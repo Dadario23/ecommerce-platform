@@ -200,10 +200,10 @@ export default function OrderSuccessClient() {
               <p className="text-xs text-blue-600">
                 Escribinos a{" "}
                 <a
-                  href="mailto:soporte@compumobile.com.ar"
+                  href="mailto:soporte@bitm-cel.com.ar"
                   className="underline underline-offset-2 hover:text-blue-800"
                 >
-                  soporte@compumobile.com.ar
+                  soporte@bitm-cel.com.ar
                 </a>{" "}
                 — Lunes a Viernes 9 a 18 hs
               </p>

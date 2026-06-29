@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 
 // Lista de clientes registrados en la plataforma
 // En el futuro esto puede venir de una colección "platform_clients"
-const REGISTERED_CLIENTS = (process.env.PLATFORM_CLIENTS ?? "compumobile").split(",").map((s) => s.trim());
+const REGISTERED_CLIENTS = (process.env.PLATFORM_CLIENTS ?? "bitm-cel").split(",").map((s) => s.trim());
 
 const CLUSTER_URI = process.env.MONGODB_CLUSTER_URI!;
 

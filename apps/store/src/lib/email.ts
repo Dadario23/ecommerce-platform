@@ -1,7 +1,7 @@
 import { Resend } from "resend";
 
-const FROM_EMAIL = process.env.FROM_EMAIL ?? "Compumobile <no-reply@compumobile.com.ar>";
-const STORE_NAME = "Compumobile";
+const FROM_EMAIL = process.env.FROM_EMAIL ?? "bitm-cel <no-reply@bitm-cel.com.ar>";
+const STORE_NAME = process.env.NEXT_PUBLIC_STORE_NAME ?? "bitm-cel";
 const STORE_URL = process.env.NEXT_PUBLIC_URL ?? "http://localhost:3000";
 
 interface OrderItem {
