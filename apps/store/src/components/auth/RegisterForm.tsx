@@ -165,7 +165,7 @@ export default function RegisterForm() {
         <input
           type="checkbox"
           {...register("newsletter")}
-          className="mt-0.5 w-4 h-4 rounded border-gray-300 accent-[#1E3A8A]"
+          className="mt-0.5 w-4 h-4 rounded border-gray-300 accent-(--tenant-primary)"
         />
         <span className="text-xs text-gray-500 leading-relaxed">
           Quiero recibir ofertas y novedades por email
@@ -182,7 +182,7 @@ export default function RegisterForm() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full bg-[#1E3A8A] text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-blue-800 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+        className="w-full bg-(--tenant-primary) text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-blue-800 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
       >
         {isSubmitting ? (
           <><Loader2 className="w-4 h-4 animate-spin" /> Creando cuenta...</>
@@ -191,7 +191,7 @@ export default function RegisterForm() {
 
       <p className="text-xs text-center text-gray-500">
         ¿Ya tenés cuenta?{" "}
-        <Link href="/login" className="text-[#1E3A8A] font-semibold hover:underline">
+        <Link href="/login" className="text-(--tenant-primary) font-semibold hover:underline">
           Iniciá sesión
         </Link>
       </p>

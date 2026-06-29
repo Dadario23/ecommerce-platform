@@ -158,7 +158,7 @@ export default async function CustomersPage() {
                 >
                   {/* Avatar + name */}
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-8 h-8 rounded-full bg-[#1E3A8A] flex items-center justify-center text-white text-[10px] font-bold shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-(--tenant-primary) flex items-center justify-center text-white text-[10px] font-bold shrink-0">
                       {initials}
                     </div>
                     <p className="text-sm font-semibold text-gray-800 truncate">

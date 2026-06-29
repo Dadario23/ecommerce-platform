@@ -102,7 +102,7 @@ export default async function ReparacionesPage({
         {canCreate && (
           <Link
             href="/soporte-tecnico/admin/reparaciones/nueva"
-            className="flex items-center gap-2 bg-[#1E3A8A] hover:bg-blue-800 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors"
+            className="flex items-center gap-2 bg-(--tenant-primary) hover:bg-blue-800 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors"
           >
             <Plus className="w-4 h-4" />
             Nueva reparación
@@ -156,7 +156,7 @@ export default async function ReparacionesPage({
                   {reparaciones.map((r) => (
                     <tr key={String(r._id)} className="hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3">
-                        <span className="font-mono font-bold text-[#1E3A8A] text-sm">{r.codigo}</span>
+                        <span className="font-mono font-bold text-(--tenant-primary) text-sm">{r.codigo}</span>
                       </td>
                       <td className="px-4 py-3">
                         <p className="font-medium text-gray-900">{r.cliente.nombre}</p>
@@ -177,7 +177,7 @@ export default async function ReparacionesPage({
                       <td className="px-4 py-3">
                         <Link
                           href={`/soporte-tecnico/admin/reparaciones/${String(r._id)}`}
-                          className="text-xs font-medium text-[#1E3A8A] hover:underline"
+                          className="text-xs font-medium text-(--tenant-primary) hover:underline"
                         >
                           Ver →
                         </Link>

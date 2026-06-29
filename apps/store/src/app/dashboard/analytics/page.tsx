@@ -215,7 +215,7 @@ export default async function AnalyticsPage() {
                     <span className="text-gray-400">{orders} órdenes</span>
                   </div>
                   {/* Bar */}
-                  <div className="w-full rounded-t-lg bg-[#1E3A8A] transition-all duration-500 min-h-1"
+                  <div className="w-full rounded-t-lg bg-(--tenant-primary) transition-all duration-500 min-h-1"
                     style={{ height: `${Math.max(pct, 2)}%` }}
                   />
                   {/* Label */}
@@ -295,7 +295,7 @@ export default async function AnalyticsPage() {
                     </div>
                     <div className="h-1 w-full bg-gray-100 rounded-full overflow-hidden ml-6">
                       <div
-                        className="h-full bg-[#1E3A8A] rounded-full"
+                        className="h-full bg-(--tenant-primary) rounded-full"
                         style={{ width: `${pct}%` }}
                       />
                     </div>

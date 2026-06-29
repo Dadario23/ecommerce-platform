@@ -182,7 +182,7 @@ export default function ShippingSettingsPage() {
         {zones.map((zone) => (
           <div key={zone.id} className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
             <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100 bg-gray-50">
-              <div className="w-8 h-8 bg-[#1E3A8A] rounded-lg flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 bg-(--tenant-primary) rounded-lg flex items-center justify-center shrink-0">
                 <MapPin className="w-4 h-4 text-white" />
               </div>
               <div>
@@ -231,7 +231,7 @@ export default function ShippingSettingsPage() {
                   <button
                     type="button"
                     onClick={() => addRange(zone.id)}
-                    className="flex items-center gap-1 text-xs text-[#1E3A8A] font-semibold hover:underline"
+                    className="flex items-center gap-1 text-xs text-(--tenant-primary) font-semibold hover:underline"
                   >
                     <Plus className="w-3.5 h-3.5" /> Agregar rango
                   </button>
@@ -299,7 +299,7 @@ export default function ShippingSettingsPage() {
           <button
             onClick={handleSave}
             disabled={saving || !shippingEnabled}
-            className="flex items-center gap-2 bg-[#1E3A8A] hover:bg-blue-800 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 bg-(--tenant-primary) hover:bg-blue-800 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {saving ? <RotateCcw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             {saving ? "Guardando..." : "Guardar tarifas"}

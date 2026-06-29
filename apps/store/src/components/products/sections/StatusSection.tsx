@@ -21,7 +21,7 @@ export default function StatusSection({ product }: StatusSectionProps) {
           type="button"
           onClick={() => setActive((v) => !v)}
           className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none ${
-            active ? "bg-[#1E3A8A]" : "bg-gray-200"
+            active ? "bg-(--tenant-primary)" : "bg-gray-200"
           }`}
         >
           <span

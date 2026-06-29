@@ -63,7 +63,7 @@ function fmtDate(d: string) {
 }
 
 const inputCls =
-  "w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#1E3A8A] placeholder:text-gray-400";
+  "w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-(--tenant-primary) placeholder:text-gray-400";
 
 export default function EditarReparacionPage() {
   const { id } = useParams<{ id: string }>();
@@ -215,7 +215,7 @@ export default function EditarReparacionPage() {
     return (
       <div className="text-center py-20 text-gray-500">
         Reparación no encontrada.{" "}
-        <Link href="/soporte-tecnico/admin/reparaciones" className="text-[#1E3A8A] hover:underline">
+        <Link href="/soporte-tecnico/admin/reparaciones" className="text-(--tenant-primary) hover:underline">
           Volver
         </Link>
       </div>
@@ -235,7 +235,7 @@ export default function EditarReparacionPage() {
         </button>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-mono font-bold text-[#1E3A8A] text-lg">{rep.codigo}</span>
+            <span className="font-mono font-bold text-(--tenant-primary) text-lg">{rep.codigo}</span>
             <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${ESTADO_COLOR[rep.estado]}`}>
               {ESTADO_LABEL[rep.estado]}
             </span>
@@ -270,7 +270,7 @@ export default function EditarReparacionPage() {
           href={`/soporte-tecnico/admin/reparaciones/${id}/ticket`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 py-2.5 text-sm font-semibold text-[#1E3A8A] border border-[#1E3A8A]/30 bg-blue-50/50 rounded-2xl hover:bg-blue-100 transition-colors"
+          className="flex items-center justify-center gap-2 py-2.5 text-sm font-semibold text-(--tenant-primary) border border-(--tenant-primary)/30 bg-blue-50/50 rounded-2xl hover:bg-blue-100 transition-colors"
         >
           <Printer className="w-4 h-4" />
           Ticket de recepción
@@ -300,7 +300,7 @@ export default function EditarReparacionPage() {
                 e === rep.estado
                   ? `${ESTADO_COLOR[e]} border-transparent opacity-60 cursor-default`
                   : nuevoEstado === e
-                    ? "bg-[#1E3A8A] text-white border-[#1E3A8A]"
+                    ? "bg-(--tenant-primary) text-white border-(--tenant-primary)"
                     : "bg-white text-gray-600 border-gray-200 hover:border-blue-300"
               }`}
             >
@@ -323,7 +323,7 @@ export default function EditarReparacionPage() {
             <button
               onClick={saveStatus}
               disabled={savingStatus}
-              className="flex items-center gap-2 bg-[#1E3A8A] hover:bg-blue-800 text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors disabled:opacity-60"
+              className="flex items-center gap-2 bg-(--tenant-primary) hover:bg-blue-800 text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors disabled:opacity-60"
             >
               {savingStatus && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
               Guardar estado → {ESTADO_LABEL[nuevoEstado]}
@@ -357,7 +357,7 @@ export default function EditarReparacionPage() {
           {[...rep.historial].reverse().map((h, i) => (
             <div key={i} className="flex gap-3 text-sm">
               <div className="flex flex-col items-center">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#1E3A8A] mt-1 shrink-0" />
+                <div className="w-2.5 h-2.5 rounded-full bg-(--tenant-primary) mt-1 shrink-0" />
                 {i < rep.historial.length - 1 && <div className="w-px flex-1 bg-gray-200 my-1" />}
               </div>
               <div className="pb-2">
@@ -573,7 +573,7 @@ export default function EditarReparacionPage() {
           <button
             type="button"
             onClick={() => setFallas((f) => [...f, ""])}
-            className="flex items-center gap-1.5 text-sm text-[#1E3A8A] font-medium hover:underline"
+            className="flex items-center gap-1.5 text-sm text-(--tenant-primary) font-medium hover:underline"
           >
             <Plus className="w-3.5 h-3.5" />
             Agregar falla
@@ -608,7 +608,7 @@ export default function EditarReparacionPage() {
         <button
           onClick={saveData}
           disabled={savingData}
-          className="flex items-center gap-2 bg-[#1E3A8A] hover:bg-blue-800 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-colors disabled:opacity-60"
+          className="flex items-center gap-2 bg-(--tenant-primary) hover:bg-blue-800 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-colors disabled:opacity-60"
         >
           {savingData && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
           {dataOk ? <><Check className="w-3.5 h-3.5" /> Guardado</> : "Guardar datos"}

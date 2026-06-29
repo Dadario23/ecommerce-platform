@@ -167,7 +167,7 @@ export default function SearchClient({ shippingEnabled = true }: Props) {
       <div className="max-w-7xl mx-auto px-4">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-1.5 text-xs text-gray-500 py-3">
-          <Link href="/" className="hover:text-[#1E3A8A] flex items-center gap-1 transition-colors">
+          <Link href="/" className="hover:text-(--tenant-primary) flex items-center gap-1 transition-colors">
             <Home className="w-3.5 h-3.5" />
             Inicio
           </Link>
@@ -182,7 +182,7 @@ export default function SearchClient({ shippingEnabled = true }: Props) {
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
               Resultados para{" "}
-              <span className="text-[#1E3A8A]">&ldquo;{query}&rdquo;</span>
+              <span className="text-(--tenant-primary)">&ldquo;{query}&rdquo;</span>
             </h1>
             {!loading && (
               <p className="text-sm text-gray-500 mt-0.5">
@@ -200,7 +200,7 @@ export default function SearchClient({ shippingEnabled = true }: Props) {
               <SlidersHorizontal className="w-4 h-4 text-gray-500" />
               Filtros
               {activeFilterCount > 0 && (
-                <span className="bg-[#1E3A8A] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                <span className="bg-(--tenant-primary) text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                   {activeFilterCount}
                 </span>
               )}
@@ -228,7 +228,7 @@ export default function SearchClient({ shippingEnabled = true }: Props) {
                       }}
                       className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
                         sort === key
-                          ? "bg-blue-50 text-[#1E3A8A] font-semibold"
+                          ? "bg-blue-50 text-(--tenant-primary) font-semibold"
                           : "text-gray-700 hover:bg-gray-50"
                       }`}
                     >
@@ -293,7 +293,7 @@ export default function SearchClient({ shippingEnabled = true }: Props) {
     shipping: "all",
                       })
                     }
-                    className="text-sm text-[#1E3A8A] font-medium hover:underline"
+                    className="text-sm text-(--tenant-primary) font-medium hover:underline"
                   >
                     Limpiar filtros
                   </button>
@@ -382,7 +382,7 @@ export default function SearchClient({ shippingEnabled = true }: Props) {
             <div className="sticky bottom-0 bg-white border-t px-4 py-4">
               <button
                 onClick={() => setMobileFiltersOpen(false)}
-                className="w-full bg-[#1E3A8A] text-white font-semibold py-3 rounded-xl hover:bg-blue-800 transition-colors"
+                className="w-full bg-(--tenant-primary) text-white font-semibold py-3 rounded-xl hover:bg-blue-800 transition-colors"
               >
                 Ver {filteredProducts.length} resultado{filteredProducts.length !== 1 ? "s" : ""}
               </button>

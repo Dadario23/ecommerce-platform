@@ -82,7 +82,7 @@ export default function ResetPasswordClient() {
   };
 
   const LeftPanel = () => (
-    <div className="hidden lg:flex lg:w-5/12 bg-[#1E3A8A] flex-col justify-between p-10 relative overflow-hidden">
+    <div className="hidden lg:flex lg:w-5/12 bg-(--tenant-primary) flex-col justify-between p-10 relative overflow-hidden">
       <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-white/5" />
       <div className="absolute -bottom-24 -left-12 w-72 h-72 rounded-full bg-white/5" />
       <Link href="/" className="relative flex items-center gap-3">
@@ -144,11 +144,11 @@ export default function ResetPasswordClient() {
               </div>
               <Link
                 href="/forgot-password"
-                className="block w-full bg-[#1E3A8A] text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-blue-800 transition-colors"
+                className="block w-full bg-(--tenant-primary) text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-blue-800 transition-colors"
               >
                 Solicitar nuevo enlace
               </Link>
-              <Link href="/login" className="block text-xs text-gray-400 hover:text-[#1E3A8A] transition-colors">
+              <Link href="/login" className="block text-xs text-gray-400 hover:text-(--tenant-primary) transition-colors">
                 Volver al inicio de sesión
               </Link>
             </div>
@@ -168,7 +168,7 @@ export default function ResetPasswordClient() {
           <div className="max-w-sm mx-auto w-full">
             <Link
               href="/login"
-              className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-[#1E3A8A] font-medium mb-6 transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-(--tenant-primary) font-medium mb-6 transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               Volver al inicio de sesión
@@ -248,7 +248,7 @@ export default function ResetPasswordClient() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-[#1E3A8A] text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-blue-800 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+                    className="w-full bg-(--tenant-primary) text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-blue-800 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
                   >
                     {loading ? (
                       <><Loader2 className="w-4 h-4 animate-spin" /> Restableciendo...</>

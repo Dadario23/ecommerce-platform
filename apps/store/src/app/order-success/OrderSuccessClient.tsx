@@ -154,7 +154,7 @@ export default function OrderSuccessClient() {
                           step.done
                             ? "bg-green-500"
                             : i === 1
-                            ? "bg-[#1E3A8A]"
+                            ? "bg-(--tenant-primary)"
                             : "bg-gray-100"
                         }`}
                       >
@@ -170,7 +170,7 @@ export default function OrderSuccessClient() {
                             step.done
                               ? "text-green-700"
                               : i === 1
-                              ? "text-[#1E3A8A]"
+                              ? "text-(--tenant-primary)"
                               : "text-gray-400"
                           }`}
                         >
@@ -214,7 +214,7 @@ export default function OrderSuccessClient() {
           <div className="px-5 pb-6 flex flex-col gap-3">
             <button
               onClick={() => router.push("/account/orders")}
-              className="w-full bg-[#1E3A8A] hover:bg-blue-800 text-white font-semibold py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm"
+              className="w-full bg-(--tenant-primary) hover:bg-blue-800 text-white font-semibold py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm"
             >
               <ClipboardList className="w-4 h-4" />
               Ver mis pedidos

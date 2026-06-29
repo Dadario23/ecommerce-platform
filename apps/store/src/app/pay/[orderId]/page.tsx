@@ -42,7 +42,7 @@ export default async function PayPage({ params }: Props) {
       <div className="w-full max-w-sm bg-white rounded-2xl shadow-lg overflow-hidden">
 
         {/* Header */}
-        <div className="bg-[#1E3A8A] px-6 py-5 text-center">
+        <div className="bg-(--tenant-primary) px-6 py-5 text-center">
           <div className="relative w-32 h-10 mx-auto mb-2">
             <Image src="/logo.svg" alt="Compumobile" fill className="object-contain brightness-0 invert" />
           </div>
@@ -86,7 +86,7 @@ export default async function PayPage({ params }: Props) {
                   <p className="text-[10px] text-gray-400 uppercase tracking-wide">Alias</p>
                   <p className="text-sm font-bold text-gray-800 font-mono">{ALIAS}</p>
                 </div>
-                <span className="text-xs bg-[#1E3A8A] text-white px-2 py-1 rounded-lg font-semibold">
+                <span className="text-xs bg-(--tenant-primary) text-white px-2 py-1 rounded-lg font-semibold">
                   Copiar
                 </span>
               </div>

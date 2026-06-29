@@ -59,7 +59,7 @@ export default function OrderPage() {
         <p className="text-sm text-gray-400 mb-6">Agregá productos para continuar</p>
         <Link
           href="/"
-          className="inline-flex items-center gap-2 bg-[#1E3A8A] text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-blue-800 transition-colors"
+          className="inline-flex items-center gap-2 bg-(--tenant-primary) text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-blue-800 transition-colors"
         >
           Ver productos
           <ArrowRight className="w-4 h-4" />
@@ -160,7 +160,7 @@ export default function OrderPage() {
         {/* CTA */}
         <button
           onClick={() => router.push("/checkout")}
-          className="w-full bg-[#1E3A8A] hover:bg-blue-800 text-white font-semibold py-4 rounded-xl transition-colors flex items-center justify-center gap-2"
+          className="w-full bg-(--tenant-primary) hover:bg-blue-800 text-white font-semibold py-4 rounded-xl transition-colors flex items-center justify-center gap-2"
         >
           Continuar
           <ArrowRight className="w-4 h-4" />

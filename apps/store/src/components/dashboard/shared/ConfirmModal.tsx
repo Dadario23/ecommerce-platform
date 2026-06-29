@@ -54,7 +54,7 @@ export function ConfirmModal({
             className={`flex-1 text-sm font-semibold py-2.5 rounded-xl transition-colors ${
               variant === "destructive"
                 ? "bg-red-500 text-white hover:bg-red-600"
-                : "bg-[#1E3A8A] text-white hover:bg-blue-800"
+                : "bg-(--tenant-primary) text-white hover:bg-blue-800"
             }`}
           >
             {confirmText}

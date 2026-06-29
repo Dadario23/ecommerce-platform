@@ -37,7 +37,7 @@ export default function CheckoutStepDate({
         <div className="bg-white border border-gray-100 rounded-2xl p-5 space-y-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-              <MapPin className="w-5 h-5 text-[#1E3A8A]" />
+              <MapPin className="w-5 h-5 text-(--tenant-primary)" />
             </div>
             <div>
               <p className="text-sm font-bold text-gray-800">Retiro / punto acordado</p>
@@ -135,7 +135,7 @@ export default function CheckoutStepDate({
       <button
         type="button"
         onClick={onContinue}
-        className="w-full bg-[#1E3A8A] hover:bg-blue-800 text-white font-semibold py-4 rounded-xl transition-colors mt-2"
+        className="w-full bg-(--tenant-primary) hover:bg-blue-800 text-white font-semibold py-4 rounded-xl transition-colors mt-2"
       >
         Continuar
       </button>

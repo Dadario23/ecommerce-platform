@@ -23,13 +23,13 @@ export default function TrackingSearch() {
           value={code}
           onChange={(e) => setCode(e.target.value)}
           placeholder="Ej: CM-0001"
-          className="w-full pl-9 pr-4 py-3 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#1E3A8A] placeholder:text-gray-400 font-mono uppercase tracking-widest"
+          className="w-full pl-9 pr-4 py-3 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-(--tenant-primary) placeholder:text-gray-400 font-mono uppercase tracking-widest"
         />
       </div>
       <button
         type="submit"
         disabled={!code.trim()}
-        className="bg-[#1E3A8A] hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-sm px-5 py-3 rounded-xl transition-colors whitespace-nowrap"
+        className="bg-(--tenant-primary) hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-sm px-5 py-3 rounded-xl transition-colors whitespace-nowrap"
       >
         Buscar
       </button>

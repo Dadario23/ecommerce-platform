@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { Loader2, Check, Phone } from "lucide-react";
 
 const inputCls =
-  "w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#1E3A8A] placeholder:text-gray-400";
+  "w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-(--tenant-primary) placeholder:text-gray-400";
 
 export default function ProfilePage() {
   const { data: session, update } = useSession();
@@ -126,7 +126,7 @@ export default function ProfilePage() {
         <button
           type="submit"
           disabled={saving}
-          className="flex items-center gap-2 bg-[#1E3A8A] hover:bg-blue-800 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-colors disabled:opacity-60"
+          className="flex items-center gap-2 bg-(--tenant-primary) hover:bg-blue-800 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-colors disabled:opacity-60"
         >
           {saving && <Loader2 className="w-4 h-4 animate-spin" />}
           {ok ? (

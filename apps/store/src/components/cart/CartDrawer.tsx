@@ -68,12 +68,12 @@ export default function CartDrawer() {
           {/* Header */}
           <SheetHeader className="px-5 py-4 border-b border-gray-100">
             <div className="flex items-center gap-2">
-              <ShoppingBag className="w-5 h-5 text-[#1E3A8A]" />
+              <ShoppingBag className="w-5 h-5 text-(--tenant-primary)" />
               <SheetTitle className="text-base font-bold text-gray-900">
                 Mi carrito
               </SheetTitle>
               {totalItems > 0 && (
-                <span className="ml-1 bg-[#1E3A8A] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                <span className="ml-1 bg-(--tenant-primary) text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
                   {totalItems}
                 </span>
               )}
@@ -100,7 +100,7 @@ export default function CartDrawer() {
                 <Link
                   href="/"
                   onClick={close}
-                  className="inline-flex items-center gap-2 bg-[#1E3A8A] text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-blue-800 transition-colors"
+                  className="inline-flex items-center gap-2 bg-(--tenant-primary) text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-blue-800 transition-colors"
                 >
                   Ver productos
                   <ArrowRight className="w-4 h-4" />
@@ -206,7 +206,7 @@ export default function CartDrawer() {
               {/* CTA */}
               <button
                 onClick={handleCheckout}
-                className="w-full bg-[#1E3A8A] hover:bg-blue-800 text-white font-semibold py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm"
+                className="w-full bg-(--tenant-primary) hover:bg-blue-800 text-white font-semibold py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm"
               >
                 Finalizar compra
                 <ArrowRight className="w-4 h-4" />

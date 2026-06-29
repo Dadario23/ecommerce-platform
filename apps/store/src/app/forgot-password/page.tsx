@@ -57,7 +57,7 @@ export default function ForgotPasswordPage() {
     <div className="min-h-screen bg-gray-50 pt-20 md:pt-28 pb-10 px-4">
       <div className="max-w-4xl mx-auto flex rounded-2xl overflow-hidden shadow-xl border border-gray-100">
         {/* Left panel */}
-        <div className="hidden lg:flex lg:w-5/12 bg-[#1E3A8A] flex-col justify-between p-10 relative overflow-hidden">
+        <div className="hidden lg:flex lg:w-5/12 bg-(--tenant-primary) flex-col justify-between p-10 relative overflow-hidden">
           <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-white/5" />
           <div className="absolute -bottom-24 -left-12 w-72 h-72 rounded-full bg-white/5" />
 
@@ -90,7 +90,7 @@ export default function ForgotPasswordPage() {
           <div className="max-w-sm mx-auto w-full">
             <Link
               href="/login"
-              className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-[#1E3A8A] font-medium mb-6 transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-(--tenant-primary) font-medium mb-6 transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               Volver al inicio de sesión
@@ -131,7 +131,7 @@ export default function ForgotPasswordPage() {
 
                 <Link
                   href="/login"
-                  className="block w-full text-center bg-[#1E3A8A] text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-blue-800 transition-colors"
+                  className="block w-full text-center bg-(--tenant-primary) text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-blue-800 transition-colors"
                 >
                   Volver al inicio de sesión
                 </Link>
@@ -165,7 +165,7 @@ export default function ForgotPasswordPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-[#1E3A8A] text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-blue-800 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+                  className="w-full bg-(--tenant-primary) text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-blue-800 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
                 >
                   {loading ? (
                     <><Loader2 className="w-4 h-4 animate-spin" /> Enviando...</>

@@ -25,7 +25,7 @@ const benefits = [
 
 export default function BenefitsBar() {
   return (
-    <div className="bg-[#1E3A8A] mt-4">
+    <div className="bg-(--tenant-primary) mt-4">
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 divide-x divide-blue-700">
         {benefits.map(({ icon: Icon, title, subtitle }, i) => (
           <div

@@ -110,6 +110,8 @@
 }
 
 :root {
+  --tenant-primary: #1E3A8A;
+  --tenant-accent: #3B82F6;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);

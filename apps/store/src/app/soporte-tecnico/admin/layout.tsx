@@ -240,7 +240,7 @@ export default function SoporteAdminLayout({ children }: { children: React.React
           <div className="flex items-center gap-2">
             <NotificationBell buttonClassName="relative p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100 transition-colors" />
             <div className="flex items-center gap-2 pl-2 border-l border-gray-100">
-              <div className="w-7 h-7 rounded-full bg-[#1E3A8A] flex items-center justify-center text-white text-[10px] font-bold">
+              <div className="w-7 h-7 rounded-full bg-(--tenant-primary) flex items-center justify-center text-white text-[10px] font-bold">
                 {initials}
               </div>
               <span className="hidden sm:block text-xs font-medium text-gray-700 max-w-24 truncate">

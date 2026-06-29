@@ -40,10 +40,10 @@ const TIPO_LABEL: Record<DeviceType, string> = {
 };
 
 const inputCls =
-  "w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#1E3A8A] placeholder:text-gray-400";
+  "w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-(--tenant-primary) placeholder:text-gray-400";
 
 const selectCls =
-  "w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#1E3A8A] text-gray-700 cursor-pointer";
+  "w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-(--tenant-primary) text-gray-700 cursor-pointer";
 
 export default function NuevaReparacionForm({ presupuestoId }: { presupuestoId?: string }) {
   const router = useRouter();
@@ -519,7 +519,7 @@ export default function NuevaReparacionForm({ presupuestoId }: { presupuestoId?:
                   type="button"
                   onClick={lookupClient}
                   disabled={!emailInput.trim()}
-                  className="px-4 py-2.5 bg-[#1E3A8A] text-white text-sm font-medium rounded-xl hover:bg-blue-800 transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                  className="px-4 py-2.5 bg-(--tenant-primary) text-white text-sm font-medium rounded-xl hover:bg-blue-800 transition-colors flex items-center gap-1.5 disabled:opacity-50"
                 >
                   <Search className="w-4 h-4" />
                   Buscar
@@ -527,7 +527,7 @@ export default function NuevaReparacionForm({ presupuestoId }: { presupuestoId?:
               </div>
               <p className="text-xs text-gray-400">
                 Ingresá el email del cliente para cargar sus datos, o{" "}
-                <button type="button" className="text-[#1E3A8A] hover:underline font-medium" onClick={() => setLookupDone(true)}>
+                <button type="button" className="text-(--tenant-primary) hover:underline font-medium" onClick={() => setLookupDone(true)}>
                   completá manualmente
                 </button>.
               </p>
@@ -596,7 +596,7 @@ export default function NuevaReparacionForm({ presupuestoId }: { presupuestoId?:
           <div className="bg-white rounded-2xl border border-gray-200 p-5 space-y-4">
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Equipo y fallas</p>
-              <button type="button" onClick={handleStartEditing} className="flex items-center gap-1.5 text-xs text-[#1E3A8A] font-medium hover:underline">
+              <button type="button" onClick={handleStartEditing} className="flex items-center gap-1.5 text-xs text-(--tenant-primary) font-medium hover:underline">
                 <Pencil className="w-3.5 h-3.5" />
                 Editar
               </button>
@@ -642,7 +642,7 @@ export default function NuevaReparacionForm({ presupuestoId }: { presupuestoId?:
                       type="button"
                       onClick={() => handleTipoChange(t)}
                       className={`flex-1 py-2 px-3 rounded-xl border text-sm font-medium transition-colors ${
-                        tipo === t ? "bg-[#1E3A8A] text-white border-[#1E3A8A]" : "bg-white text-gray-600 border-gray-200 hover:border-blue-300"
+                        tipo === t ? "bg-(--tenant-primary) text-white border-(--tenant-primary)" : "bg-white text-gray-600 border-gray-200 hover:border-blue-300"
                       }`}
                     >
                       {t === "pc" ? "PC" : t.charAt(0).toUpperCase() + t.slice(1)}
@@ -666,7 +666,7 @@ export default function NuevaReparacionForm({ presupuestoId }: { presupuestoId?:
                   <div className="space-y-1">
                     <input value={marca} onChange={(e) => { setMarca(e.target.value); markChanged(); }} placeholder="Samsung, HP, Apple…" required className={inputCls} />
                     {catalogBrands.length > 0 && (
-                      <button type="button" onClick={() => { setMarcaCustom(false); setMarca(""); setModelo(""); setModeloCustom(false); setFallas([""]); }} className="text-xs text-[#1E3A8A] hover:underline">
+                      <button type="button" onClick={() => { setMarcaCustom(false); setMarca(""); setModelo(""); setModeloCustom(false); setFallas([""]); }} className="text-xs text-(--tenant-primary) hover:underline">
                         ← Elegir del catálogo
                       </button>
                     )}
@@ -692,7 +692,7 @@ export default function NuevaReparacionForm({ presupuestoId }: { presupuestoId?:
                       className={inputCls}
                     />
                     {!marcaCustom && catalogModels.length > 0 && modeloCustom && (
-                      <button type="button" onClick={() => { setModeloCustom(false); setModelo(""); setFallas([""]); }} className="text-xs text-[#1E3A8A] hover:underline">
+                      <button type="button" onClick={() => { setModeloCustom(false); setModelo(""); setFallas([""]); }} className="text-xs text-(--tenant-primary) hover:underline">
                         ← Elegir del catálogo
                       </button>
                     )}
@@ -716,8 +716,8 @@ export default function NuevaReparacionForm({ presupuestoId }: { presupuestoId?:
                           onClick={() => toggleChip(rt)}
                           className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
                             selected
-                              ? "bg-[#1E3A8A] text-white border-[#1E3A8A]"
-                              : "bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:text-[#1E3A8A]"
+                              ? "bg-(--tenant-primary) text-white border-(--tenant-primary)"
+                              : "bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:text-(--tenant-primary)"
                           }`}
                         >
                           {rt}
@@ -744,7 +744,7 @@ export default function NuevaReparacionForm({ presupuestoId }: { presupuestoId?:
                     </div>
                   )}
 
-                  <button type="button" onClick={addTextFalla} className="flex items-center gap-1.5 text-sm text-[#1E3A8A] font-medium hover:underline mt-1">
+                  <button type="button" onClick={addTextFalla} className="flex items-center gap-1.5 text-sm text-(--tenant-primary) font-medium hover:underline mt-1">
                     <Plus className="w-3.5 h-3.5" />
                     Agregar falla personalizada
                   </button>
@@ -768,7 +768,7 @@ export default function NuevaReparacionForm({ presupuestoId }: { presupuestoId?:
                       </div>
                     ))}
                   </div>
-                  <button type="button" onClick={() => { setFallas((f) => [...f, ""]); markChanged(); }} className="flex items-center gap-1.5 text-sm text-[#1E3A8A] font-medium hover:underline mt-1">
+                  <button type="button" onClick={() => { setFallas((f) => [...f, ""]); markChanged(); }} className="flex items-center gap-1.5 text-sm text-(--tenant-primary) font-medium hover:underline mt-1">
                     <Plus className="w-3.5 h-3.5" />
                     Agregar falla
                   </button>
@@ -894,7 +894,7 @@ export default function NuevaReparacionForm({ presupuestoId }: { presupuestoId?:
             className={`px-5 flex items-center justify-center gap-2 py-2.5 text-sm font-semibold rounded-xl border transition-colors disabled:opacity-40 ${
               saveSuccess
                 ? "bg-green-50 border-green-300 text-green-700"
-                : "bg-white border-[#1E3A8A] text-[#1E3A8A] hover:bg-blue-50"
+                : "bg-white border-(--tenant-primary) text-(--tenant-primary) hover:bg-blue-50"
             }`}
           >
             {loadingAction === "save" ? (
@@ -911,7 +911,7 @@ export default function NuevaReparacionForm({ presupuestoId }: { presupuestoId?:
           <button
             type="submit"
             disabled={loadingAction !== null}
-            className="px-5 flex items-center justify-center gap-2 py-2.5 text-sm font-bold text-white bg-[#1E3A8A] hover:bg-blue-800 rounded-xl transition-colors disabled:opacity-60"
+            className="px-5 flex items-center justify-center gap-2 py-2.5 text-sm font-bold text-white bg-(--tenant-primary) hover:bg-blue-800 rounded-xl transition-colors disabled:opacity-60"
           >
             {loadingAction === "register" && <Loader2 className="w-4 h-4 animate-spin" />}
             Registrar
@@ -923,7 +923,7 @@ export default function NuevaReparacionForm({ presupuestoId }: { presupuestoId?:
           <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full mx-4 space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                <Printer className="w-5 h-5 text-[#1E3A8A]" />
+                <Printer className="w-5 h-5 text-(--tenant-primary)" />
               </div>
               <div>
                 <p className="font-bold text-gray-900">Reparación registrada</p>
@@ -945,7 +945,7 @@ export default function NuevaReparacionForm({ presupuestoId }: { presupuestoId?:
                   );
                   router.push(`/soporte-tecnico/admin/reparaciones/${printModal.id}`);
                 }}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#1E3A8A] rounded-xl hover:bg-blue-800 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-(--tenant-primary) rounded-xl hover:bg-blue-800 transition-colors"
               >
                 <Printer className="w-4 h-4" />
                 Imprimir ticket

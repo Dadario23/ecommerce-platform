@@ -5,7 +5,7 @@ export default function SupportBanner() {
   return (
     <Link
       href="/soporte-tecnico"
-      className="group flex items-center justify-between gap-4 bg-[#1E3A8A] hover:bg-blue-800 text-white rounded-2xl px-5 py-4 transition-colors"
+      className="group flex items-center justify-between gap-4 bg-(--tenant-primary) hover:bg-blue-800 text-white rounded-2xl px-5 py-4 transition-colors"
     >
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center shrink-0">

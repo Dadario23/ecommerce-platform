@@ -133,7 +133,7 @@ export default function FiltersSidebar({
                   onClick={() => onChange({ ...filters, condition: val })}
                   className={`flex-1 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
                     active
-                      ? "bg-[#1E3A8A] text-white border-[#1E3A8A]"
+                      ? "bg-(--tenant-primary) text-white border-(--tenant-primary)"
                       : "bg-white text-gray-600 border-gray-200 hover:border-blue-300"
                   }`}
                 >
@@ -161,7 +161,7 @@ export default function FiltersSidebar({
                   onClick={() => onChange({ ...filters, shipping: val })}
                   className={`flex-1 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
                     active
-                      ? "bg-[#1E3A8A] text-white border-[#1E3A8A]"
+                      ? "bg-(--tenant-primary) text-white border-(--tenant-primary)"
                       : "bg-white text-gray-600 border-gray-200 hover:border-blue-300"
                   }`}
                 >

@@ -39,7 +39,7 @@ export default function SoporteTecnicoPage() {
     <main className="pb-20 bg-gray-50 min-h-screen">
 
       {/* ── HERO ── */}
-      <section className="bg-[#1E3A8A] text-white pt-20 pb-12 md:pt-24 md:pb-16 px-4">
+      <section className="bg-(--tenant-primary) text-white pt-20 pb-12 md:pt-24 md:pb-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-blue-300 text-xs font-semibold uppercase tracking-widest mb-3">
             Compumobile · Soporte Técnico
@@ -62,7 +62,7 @@ export default function SoporteTecnicoPage() {
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
-                <Smartphone className="w-4.5 h-4.5 text-[#1E3A8A]" />
+                <Smartphone className="w-4.5 h-4.5 text-(--tenant-primary)" />
               </div>
               <div>
                 <p className="font-bold text-gray-900 text-sm">Clientes Particulares</p>
@@ -72,7 +72,7 @@ export default function SoporteTecnicoPage() {
             <ul className="space-y-1.5">
               {PERSONAL_SERVICES.map((s) => (
                 <li key={s} className="flex items-center gap-2 text-sm text-gray-600">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#1E3A8A] shrink-0" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-(--tenant-primary) shrink-0" />
                   {s}
                 </li>
               ))}
@@ -83,7 +83,7 @@ export default function SoporteTecnicoPage() {
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
-                <Building2 className="w-4.5 h-4.5 text-[#1E3A8A]" />
+                <Building2 className="w-4.5 h-4.5 text-(--tenant-primary)" />
               </div>
               <div>
                 <p className="font-bold text-gray-900 text-sm">Empresas y Pymes</p>
@@ -93,7 +93,7 @@ export default function SoporteTecnicoPage() {
             <ul className="space-y-1.5 mb-4">
               {ENTERPRISE_SERVICES.map((s) => (
                 <li key={s} className="flex items-center gap-2 text-sm text-gray-600">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#1E3A8A] shrink-0" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-(--tenant-primary) shrink-0" />
                   {s}
                 </li>
               ))}
@@ -102,7 +102,7 @@ export default function SoporteTecnicoPage() {
               href={WA_EMPRESA}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 bg-[#1E3A8A] hover:bg-blue-800 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors"
+              className="flex items-center justify-center gap-2 bg-(--tenant-primary) hover:bg-blue-800 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors"
             >
               <MessageCircle className="w-4 h-4" />
               Consultar para mi empresa
@@ -112,7 +112,7 @@ export default function SoporteTecnicoPage() {
 
         {/* ── CHATBOT CTA ── */}
         <div className="mt-6 bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-[#1E3A8A] flex items-center justify-center shrink-0 shadow-md">
+          <div className="w-12 h-12 rounded-2xl bg-(--tenant-primary) flex items-center justify-center shrink-0 shadow-md">
             <MessageCircle className="w-6 h-6 text-white" fill="currentColor" />
           </div>
           <div className="flex-1 min-w-0">
@@ -130,7 +130,7 @@ export default function SoporteTecnicoPage() {
                   key={text}
                   className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100"
                 >
-                  <Icon className="w-3.5 h-3.5 text-[#1E3A8A]" />
+                  <Icon className="w-3.5 h-3.5 text-(--tenant-primary)" />
                   {text}
                 </span>
               ))}
@@ -139,9 +139,9 @@ export default function SoporteTecnicoPage() {
         </div>
 
         {/* ── TRACKING ── */}
-        <div className="mt-4 rounded-2xl border-2 border-[#1E3A8A] bg-linear-to-br from-blue-50 to-white shadow-sm overflow-hidden">
+        <div className="mt-4 rounded-2xl border-2 border-(--tenant-primary) bg-linear-to-br from-blue-50 to-white shadow-sm overflow-hidden">
           <div className="px-5 pt-5 pb-2 flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#1E3A8A] flex items-center justify-center shrink-0 shadow-md">
+            <div className="w-10 h-10 rounded-xl bg-(--tenant-primary) flex items-center justify-center shrink-0 shadow-md">
               <span className="text-lg">🔍</span>
             </div>
             <div>
@@ -156,7 +156,7 @@ export default function SoporteTecnicoPage() {
             <TrackingSearch />
             <p className="text-xs text-gray-400 mt-2">
               El código tiene el formato <span className="font-mono font-semibold text-gray-500">CM-0001</span>. Si no lo tenés,{" "}
-              <Link href="/soporte-tecnico/seguimiento" className="text-[#1E3A8A] hover:underline font-medium">
+              <Link href="/soporte-tecnico/seguimiento" className="text-(--tenant-primary) hover:underline font-medium">
                 ingresá con tu cuenta
               </Link>{" "}
               para ver todos tus equipos.

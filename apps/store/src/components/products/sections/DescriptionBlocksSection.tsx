@@ -149,7 +149,7 @@ export default function DescriptionBlocksSection({ blocks, onChange }: Props) {
                               className="object-cover"
                             />
                           </div>
-                          <label className="flex items-center justify-center gap-1.5 text-xs text-gray-400 hover:text-[#1E3A8A] cursor-pointer transition-colors">
+                          <label className="flex items-center justify-center gap-1.5 text-xs text-gray-400 hover:text-(--tenant-primary) cursor-pointer transition-colors">
                             <ImageIcon className="w-3.5 h-3.5" />
                             Cambiar imagen
                             <input

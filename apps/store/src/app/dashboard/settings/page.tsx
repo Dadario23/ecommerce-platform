@@ -27,7 +27,7 @@ export default async function SettingsPage() {
   }
 
   const settings = {
-    storeName:             doc?.storeName ?? "Compumobile",
+    storeName:             doc?.storeName ?? "",
     storeEmail:            doc?.storeEmail ?? "",
     storePhone:            doc?.storePhone ?? "",
     storeDescription:      doc?.storeDescription ?? "",

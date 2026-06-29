@@ -32,7 +32,7 @@ export default function ProductBuyActions({ product }: ProductBuyActionsProps) {
     <div className="flex flex-col gap-3 mt-4">
       <Button
         onClick={handleBuy}
-        className="w-full bg-[#1E3A8A] hover:bg-[#1E40AF] text-white text-lg py-6 rounded-lg shadow-md transition-all"
+        className="w-full bg-(--tenant-primary) hover:bg-[#1E40AF] text-white text-lg py-6 rounded-lg shadow-md transition-all"
       >
         Comprar
       </Button>

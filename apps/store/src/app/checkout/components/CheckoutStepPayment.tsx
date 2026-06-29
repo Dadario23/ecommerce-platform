@@ -51,15 +51,15 @@ export default function CheckoutStepPayment({
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-3">
         {deliveryMethod === "domicilio" ? (
           /* Domicilio → solo Mercado Pago */
-          <div className="flex items-center gap-4 p-4 rounded-xl border-2 border-[#1E3A8A] bg-blue-50">
-            <div className="w-10 h-10 rounded-xl bg-[#1E3A8A] flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-4 p-4 rounded-xl border-2 border-(--tenant-primary) bg-blue-50">
+            <div className="w-10 h-10 rounded-xl bg-(--tenant-primary) flex items-center justify-center shrink-0">
               <CreditCard className="w-5 h-5 text-white" />
             </div>
             <div className="flex-1">
               <p className="font-semibold text-sm text-gray-800">Mercado Pago</p>
               <p className="text-xs text-gray-500">Tarjeta, transferencia, cuotas sin interés</p>
             </div>
-            <Check className="w-5 h-5 text-[#1E3A8A] shrink-0" />
+            <Check className="w-5 h-5 text-(--tenant-primary) shrink-0" />
           </div>
         ) : (
           /* Contraentrega o Retiro → Mercado Pago, Efectivo o Transferencia */
@@ -69,13 +69,13 @@ export default function CheckoutStepPayment({
               onClick={() => onPaymentMethodChange("mercadopago")}
               className={`w-full text-left flex items-center gap-4 p-4 rounded-xl border-2 transition-all ${
                 paymentMethod === "mercadopago"
-                  ? "border-[#1E3A8A] bg-blue-50"
+                  ? "border-(--tenant-primary) bg-blue-50"
                   : "border-gray-100 hover:border-gray-200"
               }`}
             >
               <div
                 className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                  paymentMethod === "mercadopago" ? "bg-[#1E3A8A]" : "bg-gray-100"
+                  paymentMethod === "mercadopago" ? "bg-(--tenant-primary)" : "bg-gray-100"
                 }`}
               >
                 <CreditCard
@@ -89,7 +89,7 @@ export default function CheckoutStepPayment({
                 <p className="text-xs text-gray-500">Tarjeta, transferencia, cuotas sin interés</p>
               </div>
               {paymentMethod === "mercadopago" && (
-                <Check className="w-5 h-5 text-[#1E3A8A] shrink-0" />
+                <Check className="w-5 h-5 text-(--tenant-primary) shrink-0" />
               )}
             </button>
 
@@ -98,13 +98,13 @@ export default function CheckoutStepPayment({
               onClick={() => onPaymentMethodChange("cash")}
               className={`w-full text-left flex items-center gap-4 p-4 rounded-xl border-2 transition-all ${
                 paymentMethod === "cash"
-                  ? "border-[#1E3A8A] bg-blue-50"
+                  ? "border-(--tenant-primary) bg-blue-50"
                   : "border-gray-100 hover:border-gray-200"
               }`}
             >
               <div
                 className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                  paymentMethod === "cash" ? "bg-[#1E3A8A]" : "bg-gray-100"
+                  paymentMethod === "cash" ? "bg-(--tenant-primary)" : "bg-gray-100"
                 }`}
               >
                 <Package
@@ -124,7 +124,7 @@ export default function CheckoutStepPayment({
                 </p>
               </div>
               {paymentMethod === "cash" && (
-                <Check className="w-5 h-5 text-[#1E3A8A] shrink-0" />
+                <Check className="w-5 h-5 text-(--tenant-primary) shrink-0" />
               )}
             </button>
 
@@ -133,13 +133,13 @@ export default function CheckoutStepPayment({
               onClick={() => onPaymentMethodChange("transfer")}
               className={`w-full text-left flex items-center gap-4 p-4 rounded-xl border-2 transition-all ${
                 paymentMethod === "transfer"
-                  ? "border-[#1E3A8A] bg-blue-50"
+                  ? "border-(--tenant-primary) bg-blue-50"
                   : "border-gray-100 hover:border-gray-200"
               }`}
             >
               <div
                 className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                  paymentMethod === "transfer" ? "bg-[#1E3A8A]" : "bg-gray-100"
+                  paymentMethod === "transfer" ? "bg-(--tenant-primary)" : "bg-gray-100"
                 }`}
               >
                 <Banknote
@@ -153,7 +153,7 @@ export default function CheckoutStepPayment({
                 <p className="text-xs text-gray-500">Te enviamos los datos por email al confirmar</p>
               </div>
               {paymentMethod === "transfer" && (
-                <Check className="w-5 h-5 text-[#1E3A8A] shrink-0" />
+                <Check className="w-5 h-5 text-(--tenant-primary) shrink-0" />
               )}
             </button>
           </>
@@ -194,7 +194,7 @@ export default function CheckoutStepPayment({
               type="button"
               onClick={onApplyCoupon}
               disabled={checkingCoupon || !couponCode.trim()}
-              className="px-4 py-2 text-sm font-semibold border border-gray-200 rounded-lg text-gray-700 hover:border-blue-300 hover:text-[#1E3A8A] disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+              className="px-4 py-2 text-sm font-semibold border border-gray-200 rounded-lg text-gray-700 hover:border-blue-300 hover:text-(--tenant-primary) disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
             >
               {checkingCoupon ? "..." : "Aplicar"}
             </button>
@@ -208,7 +208,7 @@ export default function CheckoutStepPayment({
       <button
         type="button"
         onClick={onContinue}
-        className="w-full bg-[#1E3A8A] hover:bg-blue-800 text-white font-semibold py-4 rounded-xl transition-colors mt-2"
+        className="w-full bg-(--tenant-primary) hover:bg-blue-800 text-white font-semibold py-4 rounded-xl transition-colors mt-2"
       >
         Continuar
       </button>

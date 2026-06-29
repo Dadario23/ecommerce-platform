@@ -14,7 +14,7 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-gray-50 pt-20 md:pt-28 pb-10 px-4">
       <div className="max-w-4xl mx-auto flex rounded-2xl overflow-hidden shadow-xl border border-gray-100">
         {/* Left panel */}
-        <div className="hidden lg:flex lg:w-5/12 bg-[#1E3A8A] flex-col justify-between p-10 relative overflow-hidden">
+        <div className="hidden lg:flex lg:w-5/12 bg-(--tenant-primary) flex-col justify-between p-10 relative overflow-hidden">
           <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-white/5" />
           <div className="absolute -bottom-24 -left-12 w-72 h-72 rounded-full bg-white/5" />
 

@@ -62,7 +62,7 @@ export default function TicketPage() {
     return (
       <div className="text-center py-20 text-gray-500">
         Reparación no encontrada.{" "}
-        <Link href="/soporte-tecnico/admin/reparaciones" className="text-[#1E3A8A] hover:underline">
+        <Link href="/soporte-tecnico/admin/reparaciones" className="text-(--tenant-primary) hover:underline">
           Volver
         </Link>
       </div>
@@ -93,7 +93,7 @@ export default function TicketPage() {
         </button>
         <button
           onClick={() => window.print()}
-          className="flex items-center gap-2 px-4 py-2 bg-[#1E3A8A] text-white text-sm font-semibold rounded-xl hover:bg-blue-800 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-(--tenant-primary) text-white text-sm font-semibold rounded-xl hover:bg-blue-800 transition-colors"
         >
           <Printer className="w-4 h-4" />
           Imprimir
@@ -106,7 +106,7 @@ export default function TicketPage() {
       >
         {/* Encabezado */}
         <div className="text-center pb-5 border-b border-dashed border-gray-300">
-          <p className="text-2xl font-bold tracking-wider text-[#1E3A8A]">COMPUMOBILE</p>
+          <p className="text-2xl font-bold tracking-wider text-(--tenant-primary)">COMPUMOBILE</p>
           <p className="text-xs text-gray-400 mt-1 uppercase tracking-widest">Ticket de Recepción de Equipo</p>
         </div>
 
@@ -114,7 +114,7 @@ export default function TicketPage() {
         <div className="flex items-start justify-between py-5 border-b border-dashed border-gray-200">
           <div>
             <p className="text-[10px] uppercase tracking-widest text-gray-400">Orden N°</p>
-            <p className="text-4xl font-bold text-[#1E3A8A] leading-none mt-1">{rep.codigo}</p>
+            <p className="text-4xl font-bold text-(--tenant-primary) leading-none mt-1">{rep.codigo}</p>
           </div>
           <div className="text-right">
             <p className="text-[10px] uppercase tracking-widest text-gray-400">Recibido el</p>
@@ -179,7 +179,7 @@ export default function TicketPage() {
           <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-1">
             Seguí el estado de tu equipo en:
           </p>
-          <p className="text-xs text-[#1E3A8A] break-all mt-1">{trackingUrl}</p>
+          <p className="text-xs text-(--tenant-primary) break-all mt-1">{trackingUrl}</p>
         </div>
 
         {/* Firmas */}

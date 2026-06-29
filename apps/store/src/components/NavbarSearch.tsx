@@ -95,7 +95,7 @@ export default function NavbarSearch() {
         <button
           type="button"
           onClick={handleSearch}
-          className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 bg-[#1E3A8A] hover:bg-blue-700 rounded-full flex items-center justify-center text-white transition-colors shrink-0"
+          className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 bg-(--tenant-primary) hover:bg-blue-700 rounded-full flex items-center justify-center text-white transition-colors shrink-0"
         >
           {loading ? (
             <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />

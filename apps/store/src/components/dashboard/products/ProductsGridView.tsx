@@ -50,7 +50,7 @@ export function ProductsGridView({ products, onEdit, onDelete }: ProductsGridVie
               <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
                   onClick={() => onEdit(product._id)}
-                  className="p-1.5 text-gray-400 hover:text-[#1E3A8A] hover:bg-blue-50 rounded-lg transition-colors"
+                  className="p-1.5 text-gray-400 hover:text-(--tenant-primary) hover:bg-blue-50 rounded-lg transition-colors"
                   title="Editar"
                 >
                   <Edit className="w-3.5 h-3.5" />

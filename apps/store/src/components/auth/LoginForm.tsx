@@ -105,7 +105,7 @@ export default function LoginForm({ fromCart = false }: LoginFormProps) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-[#1E3A8A] text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-blue-800 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+          className="w-full bg-(--tenant-primary) text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-blue-800 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
         >
           {isSubmitting ? (
             <><Loader2 className="w-4 h-4 animate-spin" /> Ingresando...</>
@@ -137,13 +137,13 @@ export default function LoginForm({ fromCart = false }: LoginFormProps) {
       {/* Links */}
       <div className="text-center text-xs text-gray-500 space-y-1.5 pt-1">
         <p>
-          <Link href="/forgot-password" className="text-[#1E3A8A] font-semibold hover:underline">
+          <Link href="/forgot-password" className="text-(--tenant-primary) font-semibold hover:underline">
             ¿Olvidaste tu contraseña?
           </Link>
         </p>
         <p>
           ¿No tenés cuenta?{" "}
-          <Link href="/register" className="text-[#1E3A8A] font-semibold hover:underline">
+          <Link href="/register" className="text-(--tenant-primary) font-semibold hover:underline">
             Registrate aquí
           </Link>
         </p>

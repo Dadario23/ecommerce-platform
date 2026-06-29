@@ -135,7 +135,7 @@ export default function CatalogoClient({ items: initial }: { items: CatalogEntry
         </div>
         <button
           onClick={openNew}
-          className="flex items-center gap-2 bg-[#1E3A8A] hover:bg-blue-800 text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors"
+          className="flex items-center gap-2 bg-(--tenant-primary) hover:bg-blue-800 text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors"
         >
           <Plus className="w-4 h-4" />
           Nuevo modelo
@@ -150,7 +150,7 @@ export default function CatalogoClient({ items: initial }: { items: CatalogEntry
             onClick={() => setFilter(f)}
             className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${
               filter === f
-                ? "bg-[#1E3A8A] text-white border-[#1E3A8A]"
+                ? "bg-(--tenant-primary) text-white border-(--tenant-primary)"
                 : "bg-white text-gray-600 border-gray-200 hover:border-blue-300"
             }`}
           >
@@ -220,7 +220,7 @@ export default function CatalogoClient({ items: initial }: { items: CatalogEntry
                     <div className="flex items-center gap-2 justify-end">
                       <button
                         onClick={() => openEdit(entry)}
-                        className="text-gray-400 hover:text-[#1E3A8A] transition-colors"
+                        className="text-gray-400 hover:text-(--tenant-primary) transition-colors"
                         title="Editar"
                       >
                         <Pencil className="w-4 h-4" />
@@ -273,7 +273,7 @@ export default function CatalogoClient({ items: initial }: { items: CatalogEntry
                       onClick={() => setField("deviceType", d)}
                       className={`flex-1 py-2 text-xs font-semibold rounded-xl border transition-colors ${
                         modal.entry.deviceType === d
-                          ? "bg-[#1E3A8A] text-white border-[#1E3A8A]"
+                          ? "bg-(--tenant-primary) text-white border-(--tenant-primary)"
                           : "bg-white text-gray-600 border-gray-200 hover:border-blue-300"
                       }`}
                     >
@@ -291,7 +291,7 @@ export default function CatalogoClient({ items: initial }: { items: CatalogEntry
                     value={modal.entry.brand}
                     onChange={(e) => setField("brand", e.target.value)}
                     placeholder="Ej: Samsung"
-                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#1E3A8A]"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-(--tenant-primary)"
                   />
                 </div>
                 <div>
@@ -300,7 +300,7 @@ export default function CatalogoClient({ items: initial }: { items: CatalogEntry
                     value={modal.entry.model}
                     onChange={(e) => setField("model", e.target.value)}
                     placeholder="Ej: Galaxy A54"
-                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#1E3A8A]"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-(--tenant-primary)"
                   />
                 </div>
               </div>
@@ -310,7 +310,7 @@ export default function CatalogoClient({ items: initial }: { items: CatalogEntry
                 <div
                   onClick={() => setField("active", !modal.entry.active)}
                   className={`relative w-10 h-5 rounded-full transition-colors ${
-                    modal.entry.active ? "bg-[#1E3A8A]" : "bg-gray-300"
+                    modal.entry.active ? "bg-(--tenant-primary)" : "bg-gray-300"
                   }`}
                 >
                   <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
@@ -329,7 +329,7 @@ export default function CatalogoClient({ items: initial }: { items: CatalogEntry
                   <button
                     type="button"
                     onClick={addRepair}
-                    className="flex items-center gap-1 text-xs font-semibold text-[#1E3A8A] hover:underline"
+                    className="flex items-center gap-1 text-xs font-semibold text-(--tenant-primary) hover:underline"
                   >
                     <Plus className="w-3.5 h-3.5" /> Agregar
                   </button>
@@ -344,7 +344,7 @@ export default function CatalogoClient({ items: initial }: { items: CatalogEntry
                           value={r.type}
                           onChange={(e) => updateRepair(i, "type", e.target.value)}
                           placeholder="Tipo de reparación"
-                          className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#1E3A8A]"
+                          className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-(--tenant-primary)"
                         />
                         <div className="relative w-32 shrink-0">
                           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
@@ -354,7 +354,7 @@ export default function CatalogoClient({ items: initial }: { items: CatalogEntry
                             value={r.price || ""}
                             onChange={(e) => updateRepair(i, "price", e.target.value)}
                             placeholder="0 = consultar"
-                            className="w-full pl-6 pr-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#1E3A8A]"
+                            className="w-full pl-6 pr-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-(--tenant-primary)"
                           />
                         </div>
                         <button
@@ -383,7 +383,7 @@ export default function CatalogoClient({ items: initial }: { items: CatalogEntry
               <button
                 onClick={save}
                 disabled={saving}
-                className="px-5 py-2 text-sm font-bold bg-[#1E3A8A] text-white rounded-xl hover:bg-blue-800 transition-colors disabled:opacity-50"
+                className="px-5 py-2 text-sm font-bold bg-(--tenant-primary) text-white rounded-xl hover:bg-blue-800 transition-colors disabled:opacity-50"
               >
                 {saving ? "Guardando…" : "Guardar"}
               </button>

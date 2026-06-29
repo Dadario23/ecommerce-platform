@@ -81,7 +81,7 @@ export default function PresupuestosClient({ presupuestos: initial }: { presupue
             onClick={() => setFilter("pendiente")}
             className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${
               filter === "pendiente"
-                ? "bg-[#1E3A8A] text-white border-[#1E3A8A]"
+                ? "bg-(--tenant-primary) text-white border-(--tenant-primary)"
                 : "bg-white text-gray-600 border-gray-200 hover:border-blue-300"
             }`}
           >
@@ -96,7 +96,7 @@ export default function PresupuestosClient({ presupuestos: initial }: { presupue
             onClick={() => setFilter("todos")}
             className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${
               filter === "todos"
-                ? "bg-[#1E3A8A] text-white border-[#1E3A8A]"
+                ? "bg-(--tenant-primary) text-white border-(--tenant-primary)"
                 : "bg-white text-gray-600 border-gray-200 hover:border-blue-300"
             }`}
           >
@@ -142,7 +142,7 @@ export default function PresupuestosClient({ presupuestos: initial }: { presupue
                       <span key={i} className="inline-flex items-center gap-1 text-xs bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 text-gray-700">
                         <span>{item.repair}</span>
                         {item.price !== "a consultar" ? (
-                          <span className="text-[#1E3A8A] font-semibold">· {fmtPrice(item.price)}</span>
+                          <span className="text-(--tenant-primary) font-semibold">· {fmtPrice(item.price)}</span>
                         ) : (
                           <span className="text-gray-400">· a consultar</span>
                         )}
@@ -151,7 +151,7 @@ export default function PresupuestosClient({ presupuestos: initial }: { presupue
                   </div>
 
                   {p.totalEstimado ? (
-                    <p className="text-sm font-bold text-[#1E3A8A] mt-1">
+                    <p className="text-sm font-bold text-(--tenant-primary) mt-1">
                       Total estimado: ${p.totalEstimado.toLocaleString("es-AR")}
                     </p>
                   ) : (
@@ -171,7 +171,7 @@ export default function PresupuestosClient({ presupuestos: initial }: { presupue
                     <>
                       <Link
                         href={`/soporte-tecnico/admin/reparaciones/nueva?from=${p.id}`}
-                        className="flex items-center gap-2 bg-[#1E3A8A] hover:bg-blue-800 text-white text-xs font-bold px-3 py-2 rounded-xl transition-colors"
+                        className="flex items-center gap-2 bg-(--tenant-primary) hover:bg-blue-800 text-white text-xs font-bold px-3 py-2 rounded-xl transition-colors"
                       >
                         <Wrench className="w-3.5 h-3.5" />
                         Crear reparación
@@ -189,7 +189,7 @@ export default function PresupuestosClient({ presupuestos: initial }: { presupue
                   {p.estado === "convertido" && p.reparacionId && (
                     <Link
                       href={`/soporte-tecnico/admin/reparaciones/${p.reparacionId}`}
-                      className="text-xs font-medium text-[#1E3A8A] hover:underline"
+                      className="text-xs font-medium text-(--tenant-primary) hover:underline"
                     >
                       Ver reparación →
                     </Link>

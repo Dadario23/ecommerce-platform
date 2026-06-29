@@ -98,14 +98,14 @@ export function ProductsFilters({
           onClick={() => setShowMore((p) => !p)}
           className={`flex items-center gap-1.5 text-xs font-semibold px-3 h-9 border rounded-lg transition-colors ${
             showMore || hasAdvancedFilters
-              ? "border-[#1E3A8A] text-[#1E3A8A] bg-blue-50"
+              ? "border-(--tenant-primary) text-(--tenant-primary) bg-blue-50"
               : "border-gray-200 text-gray-600 hover:bg-gray-50"
           }`}
         >
           <SlidersHorizontal className="w-3.5 h-3.5" />
           Más filtros
           {hasAdvancedFilters && (
-            <span className="w-4 h-4 rounded-full bg-[#1E3A8A] text-white text-[9px] flex items-center justify-center">
+            <span className="w-4 h-4 rounded-full bg-(--tenant-primary) text-white text-[9px] flex items-center justify-center">
               !
             </span>
           )}

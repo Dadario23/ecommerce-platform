@@ -142,7 +142,7 @@ export default function OrdersTable({ orders: initialOrders }: { orders: Order[]
                   >
                     <button
                       onClick={() => setSelectedOrder(order)}
-                      className="text-sm font-semibold text-[#1E3A8A] font-mono hover:underline text-left"
+                      className="text-sm font-semibold text-(--tenant-primary) font-mono hover:underline text-left"
                     >
                       #{order.orderNumber}
                     </button>

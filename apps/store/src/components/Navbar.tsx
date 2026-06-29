@@ -79,7 +79,7 @@ export default function Navbar({ initialCategories = [], showRepairs = false }: 
     <>
       <header className="fixed top-0 left-0 w-full z-50">
         {/* ── TOP BAR ── */}
-        <div className="bg-[#1E3A8A]">
+        <div className="bg-(--tenant-primary)">
           <div className="max-w-7xl mx-auto px-4 flex items-center gap-3 py-3 md:py-3.5">
             {/* Mobile: hamburger */}
             <button
@@ -247,7 +247,7 @@ export default function Navbar({ initialCategories = [], showRepairs = false }: 
                 <button
                   key={cat._id}
                   onClick={() => goToCategory(cat)}
-                  className="px-3.5 py-2.5 whitespace-nowrap text-sm text-gray-600 hover:text-[#1E3A8A] hover:bg-blue-50 font-medium transition-colors rounded-md shrink-0"
+                  className="px-3.5 py-2.5 whitespace-nowrap text-sm text-gray-600 hover:text-(--tenant-primary) hover:bg-blue-50 font-medium transition-colors rounded-md shrink-0"
                 >
                   {cat.name}
                 </button>
@@ -257,7 +257,7 @@ export default function Navbar({ initialCategories = [], showRepairs = false }: 
                   <div className="w-px h-4 bg-gray-200 mx-1 shrink-0" />
                   <Link
                     href="/soporte-tecnico"
-                    className="flex items-center gap-1.5 px-3.5 py-2.5 whitespace-nowrap text-sm text-[#1E3A8A] hover:bg-blue-50 font-semibold transition-colors rounded-md shrink-0"
+                    className="flex items-center gap-1.5 px-3.5 py-2.5 whitespace-nowrap text-sm text-(--tenant-primary) hover:bg-blue-50 font-semibold transition-colors rounded-md shrink-0"
                   >
                     <Wrench className="w-3.5 h-3.5" />
                     Soporte Técnico
@@ -286,7 +286,7 @@ export default function Navbar({ initialCategories = [], showRepairs = false }: 
             onClick={(e) => e.stopPropagation()}
           >
             {/* Drawer header */}
-            <div className="bg-[#1E3A8A] px-4 py-5 flex items-center justify-between shrink-0">
+            <div className="bg-(--tenant-primary) px-4 py-5 flex items-center justify-between shrink-0">
               {session ? (
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-blue-400 flex items-center justify-center text-white font-bold text-base">
@@ -329,7 +329,7 @@ export default function Navbar({ initialCategories = [], showRepairs = false }: 
                   <li key={cat._id}>
                     <button
                       onClick={() => goToCategory(cat)}
-                      className="w-full flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-[#1E3A8A] transition-colors text-left"
+                      className="w-full flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-(--tenant-primary) transition-colors text-left"
                     >
                       {cat.name}
                       <ChevronRight className="w-4 h-4 text-gray-300 shrink-0" />
@@ -341,7 +341,7 @@ export default function Navbar({ initialCategories = [], showRepairs = false }: 
                     <Link
                       href="/soporte-tecnico"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 text-sm text-[#1E3A8A] font-semibold hover:bg-blue-50"
+                      className="flex items-center gap-3 px-4 py-3 text-sm text-(--tenant-primary) font-semibold hover:bg-blue-50"
                     >
                       <Wrench className="w-4 h-4" />
                       Soporte Técnico

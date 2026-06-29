@@ -127,7 +127,7 @@ export default function SeguimientoDetailPage() {
     return (
       <main className="pt-20 pb-20 bg-gray-50 min-h-screen">
         <div className="max-w-lg mx-auto px-4 flex flex-col items-center justify-center py-20 gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-[#1E3A8A]" />
+          <Loader2 className="w-8 h-8 animate-spin text-(--tenant-primary)" />
           <p className="text-sm text-gray-500">Cargando seguimiento…</p>
         </div>
       </main>
@@ -141,7 +141,7 @@ export default function SeguimientoDetailPage() {
         <div className="max-w-lg mx-auto px-4 space-y-5">
           <Link
             href="/soporte-tecnico/seguimiento"
-            className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#1E3A8A] transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-(--tenant-primary) transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Buscar otro código
@@ -150,7 +150,7 @@ export default function SeguimientoDetailPage() {
             <AlertCircle className="w-10 h-10 text-gray-300 mx-auto mb-3" />
             <p className="font-semibold text-gray-800">
               No encontramos el código{" "}
-              <span className="font-mono text-[#1E3A8A]">{codigo?.toUpperCase()}</span>
+              <span className="font-mono text-(--tenant-primary)">{codigo?.toUpperCase()}</span>
             </p>
             <p className="text-sm text-gray-400 mt-1">
               Revisá que esté escrito correctamente o contactanos.
@@ -198,7 +198,7 @@ export default function SeguimientoDetailPage() {
         <div className="flex items-center justify-between">
           <Link
             href="/soporte-tecnico/seguimiento"
-            className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#1E3A8A] transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-(--tenant-primary) transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Buscar otro código
@@ -234,7 +234,7 @@ export default function SeguimientoDetailPage() {
         )}
 
         {/* Status hero */}
-        <div className="bg-[#1E3A8A] text-white rounded-2xl p-5">
+        <div className="bg-(--tenant-primary) text-white rounded-2xl p-5">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-blue-300 text-xs font-semibold uppercase tracking-wider mb-1">
@@ -273,7 +273,7 @@ export default function SeguimientoDetailPage() {
                     {/* Connector line */}
                     {idx > 0 && (
                       <div
-                        className={`absolute top-3 h-0.5 ${done || current ? "bg-[#1E3A8A]" : "bg-gray-200"}`}
+                        className={`absolute top-3 h-0.5 ${done || current ? "bg-(--tenant-primary)" : "bg-gray-200"}`}
                         style={{ left: "-50%", width: "100%" }}
                       />
                     )}
@@ -281,9 +281,9 @@ export default function SeguimientoDetailPage() {
                     <div
                       className={`w-6 h-6 rounded-full border-2 flex items-center justify-center z-10 shrink-0 transition-all duration-500 ${
                         done
-                          ? "bg-[#1E3A8A] border-[#1E3A8A]"
+                          ? "bg-(--tenant-primary) border-(--tenant-primary)"
                           : current
-                            ? "bg-white border-[#1E3A8A] ring-4 ring-blue-100"
+                            ? "bg-white border-(--tenant-primary) ring-4 ring-blue-100"
                             : "bg-white border-gray-200"
                       }`}
                     >
@@ -298,13 +298,13 @@ export default function SeguimientoDetailPage() {
                           />
                         </svg>
                       )}
-                      {current && <div className="w-2 h-2 rounded-full bg-[#1E3A8A]" />}
+                      {current && <div className="w-2 h-2 rounded-full bg-(--tenant-primary)" />}
                     </div>
                     {/* Label */}
                     <p
                       className={`text-center mt-1.5 leading-tight px-0.5 ${
                         current
-                          ? "font-bold text-[#1E3A8A]"
+                          ? "font-bold text-(--tenant-primary)"
                           : done
                             ? "font-medium text-gray-500"
                             : "text-gray-300"
@@ -330,7 +330,7 @@ export default function SeguimientoDetailPage() {
               {[...rep.historial].reverse().map((h, i) => (
                 <div key={i} className="flex gap-3 text-sm">
                   <div className="flex flex-col items-center">
-                    <div className="w-2 h-2 rounded-full bg-[#1E3A8A] mt-1.5 shrink-0" />
+                    <div className="w-2 h-2 rounded-full bg-(--tenant-primary) mt-1.5 shrink-0" />
                     {i < rep.historial.length - 1 && (
                       <div className="w-px flex-1 bg-gray-200 my-1" />
                     )}
@@ -379,7 +379,7 @@ export default function SeguimientoDetailPage() {
             {rep.presupuesto && (
               <div className="flex gap-2 pt-1 border-t border-gray-100 items-center">
                 <span className="text-gray-500 w-28">Presupuesto</span>
-                <span className="font-bold text-[#1E3A8A] text-base">
+                <span className="font-bold text-(--tenant-primary) text-base">
                   ${rep.presupuesto.toLocaleString("es-AR")}
                 </span>
               </div>
@@ -428,7 +428,7 @@ export default function SeguimientoDetailPage() {
 
         {/* ── Pagar con Mercado Pago ── */}
         {canPay && (
-          <div className="rounded-2xl border-2 border-[#1E3A8A] bg-blue-50 p-5 space-y-3">
+          <div className="rounded-2xl border-2 border-(--tenant-primary) bg-blue-50 p-5 space-y-3">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="font-bold text-gray-900 text-sm">Pagá tu reparación online</p>
@@ -437,7 +437,7 @@ export default function SeguimientoDetailPage() {
                 </p>
               </div>
               <div className="text-right shrink-0">
-                <p className="text-2xl font-extrabold text-[#1E3A8A]">
+                <p className="text-2xl font-extrabold text-(--tenant-primary)">
                   ${rep.presupuesto!.toLocaleString("es-AR")}
                 </p>
               </div>
@@ -445,7 +445,7 @@ export default function SeguimientoDetailPage() {
             <button
               onClick={handlePagar}
               disabled={paying}
-              className="w-full flex items-center justify-center gap-2 bg-[#1E3A8A] hover:bg-blue-800 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-sm py-3.5 rounded-xl transition-colors"
+              className="w-full flex items-center justify-center gap-2 bg-(--tenant-primary) hover:bg-blue-800 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-sm py-3.5 rounded-xl transition-colors"
             >
               {paying ? (
                 <><Loader2 className="w-4 h-4 animate-spin" /> Redirigiendo…</>

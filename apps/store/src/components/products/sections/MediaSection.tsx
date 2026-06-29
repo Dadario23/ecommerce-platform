@@ -150,7 +150,7 @@ export default function MediaSection({ product, onImagesChange }: Props) {
                 className="w-full h-full object-contain p-1.5"
               />
               {i === 0 && (
-                <span className="absolute bottom-1 left-1 text-[10px] bg-[#1E3A8A] text-white px-1.5 py-0.5 rounded-md">
+                <span className="absolute bottom-1 left-1 text-[10px] bg-(--tenant-primary) text-white px-1.5 py-0.5 rounded-md">
                   Principal
                 </span>
               )}

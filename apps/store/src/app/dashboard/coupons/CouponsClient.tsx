@@ -143,7 +143,7 @@ export default function CouponsClient({ initialCoupons }: { initialCoupons: Coup
             </p>
             <button
               onClick={() => setShowForm(true)}
-              className="flex items-center gap-1.5 bg-[#1E3A8A] text-white text-xs font-semibold px-3.5 py-2 rounded-xl hover:bg-blue-800 transition-colors"
+              className="flex items-center gap-1.5 bg-(--tenant-primary) text-white text-xs font-semibold px-3.5 py-2 rounded-xl hover:bg-blue-800 transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
               Nuevo cupón
@@ -159,7 +159,7 @@ export default function CouponsClient({ initialCoupons }: { initialCoupons: Coup
               <p className="text-sm text-gray-400 mb-5">Creá el primer cupón de descuento</p>
               <button
                 onClick={() => setShowForm(true)}
-                className="flex items-center gap-2 bg-[#1E3A8A] text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-blue-800 transition-colors"
+                className="flex items-center gap-2 bg-(--tenant-primary) text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-blue-800 transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 Nuevo cupón
@@ -288,7 +288,7 @@ export default function CouponsClient({ initialCoupons }: { initialCoupons: Coup
                     onClick={() => setForm((f) => ({ ...f, type: "percentage" }))}
                     className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-semibold transition-colors ${
                       form.type === "percentage"
-                        ? "bg-[#1E3A8A] text-white"
+                        ? "bg-(--tenant-primary) text-white"
                         : "text-gray-500 hover:bg-gray-50"
                     }`}
                   >
@@ -300,7 +300,7 @@ export default function CouponsClient({ initialCoupons }: { initialCoupons: Coup
                     onClick={() => setForm((f) => ({ ...f, type: "fixed" }))}
                     className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-semibold border-l border-gray-200 transition-colors ${
                       form.type === "fixed"
-                        ? "bg-[#1E3A8A] text-white"
+                        ? "bg-(--tenant-primary) text-white"
                         : "text-gray-500 hover:bg-gray-50"
                     }`}
                   >
@@ -389,7 +389,7 @@ export default function CouponsClient({ initialCoupons }: { initialCoupons: Coup
                 type="button"
                 onClick={handleCreate}
                 disabled={saving}
-                className="flex-1 bg-[#1E3A8A] text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-blue-800 transition-colors disabled:opacity-70"
+                className="flex-1 bg-(--tenant-primary) text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-blue-800 transition-colors disabled:opacity-70"
               >
                 {saving ? "Guardando..." : "Crear cupón"}
               </button>

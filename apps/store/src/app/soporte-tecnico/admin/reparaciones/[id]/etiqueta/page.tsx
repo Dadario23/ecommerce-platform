@@ -54,7 +54,7 @@ export default function EtiquetaPage() {
     return (
       <div className="text-center py-20 text-gray-500">
         Reparación no encontrada.{" "}
-        <Link href="/soporte-tecnico/admin/reparaciones" className="text-[#1E3A8A] hover:underline">
+        <Link href="/soporte-tecnico/admin/reparaciones" className="text-(--tenant-primary) hover:underline">
           Volver
         </Link>
       </div>
@@ -96,7 +96,7 @@ export default function EtiquetaPage() {
         </button>
         <button
           onClick={() => window.print()}
-          className="flex items-center gap-2 px-4 py-2 bg-[#1E3A8A] text-white text-sm font-semibold rounded-xl hover:bg-blue-800 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-(--tenant-primary) text-white text-sm font-semibold rounded-xl hover:bg-blue-800 transition-colors"
         >
           <Printer className="w-4 h-4" />
           Imprimir etiqueta
@@ -132,7 +132,7 @@ export default function EtiquetaPage() {
             {/* Top: brand */}
             <div>
               <p
-                className="font-bold text-[#1E3A8A] tracking-widest uppercase"
+                className="font-bold text-(--tenant-primary) tracking-widest uppercase"
                 style={{ fontSize: 9, letterSpacing: "0.15em" }}
               >
                 COMPUMOBILE

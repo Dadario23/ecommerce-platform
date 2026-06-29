@@ -44,7 +44,7 @@ function SectionTitle({
   return (
     <div className="flex items-start gap-3 mb-5">
       <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-        <Icon className="w-4.5 h-4.5 text-[#1E3A8A]" />
+        <Icon className="w-4.5 h-4.5 text-(--tenant-primary)" />
       </div>
       <div>
         <p className="text-sm font-semibold text-gray-900">{title}</p>
@@ -129,7 +129,7 @@ export default function SettingsClient({ initialSettings, adminName, adminEmail 
       <button
         onClick={() => save(section, payload)}
         disabled={saving === section}
-        className="bg-[#1E3A8A] text-white text-sm font-semibold px-5 py-2 rounded-xl hover:bg-blue-800 transition-colors disabled:opacity-60"
+        className="bg-(--tenant-primary) text-white text-sm font-semibold px-5 py-2 rounded-xl hover:bg-blue-800 transition-colors disabled:opacity-60"
       >
         {saving === section ? "Guardando..." : "Guardar"}
       </button>
@@ -346,21 +346,21 @@ export default function SettingsClient({ initialSettings, adminName, adminEmail 
                 onClick={() => set("homeFeaturedMode", value)}
                 className={`flex flex-col items-start gap-2 p-4 rounded-xl border-2 text-left transition-all ${
                   active
-                    ? "border-[#1E3A8A] bg-blue-50"
+                    ? "border-(--tenant-primary) bg-blue-50"
                     : "border-gray-200 hover:border-blue-200 hover:bg-gray-50"
                 }`}
               >
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${active ? "bg-[#1E3A8A]" : "bg-gray-100"}`}>
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${active ? "bg-(--tenant-primary)" : "bg-gray-100"}`}>
                   <Icon className={`w-4 h-4 ${active ? "text-white" : "text-gray-500"}`} />
                 </div>
                 <div>
-                  <p className={`text-sm font-semibold ${active ? "text-[#1E3A8A]" : "text-gray-700"}`}>
+                  <p className={`text-sm font-semibold ${active ? "text-(--tenant-primary)" : "text-gray-700"}`}>
                     {label}
                   </p>
                   <p className="text-[11px] text-gray-400 mt-0.5 leading-relaxed">{description}</p>
                 </div>
                 {active && (
-                  <span className="text-[10px] font-bold text-[#1E3A8A] uppercase tracking-wider">
+                  <span className="text-[10px] font-bold text-(--tenant-primary) uppercase tracking-wider">
                     Activo
                   </span>
                 )}
@@ -401,7 +401,7 @@ export default function SettingsClient({ initialSettings, adminName, adminEmail 
                 <button
                   type="button"
                   onClick={() => setData((d) => ({ ...d, [key]: !d[key] }))}
-                  className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${active ? "bg-[#1E3A8A]" : "bg-gray-200"}`}
+                  className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${active ? "bg-(--tenant-primary)" : "bg-gray-200"}`}
                 >
                   <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${active ? "translate-x-5" : "translate-x-0"}`} />
                 </button>
@@ -430,7 +430,7 @@ export default function SettingsClient({ initialSettings, adminName, adminEmail 
         />
         <div className="space-y-3">
           <div className="flex items-center gap-3 p-3.5 bg-gray-50 rounded-xl">
-            <div className="w-9 h-9 rounded-full bg-[#1E3A8A] flex items-center justify-center text-white text-xs font-bold shrink-0">
+            <div className="w-9 h-9 rounded-full bg-(--tenant-primary) flex items-center justify-center text-white text-xs font-bold shrink-0">
               {adminName.charAt(0).toUpperCase()}
             </div>
             <div>
@@ -440,7 +440,7 @@ export default function SettingsClient({ initialSettings, adminName, adminEmail 
           </div>
           <Link
             href="/account/change-password"
-            className="flex items-center gap-2 text-sm font-semibold text-[#1E3A8A] hover:underline px-1"
+            className="flex items-center gap-2 text-sm font-semibold text-(--tenant-primary) hover:underline px-1"
           >
             <Lock className="w-4 h-4" />
             Cambiar contraseña

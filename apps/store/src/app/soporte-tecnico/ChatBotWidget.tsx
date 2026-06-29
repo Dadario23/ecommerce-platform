@@ -20,7 +20,7 @@ export default function ChatBotWidget() {
       <button
         onClick={() => setOpen((p) => !p)}
         aria-label={open ? "Cerrar asistente" : "Obtener presupuesto de reparación"}
-        className="w-14 h-14 rounded-full bg-[#1E3A8A] text-white shadow-lg hover:bg-blue-800 hover:scale-105 active:scale-95 transition-all flex items-center justify-center"
+        className="w-14 h-14 rounded-full bg-(--tenant-primary) text-white shadow-lg hover:bg-blue-800 hover:scale-105 active:scale-95 transition-all flex items-center justify-center"
       >
         {open ? (
           <X className="w-6 h-6" />

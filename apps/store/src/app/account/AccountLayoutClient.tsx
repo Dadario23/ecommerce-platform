@@ -30,7 +30,7 @@ export default function AccountLayoutClient({
           </p>
           <button
             onClick={() => router.push("/login")}
-            className="bg-[#1E3A8A] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-800 transition-colors"
+            className="bg-(--tenant-primary) text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-800 transition-colors"
           >
             Ir al login
           </button>
@@ -60,7 +60,7 @@ export default function AccountLayoutClient({
                 href={href}
                 className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap shrink-0 transition-colors ${
                   active
-                    ? "bg-[#1E3A8A] text-white"
+                    ? "bg-(--tenant-primary) text-white"
                     : "bg-white text-gray-600 border border-gray-200 hover:border-blue-300"
                 }`}
               >
@@ -78,7 +78,7 @@ export default function AccountLayoutClient({
             {/* User card */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-[#1E3A8A] flex items-center justify-center text-white font-bold text-base shrink-0">
+                <div className="w-12 h-12 rounded-full bg-(--tenant-primary) flex items-center justify-center text-white font-bold text-base shrink-0">
                   {initials}
                 </div>
                 <div className="min-w-0">
@@ -102,15 +102,15 @@ export default function AccountLayoutClient({
                     href={href}
                     className={`flex items-center justify-between px-4 py-3.5 text-sm font-medium transition-colors border-b border-gray-50 last:border-0 ${
                       active
-                        ? "bg-blue-50 text-[#1E3A8A]"
+                        ? "bg-blue-50 text-(--tenant-primary)"
                         : "text-gray-700 hover:bg-gray-50"
                     }`}
                   >
                     <span className="flex items-center gap-3">
-                      <Icon className={`w-4 h-4 ${active ? "text-[#1E3A8A]" : "text-gray-400"}`} />
+                      <Icon className={`w-4 h-4 ${active ? "text-(--tenant-primary)" : "text-gray-400"}`} />
                       {label}
                     </span>
-                    {active && <ChevronRight className="w-3.5 h-3.5 text-[#1E3A8A]" />}
+                    {active && <ChevronRight className="w-3.5 h-3.5 text-(--tenant-primary)" />}
                   </Link>
                 );
               })}

@@ -67,7 +67,7 @@ export default function MisReparacionesPage() {
         {status === "unauthenticated" && (
           <div className="bg-white rounded-2xl border border-gray-200 p-8 text-center space-y-4">
             <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto">
-              <Lock className="w-5 h-5 text-[#1E3A8A]" />
+              <Lock className="w-5 h-5 text-(--tenant-primary)" />
             </div>
             <div>
               <p className="font-semibold text-gray-900">Iniciá sesión para ver tus reparaciones</p>
@@ -77,7 +77,7 @@ export default function MisReparacionesPage() {
             </div>
             <Link
               href="/login"
-              className="inline-flex items-center gap-2 bg-[#1E3A8A] hover:bg-blue-800 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-colors"
+              className="inline-flex items-center gap-2 bg-(--tenant-primary) hover:bg-blue-800 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-colors"
             >
               Iniciar sesión
             </Link>
@@ -113,7 +113,7 @@ export default function MisReparacionesPage() {
                   ¿Tenés un código de seguimiento?{" "}
                   <button
                     onClick={() => setSearchOpen(true)}
-                    className="text-[#1E3A8A] font-medium hover:underline"
+                    className="text-(--tenant-primary) font-medium hover:underline"
                   >
                     Buscalo acá
                   </button>
@@ -132,7 +132,7 @@ export default function MisReparacionesPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-mono font-bold text-[#1E3A8A] text-sm">
+                        <span className="font-mono font-bold text-(--tenant-primary) text-sm">
                           {r.codigo}
                         </span>
                         <span
@@ -152,7 +152,7 @@ export default function MisReparacionesPage() {
                       )}
                       <p className="text-xs text-gray-400 mt-1">{fmtDate(r.createdAt)}</p>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-[#1E3A8A] transition-colors shrink-0" />
+                    <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-(--tenant-primary) transition-colors shrink-0" />
                   </Link>
                 ))}
               </div>
@@ -181,11 +181,11 @@ export default function MisReparacionesPage() {
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
                   placeholder="Ej: CM-0001"
-                  className="flex-1 px-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#1E3A8A] placeholder:text-gray-400 font-mono uppercase"
+                  className="flex-1 px-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-(--tenant-primary) placeholder:text-gray-400 font-mono uppercase"
                 />
                 <button
                   type="submit"
-                  className="bg-[#1E3A8A] hover:bg-blue-800 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-colors"
+                  className="bg-(--tenant-primary) hover:bg-blue-800 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-colors"
                 >
                   Buscar
                 </button>

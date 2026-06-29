@@ -186,7 +186,7 @@ export default function CheckoutStepReview({
         type="button"
         onClick={onConfirm}
         disabled={isProcessing}
-        className="w-full bg-[#1E3A8A] hover:bg-blue-800 text-white font-semibold py-4 rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
+        className="w-full bg-(--tenant-primary) hover:bg-blue-800 text-white font-semibold py-4 rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
       >
         {isProcessing ? (
           <>

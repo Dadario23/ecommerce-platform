@@ -128,7 +128,7 @@ function OrderCard({ order }: { order: Order }) {
           <span className="text-base font-bold text-gray-900">
             ${order.total.toLocaleString("es-AR")}
           </span>
-          <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-[#1E3A8A] transition-colors" />
+          <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-(--tenant-primary) transition-colors" />
         </div>
       </div>
 
@@ -200,7 +200,7 @@ export default function OrdersClient() {
         </div>
         <Link
           href="/"
-          className="flex items-center gap-1 text-sm text-[#1E3A8A] font-medium hover:underline"
+          className="flex items-center gap-1 text-sm text-(--tenant-primary) font-medium hover:underline"
         >
           Seguir comprando
           <ArrowRight className="w-3.5 h-3.5" />
@@ -218,7 +218,7 @@ export default function OrdersClient() {
           </p>
           <Link
             href="/"
-            className="inline-flex items-center gap-2 bg-[#1E3A8A] text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-blue-800 transition-colors"
+            className="inline-flex items-center gap-2 bg-(--tenant-primary) text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-blue-800 transition-colors"
           >
             Explorar productos
             <ArrowRight className="w-4 h-4" />

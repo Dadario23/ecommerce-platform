@@ -73,13 +73,13 @@ export default function CheckoutStepDelivery({
               onClick={() => onDeliveryMethodChange("domicilio")}
               className={`w-full text-left flex items-start gap-4 p-4 rounded-2xl border-2 transition-all ${
                 deliveryMethod === "domicilio"
-                  ? "border-[#1E3A8A] bg-blue-50"
+                  ? "border-(--tenant-primary) bg-blue-50"
                   : "border-gray-100 bg-white hover:border-gray-200"
               }`}
             >
               <div
                 className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
-                  deliveryMethod === "domicilio" ? "bg-[#1E3A8A]" : "bg-gray-100"
+                  deliveryMethod === "domicilio" ? "bg-(--tenant-primary)" : "bg-gray-100"
                 }`}
               >
                 <Home
@@ -93,7 +93,7 @@ export default function CheckoutStepDelivery({
                 <p className="text-xs text-gray-500 mt-0.5">Recibís en tu casa o donde quieras</p>
               </div>
               {deliveryMethod === "domicilio" && (
-                <Check className="w-5 h-5 text-[#1E3A8A] shrink-0 mt-0.5" />
+                <Check className="w-5 h-5 text-(--tenant-primary) shrink-0 mt-0.5" />
               )}
             </button>
 
@@ -122,13 +122,13 @@ export default function CheckoutStepDelivery({
               onClick={() => onDeliveryMethodChange("contraentrega")}
               className={`w-full text-left flex items-start gap-4 p-4 rounded-2xl border-2 transition-all ${
                 deliveryMethod === "contraentrega"
-                  ? "border-[#1E3A8A] bg-blue-50"
+                  ? "border-(--tenant-primary) bg-blue-50"
                   : "border-gray-100 bg-white hover:border-gray-200"
               }`}
             >
               <div
                 className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
-                  deliveryMethod === "contraentrega" ? "bg-[#1E3A8A]" : "bg-gray-100"
+                  deliveryMethod === "contraentrega" ? "bg-(--tenant-primary)" : "bg-gray-100"
                 }`}
               >
                 <Package
@@ -142,7 +142,7 @@ export default function CheckoutStepDelivery({
                 <p className="text-xs text-gray-500 mt-0.5">Pagás cuando recibís en tu casa</p>
               </div>
               {deliveryMethod === "contraentrega" && (
-                <Check className="w-5 h-5 text-[#1E3A8A] shrink-0 mt-0.5" />
+                <Check className="w-5 h-5 text-(--tenant-primary) shrink-0 mt-0.5" />
               )}
             </button>
           </div>
@@ -150,15 +150,15 @@ export default function CheckoutStepDelivery({
           {/* Address section */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="px-5 py-4 border-b border-gray-50 flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-[#1E3A8A]" />
+              <MapPin className="w-4 h-4 text-(--tenant-primary)" />
               <p className="text-sm font-semibold text-gray-700">Dirección de entrega</p>
             </div>
 
             <div className="p-5 space-y-4">
               {addressUIMode === "default" && (
                 <>
-                  <div className="flex items-start gap-3 p-3 rounded-xl bg-blue-50 border border-[#1E3A8A]/20">
-                    <Check className="w-4 h-4 text-[#1E3A8A] mt-0.5 shrink-0" />
+                  <div className="flex items-start gap-3 p-3 rounded-xl bg-blue-50 border border-(--tenant-primary)/20">
+                    <Check className="w-4 h-4 text-(--tenant-primary) mt-0.5 shrink-0" />
                     <div>
                       <p className="text-sm font-semibold text-gray-800">
                         {savedAddresses.find((a) => a._id === selectedAddressId)?.title ??
@@ -176,7 +176,7 @@ export default function CheckoutStepDelivery({
                     <button
                       type="button"
                       onClick={() => onAddressUIModeChange("edit")}
-                      className="flex items-center gap-1.5 text-xs font-semibold text-[#1E3A8A] hover:text-blue-800 border border-[#1E3A8A]/30 hover:border-[#1E3A8A] px-3 py-2 rounded-lg transition-colors"
+                      className="flex items-center gap-1.5 text-xs font-semibold text-(--tenant-primary) hover:text-blue-800 border border-(--tenant-primary)/30 hover:border-(--tenant-primary) px-3 py-2 rounded-lg transition-colors"
                     >
                       <Pencil className="w-3.5 h-3.5" /> Modificar dirección
                     </button>
@@ -203,14 +203,14 @@ export default function CheckoutStepDelivery({
                         onClick={() => onSelectSaved(addr)}
                         className={`w-full text-left flex items-start gap-3 p-3 border rounded-xl transition-colors ${
                           selectedAddressId === addr._id
-                            ? "border-[#1E3A8A] bg-blue-50"
+                            ? "border-(--tenant-primary) bg-blue-50"
                             : "border-gray-100 hover:border-gray-300"
                         }`}
                       >
                         <div
                           className={`w-4 h-4 rounded-full border-2 mt-0.5 shrink-0 flex items-center justify-center ${
                             selectedAddressId === addr._id
-                              ? "border-[#1E3A8A] bg-[#1E3A8A]"
+                              ? "border-(--tenant-primary) bg-(--tenant-primary)"
                               : "border-gray-300"
                           }`}
                         >
@@ -269,7 +269,7 @@ export default function CheckoutStepDelivery({
           {/* Shipping type selector */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="px-5 py-4 border-b border-gray-50 flex items-center gap-2">
-              <Truck className="w-4 h-4 text-[#1E3A8A]" />
+              <Truck className="w-4 h-4 text-(--tenant-primary)" />
               <p className="text-sm font-semibold text-gray-700">Tipo de envío</p>
             </div>
             <div className="p-5 space-y-3">
@@ -305,13 +305,13 @@ export default function CheckoutStepDelivery({
                     onClick={() => onShippingTypeChange("flex")}
                     className={`w-full text-left flex items-center gap-4 p-4 rounded-xl border-2 transition-all ${
                       shippingType === "flex"
-                        ? "border-[#1E3A8A] bg-blue-50"
+                        ? "border-(--tenant-primary) bg-blue-50"
                         : "border-gray-100 hover:border-gray-200"
                     }`}
                   >
                     <div
                       className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                        shippingType === "flex" ? "bg-[#1E3A8A]" : "bg-gray-100"
+                        shippingType === "flex" ? "bg-(--tenant-primary)" : "bg-gray-100"
                       }`}
                     >
                       <Zap
@@ -329,7 +329,7 @@ export default function CheckoutStepDelivery({
                         ${detectedZone.flex.toLocaleString("es-AR")}
                       </p>
                       {shippingType === "flex" && (
-                        <Check className="w-4 h-4 text-[#1E3A8A] ml-auto mt-1" />
+                        <Check className="w-4 h-4 text-(--tenant-primary) ml-auto mt-1" />
                       )}
                     </div>
                   </button>
@@ -339,13 +339,13 @@ export default function CheckoutStepDelivery({
                     onClick={() => onShippingTypeChange("standard")}
                     className={`w-full text-left flex items-center gap-4 p-4 rounded-xl border-2 transition-all ${
                       shippingType === "standard"
-                        ? "border-[#1E3A8A] bg-blue-50"
+                        ? "border-(--tenant-primary) bg-blue-50"
                         : "border-gray-100 hover:border-gray-200"
                     }`}
                   >
                     <div
                       className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                        shippingType === "standard" ? "bg-[#1E3A8A]" : "bg-gray-100"
+                        shippingType === "standard" ? "bg-(--tenant-primary)" : "bg-gray-100"
                       }`}
                     >
                       <Truck
@@ -363,7 +363,7 @@ export default function CheckoutStepDelivery({
                         ${detectedZone.standard.toLocaleString("es-AR")}
                       </p>
                       {shippingType === "standard" && (
-                        <Check className="w-4 h-4 text-[#1E3A8A] ml-auto mt-1" />
+                        <Check className="w-4 h-4 text-(--tenant-primary) ml-auto mt-1" />
                       )}
                     </div>
                   </button>
@@ -376,7 +376,7 @@ export default function CheckoutStepDelivery({
             type="button"
             onClick={onContinue}
             disabled={!!address.city.trim() && !detectedZone}
-            className="w-full bg-[#1E3A8A] hover:bg-blue-800 text-white font-semibold py-4 rounded-xl transition-colors mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-(--tenant-primary) hover:bg-blue-800 text-white font-semibold py-4 rounded-xl transition-colors mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Continuar
           </button>
@@ -384,8 +384,8 @@ export default function CheckoutStepDelivery({
       ) : (
         /* Envíos desactivados: retiro / punto acordado */
         <>
-          <div className="flex items-start gap-4 p-5 rounded-2xl border-2 border-[#1E3A8A] bg-blue-50">
-            <div className="w-10 h-10 rounded-xl bg-[#1E3A8A] flex items-center justify-center shrink-0 mt-0.5">
+          <div className="flex items-start gap-4 p-5 rounded-2xl border-2 border-(--tenant-primary) bg-blue-50">
+            <div className="w-10 h-10 rounded-xl bg-(--tenant-primary) flex items-center justify-center shrink-0 mt-0.5">
               <MapPin className="w-5 h-5 text-white" />
             </div>
             <div className="flex-1">
@@ -395,12 +395,12 @@ export default function CheckoutStepDelivery({
                 Una vez confirmado el pedido te contactamos para arreglar los detalles.
               </p>
             </div>
-            <Check className="w-5 h-5 text-[#1E3A8A] shrink-0 mt-0.5" />
+            <Check className="w-5 h-5 text-(--tenant-primary) shrink-0 mt-0.5" />
           </div>
 
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
             <div className="flex items-center gap-2 mb-4">
-              <MapPin className="w-4 h-4 text-[#1E3A8A]" />
+              <MapPin className="w-4 h-4 text-(--tenant-primary)" />
               <p className="text-sm font-semibold text-gray-700">Datos de contacto</p>
             </div>
             <div>
@@ -419,7 +419,7 @@ export default function CheckoutStepDelivery({
           <button
             type="button"
             onClick={onContinue}
-            className="w-full bg-[#1E3A8A] hover:bg-blue-800 text-white font-semibold py-4 rounded-xl transition-colors mt-2"
+            className="w-full bg-(--tenant-primary) hover:bg-blue-800 text-white font-semibold py-4 rounded-xl transition-colors mt-2"
           >
             Continuar
           </button>

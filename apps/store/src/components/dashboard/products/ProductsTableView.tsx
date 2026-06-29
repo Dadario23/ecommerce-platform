@@ -42,8 +42,8 @@ export function ProductsTableView({
     if (sortConfig.key !== column)
       return <ArrowUpDown className="w-3 h-3 text-gray-300 ml-1 shrink-0" />;
     return sortConfig.direction === "asc"
-      ? <ArrowUp className="w-3 h-3 text-[#1E3A8A] ml-1 shrink-0" />
-      : <ArrowDown className="w-3 h-3 text-[#1E3A8A] ml-1 shrink-0" />;
+      ? <ArrowUp className="w-3 h-3 text-(--tenant-primary) ml-1 shrink-0" />
+      : <ArrowDown className="w-3 h-3 text-(--tenant-primary) ml-1 shrink-0" />;
   }
 
   const allSelected = products.length > 0 && selectedProducts.length === products.length;
@@ -219,7 +219,7 @@ export function ProductsTableView({
                   <div className="flex items-center justify-end gap-1">
                     <button
                       onClick={() => onEdit(product._id)}
-                      className="p-1.5 text-gray-400 hover:text-[#1E3A8A] hover:bg-blue-50 rounded-lg transition-colors"
+                      className="p-1.5 text-gray-400 hover:text-(--tenant-primary) hover:bg-blue-50 rounded-lg transition-colors"
                       title="Editar"
                     >
                       <Edit className="w-3.5 h-3.5" />

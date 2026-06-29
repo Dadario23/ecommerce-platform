@@ -55,7 +55,7 @@ export default function ProductBuyActions({ product }: { product: IProduct }) {
             ? "border-gray-200 text-gray-400 cursor-not-allowed"
             : added
             ? "border-green-500 bg-green-50 text-green-700"
-            : "border-[#1E3A8A] text-[#1E3A8A] hover:bg-[#1E3A8A] hover:text-white"
+            : "border-(--tenant-primary) text-(--tenant-primary) hover:bg-(--tenant-primary) hover:text-white"
         )}
       >
         <ShoppingCart className="w-5 h-5" />
@@ -70,7 +70,7 @@ export default function ProductBuyActions({ product }: { product: IProduct }) {
           "flex items-center justify-center gap-2 w-full py-3.5 rounded-xl font-semibold text-base transition-all",
           isOutOfStock
             ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-            : "bg-[#1E3A8A] hover:bg-[#1e40af] text-white shadow-md hover:shadow-lg"
+            : "bg-(--tenant-primary) hover:bg-[#1e40af] text-white shadow-md hover:shadow-lg"
         )}
       >
         <Zap className="w-5 h-5" />

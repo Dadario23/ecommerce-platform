@@ -91,14 +91,14 @@ export default function DashboardLayout({
           <div className="flex items-center gap-2">
             <Link
               href="/"
-              className="hidden sm:flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#1E3A8A] font-medium px-3 py-1.5 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors"
+              className="hidden sm:flex items-center gap-1.5 text-xs text-gray-500 hover:text-(--tenant-primary) font-medium px-3 py-1.5 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors"
             >
               <Store className="w-3.5 h-3.5" />
               Ver tienda
             </Link>
 
             <div className="flex items-center gap-2 pl-2 border-l border-gray-100">
-              <div className="w-7 h-7 rounded-full bg-[#1E3A8A] flex items-center justify-center text-white text-[10px] font-bold">
+              <div className="w-7 h-7 rounded-full bg-(--tenant-primary) flex items-center justify-center text-white text-[10px] font-bold">
                 {initials}
               </div>
               <span className="hidden sm:block text-xs font-medium text-gray-700 max-w-24 truncate">

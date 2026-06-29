@@ -138,7 +138,7 @@ export default function NuevaCategoriaPage() {
       <div className="max-w-3xl mx-auto">
         <Link
           href="/dashboard/categories"
-          className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-[#1E3A8A] font-medium mb-6 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-(--tenant-primary) font-medium mb-6 transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Volver a categorías
@@ -230,7 +230,7 @@ export default function NuevaCategoriaPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-[#1E3A8A] text-white text-sm font-semibold px-6 py-2.5 rounded-xl hover:bg-blue-800 transition-colors disabled:opacity-60 flex items-center gap-2"
+                className="bg-(--tenant-primary) text-white text-sm font-semibold px-6 py-2.5 rounded-xl hover:bg-blue-800 transition-colors disabled:opacity-60 flex items-center gap-2"
               >
                 {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Creando...</> : "Crear categoría"}
               </button>

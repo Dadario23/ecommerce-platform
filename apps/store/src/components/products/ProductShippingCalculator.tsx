@@ -147,7 +147,7 @@ export default function ProductShippingCalculator({ shippingTypes, freeShipping 
         {/* ── No logueado (sin zona detectada) ── */}
         {!loading && !zone && (source === "unknown" || source === null) && (
           <div className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-100 rounded-xl">
-            <div className="w-8 h-8 bg-[#1E3A8A] rounded-lg flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 bg-(--tenant-primary) rounded-lg flex items-center justify-center shrink-0">
               <LogIn className="w-4 h-4 text-white" />
             </div>
             <div className="flex-1 min-w-0">
@@ -155,7 +155,7 @@ export default function ProductShippingCalculator({ shippingTypes, freeShipping 
               <p className="text-xs text-gray-500">Calculamos el precio según tu domicilio</p>
             </div>
             <Link href="/login"
-              className="text-xs font-semibold text-white bg-[#1E3A8A] px-3 py-1.5 rounded-lg hover:bg-blue-800 transition-colors shrink-0">
+              className="text-xs font-semibold text-white bg-(--tenant-primary) px-3 py-1.5 rounded-lg hover:bg-blue-800 transition-colors shrink-0">
               Ingresar
             </Link>
           </div>

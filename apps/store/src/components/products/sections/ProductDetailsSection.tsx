@@ -124,7 +124,7 @@ export default function ProductDetailsSection({ product }: { product?: Product }
               defaultChecked={product?.freeShipping ?? false}
               className="sr-only peer"
             />
-            <div className="w-10 h-5 bg-gray-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:bg-[#1E3A8A] after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5" />
+            <div className="w-10 h-5 bg-gray-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:bg-(--tenant-primary) after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5" />
           </label>
         </div>
 
@@ -140,7 +140,7 @@ export default function ProductDetailsSection({ product }: { product?: Product }
                   key={value}
                   className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-colors ${
                     checked
-                      ? "border-[#1E3A8A] bg-blue-50"
+                      ? "border-(--tenant-primary) bg-blue-50"
                       : "border-gray-200 hover:border-gray-300"
                   }`}
                 >
@@ -148,11 +148,11 @@ export default function ProductDetailsSection({ product }: { product?: Product }
                     type="checkbox"
                     checked={checked}
                     onChange={() => toggleShipping(value)}
-                    className="accent-[#1E3A8A] w-4 h-4 shrink-0"
+                    className="accent-(--tenant-primary) w-4 h-4 shrink-0"
                   />
-                  <Icon className={`w-4 h-4 shrink-0 ${checked ? "text-[#1E3A8A]" : "text-gray-400"}`} />
+                  <Icon className={`w-4 h-4 shrink-0 ${checked ? "text-(--tenant-primary)" : "text-gray-400"}`} />
                   <div className="min-w-0">
-                    <p className={`text-sm font-semibold ${checked ? "text-[#1E3A8A]" : "text-gray-700"}`}>
+                    <p className={`text-sm font-semibold ${checked ? "text-(--tenant-primary)" : "text-gray-700"}`}>
                       {label}
                     </p>
                     <p className="text-xs text-gray-400">{desc}</p>
@@ -169,14 +169,14 @@ export default function ProductDetailsSection({ product }: { product?: Product }
             {(["new", "used"] as const).map((val) => (
               <label
                 key={val}
-                className="flex-1 flex items-center justify-center gap-2 border border-gray-200 rounded-xl py-2.5 cursor-pointer has-[:checked]:border-[#1E3A8A] has-[:checked]:bg-blue-50 transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 border border-gray-200 rounded-xl py-2.5 cursor-pointer has-[:checked]:border-(--tenant-primary) has-[:checked]:bg-blue-50 transition-colors"
               >
                 <input
                   type="radio"
                   name="condition"
                   value={val}
                   defaultChecked={(product?.condition ?? "new") === val}
-                  className="accent-[#1E3A8A]"
+                  className="accent-(--tenant-primary)"
                 />
                 <span className="text-sm font-medium text-gray-700">
                   {val === "new" ? "Nuevo" : "Usado"}

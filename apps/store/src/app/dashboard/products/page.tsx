@@ -290,7 +290,7 @@ export default function ProductsPage() {
                 <button
                   onClick={() => setViewMode("table")}
                   className={`px-3 py-2 transition-colors ${
-                    viewMode === "table" ? "bg-[#1E3A8A] text-white" : "text-gray-500 hover:bg-gray-50"
+                    viewMode === "table" ? "bg-(--tenant-primary) text-white" : "text-gray-500 hover:bg-gray-50"
                   }`}
                   title="Vista tabla"
                 >
@@ -299,7 +299,7 @@ export default function ProductsPage() {
                 <button
                   onClick={() => setViewMode("grid")}
                   className={`px-3 py-2 border-l border-gray-200 transition-colors ${
-                    viewMode === "grid" ? "bg-[#1E3A8A] text-white" : "text-gray-500 hover:bg-gray-50"
+                    viewMode === "grid" ? "bg-(--tenant-primary) text-white" : "text-gray-500 hover:bg-gray-50"
                   }`}
                   title="Vista grilla"
                 >
@@ -309,7 +309,7 @@ export default function ProductsPage() {
             )}
             <Link
               href="/dashboard/products/new"
-              className="flex items-center gap-1.5 bg-[#1E3A8A] text-white text-xs font-semibold px-3.5 py-2 rounded-xl hover:bg-blue-800 transition-colors"
+              className="flex items-center gap-1.5 bg-(--tenant-primary) text-white text-xs font-semibold px-3.5 py-2 rounded-xl hover:bg-blue-800 transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
               Nuevo producto
@@ -328,7 +328,7 @@ export default function ProductsPage() {
                 onClick={() => handleTabChange(tab.key)}
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors border-b-2 -mb-px ${
                   isActive
-                    ? "border-[#1E3A8A] text-[#1E3A8A]"
+                    ? "border-(--tenant-primary) text-(--tenant-primary)"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-200"
                 }`}
               >
@@ -336,7 +336,7 @@ export default function ProductsPage() {
                 <span
                   className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-5 text-center ${
                     isActive
-                      ? "bg-[#1E3A8A]/10 text-[#1E3A8A]"
+                      ? "bg-(--tenant-primary)/10 text-(--tenant-primary)"
                       : "bg-gray-100 text-gray-500"
                   }`}
                 >

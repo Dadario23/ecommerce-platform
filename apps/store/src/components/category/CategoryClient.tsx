@@ -114,7 +114,7 @@ export default function CategoryClient({ categoryName, initialProducts, shipping
       <div className="max-w-7xl mx-auto px-4">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-1.5 text-xs text-gray-500 py-3">
-          <Link href="/" className="hover:text-[#1E3A8A] flex items-center gap-1 transition-colors">
+          <Link href="/" className="hover:text-(--tenant-primary) flex items-center gap-1 transition-colors">
             <Home className="w-3.5 h-3.5" /> Inicio
           </Link>
           <ChevronRight className="w-3.5 h-3.5 text-gray-300" />
@@ -139,7 +139,7 @@ export default function CategoryClient({ categoryName, initialProducts, shipping
               <SlidersHorizontal className="w-4 h-4 text-gray-500" />
               Filtros
               {activeFilterCount > 0 && (
-                <span className="bg-[#1E3A8A] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                <span className="bg-(--tenant-primary) text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                   {activeFilterCount}
                 </span>
               )}
@@ -158,7 +158,7 @@ export default function CategoryClient({ categoryName, initialProducts, shipping
                 <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-100 rounded-xl shadow-lg z-20 overflow-hidden">
                   {(Object.keys(SORT_LABELS) as SortOption[]).map((key) => (
                     <button key={key} onClick={() => { setSort(key); setSortOpen(false); setPage(1); }}
-                      className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${sort === key ? "bg-blue-50 text-[#1E3A8A] font-semibold" : "text-gray-700 hover:bg-gray-50"}`}>
+                      className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${sort === key ? "bg-blue-50 text-(--tenant-primary) font-semibold" : "text-gray-700 hover:bg-gray-50"}`}>
                       {SORT_LABELS[key]}
                     </button>
                   ))}
@@ -197,7 +197,7 @@ export default function CategoryClient({ categoryName, initialProducts, shipping
                 <p className="text-gray-400 text-sm mb-4">Probá cambiando los criterios de búsqueda</p>
                 <button
                   onClick={() => handleFilterChange({ brands: [], minPrice: priceRange.min, maxPrice: priceRange.max, inStockOnly: false, condition: "all", shipping: "all" })}
-                  className="text-sm text-[#1E3A8A] font-medium hover:underline"
+                  className="text-sm text-(--tenant-primary) font-medium hover:underline"
                 >
                   Limpiar filtros
                 </button>
@@ -245,7 +245,7 @@ export default function CategoryClient({ categoryName, initialProducts, shipping
             </div>
             <div className="sticky bottom-0 bg-white border-t px-4 py-4">
               <button onClick={() => setMobileFiltersOpen(false)}
-                className="w-full bg-[#1E3A8A] text-white font-semibold py-3 rounded-xl hover:bg-blue-800 transition-colors">
+                className="w-full bg-(--tenant-primary) text-white font-semibold py-3 rounded-xl hover:bg-blue-800 transition-colors">
                 Ver {filteredProducts.length} resultado{filteredProducts.length !== 1 ? "s" : ""}
               </button>
             </div>

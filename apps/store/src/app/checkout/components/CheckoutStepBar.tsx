@@ -30,7 +30,7 @@ export default function CheckoutStepBar({ step }: CheckoutStepBarProps) {
                 i < active
                   ? "bg-green-500 text-white"
                   : i === active
-                    ? "bg-[#1E3A8A] text-white"
+                    ? "bg-(--tenant-primary) text-white"
                     : "bg-gray-100 text-gray-400"
               }`}
             >
@@ -39,7 +39,7 @@ export default function CheckoutStepBar({ step }: CheckoutStepBarProps) {
             <span
               className={`text-[10px] font-medium leading-none ${
                 i === active
-                  ? "text-[#1E3A8A]"
+                  ? "text-(--tenant-primary)"
                   : i < active
                     ? "text-green-600"
                     : "text-gray-400"

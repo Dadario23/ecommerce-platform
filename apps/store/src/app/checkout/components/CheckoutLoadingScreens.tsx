@@ -8,9 +8,9 @@ export function CheckoutInitLoader() {
     <div className="flex flex-col items-center justify-center min-h-[65vh] gap-6">
       <div className="relative w-20 h-20">
         <div className="absolute inset-0 rounded-full border-4 border-blue-100" />
-        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#1E3A8A] animate-spin" />
+        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-(--tenant-primary) animate-spin" />
         <div className="absolute inset-0 flex items-center justify-center">
-          <Package className="w-8 h-8 text-[#1E3A8A]" />
+          <Package className="w-8 h-8 text-(--tenant-primary)" />
         </div>
       </div>
       <div className="text-center">
@@ -28,7 +28,7 @@ export function CheckoutTransitionLoader({ message }: { message: string }) {
     <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
       <div className="relative w-12 h-12">
         <div className="absolute inset-0 rounded-full border-4 border-blue-100" />
-        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#1E3A8A] animate-spin" />
+        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-(--tenant-primary) animate-spin" />
       </div>
       <p className="text-gray-500 text-sm">{message}</p>
     </div>
@@ -40,9 +40,9 @@ export function CheckoutProcessingLoader() {
     <div className="flex flex-col items-center justify-center min-h-[65vh] gap-6">
       <div className="relative w-20 h-20">
         <div className="absolute inset-0 rounded-full border-4 border-blue-100" />
-        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#1E3A8A] animate-spin" />
+        <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-(--tenant-primary) animate-spin" />
         <div className="absolute inset-0 flex items-center justify-center">
-          <ShieldCheck className="w-8 h-8 text-[#1E3A8A]" />
+          <ShieldCheck className="w-8 h-8 text-(--tenant-primary)" />
         </div>
       </div>
       <div className="text-center">
@@ -63,7 +63,7 @@ export function CheckoutEmptyCartView({ onGoToStore }: { onGoToStore: () => void
       </p>
       <button
         onClick={onGoToStore}
-        className="bg-[#1E3A8A] text-white px-5 py-2.5 rounded-xl text-sm font-semibold"
+        className="bg-(--tenant-primary) text-white px-5 py-2.5 rounded-xl text-sm font-semibold"
       >
         Volver a la tienda
       </button>

@@ -568,7 +568,7 @@ export default function ChatBot({ onClose }: { onClose?: () => void } = {}) {
           to   { opacity: 1; transform: translateY(0); }
         }
         .cm-msg { animation: cmSlideIn .25s ease forwards; }
-        .cm-opt:hover { background: #eff6ff !important; border-color: #1E3A8A !important; color: #1E3A8A !important; }
+        .cm-opt:hover { background: #eff6ff !important; border-color: var(--tenant-primary) !important; color: var(--tenant-primary) !important; }
       `}</style>
 
       <div
@@ -578,7 +578,7 @@ export default function ChatBot({ onClose }: { onClose?: () => void } = {}) {
         {/* Header */}
         <div
           className="flex items-center gap-3 px-4 py-3 border-b border-gray-100 shrink-0"
-          style={{ background: "#1E3A8A" }}
+          style={{ background: "var(--tenant-primary)" }}
         >
           <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-lg shrink-0">
             🛠️
@@ -615,13 +615,13 @@ export default function ChatBot({ onClose }: { onClose?: () => void } = {}) {
               className={`cm-msg flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
             >
               {m.role === "bot" && (
-                <div className="w-7 h-7 rounded-full bg-[#1E3A8A] flex items-center justify-center text-white text-xs font-bold shrink-0 self-end mr-2">
+                <div className="w-7 h-7 rounded-full bg-(--tenant-primary) flex items-center justify-center text-white text-xs font-bold shrink-0 self-end mr-2">
                   CM
                 </div>
               )}
               {m.isCard && m.card ? (
-                <div className="max-w-xs rounded-2xl border border-[#1E3A8A] bg-blue-50 overflow-hidden shadow-sm">
-                  <div className="bg-[#1E3A8A] px-4 py-2.5">
+                <div className="max-w-xs rounded-2xl border border-(--tenant-primary) bg-blue-50 overflow-hidden shadow-sm">
+                  <div className="bg-(--tenant-primary) px-4 py-2.5">
                     <p className="text-xs font-bold text-white uppercase tracking-wider">
                       ✅ Precio estimado
                     </p>
@@ -643,7 +643,7 @@ export default function ChatBot({ onClose }: { onClose?: () => void } = {}) {
                     ))}
                     <div className="flex justify-between items-center pt-1">
                       <span className="text-sm text-gray-500">Precio</span>
-                      <span className="text-2xl font-bold text-[#1E3A8A]">
+                      <span className="text-2xl font-bold text-(--tenant-primary)">
                         ${fmtPrice(m.card.price)}
                       </span>
                     </div>
@@ -656,7 +656,7 @@ export default function ChatBot({ onClose }: { onClose?: () => void } = {}) {
                 <div
                   className={`max-w-xs px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
                     m.role === "user"
-                      ? "bg-[#1E3A8A] text-white rounded-br-sm"
+                      ? "bg-(--tenant-primary) text-white rounded-br-sm"
                       : "bg-white border border-gray-200 text-gray-700 rounded-bl-sm shadow-sm"
                   }`}
                   dangerouslySetInnerHTML={{ __html: m.html }}
@@ -668,7 +668,7 @@ export default function ChatBot({ onClose }: { onClose?: () => void } = {}) {
           {/* Typing indicator */}
           {typing && (
             <div className="flex justify-start">
-              <div className="w-7 h-7 rounded-full bg-[#1E3A8A] flex items-center justify-center text-white text-xs font-bold shrink-0 self-end mr-2">
+              <div className="w-7 h-7 rounded-full bg-(--tenant-primary) flex items-center justify-center text-white text-xs font-bold shrink-0 self-end mr-2">
                 CM
               </div>
               <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
@@ -765,7 +765,7 @@ export default function ChatBot({ onClose }: { onClose?: () => void } = {}) {
                   value={modelQ}
                   onChange={(e) => setModelQ(e.target.value)}
                   placeholder={deviceType ? MODEL_PLACEHOLDER[deviceType] : MODEL_PLACEHOLDER.celular}
-                  className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#1E3A8A] placeholder:text-gray-400"
+                  className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-(--tenant-primary) placeholder:text-gray-400"
                 />
               </div>
               {filteredModels.length === 0 ? (
@@ -775,7 +775,7 @@ export default function ChatBot({ onClose }: { onClose?: () => void } = {}) {
                     href={`https://wa.me/${WA}?text=${encodeURIComponent(`Hola! Quisiera un presupuesto para reparar mi ${sel.brand}.`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#1E3A8A] font-medium hover:underline"
+                    className="text-(--tenant-primary) font-medium hover:underline"
                   >
                     Consultanos por WhatsApp
                   </a>
@@ -788,7 +788,7 @@ export default function ChatBot({ onClose }: { onClose?: () => void } = {}) {
                     const hl =
                       q && idx >= 0
                         ? m.slice(0, idx) +
-                          `<mark class="bg-blue-100 text-[#1E3A8A] rounded px-0.5">${m.slice(idx, idx + q.length)}</mark>` +
+                          `<mark class="bg-blue-100 text-(--tenant-primary) rounded px-0.5">${m.slice(idx, idx + q.length)}</mark>` +
                           m.slice(idx + q.length)
                         : m;
                     return (
@@ -919,7 +919,7 @@ export default function ChatBot({ onClose }: { onClose?: () => void } = {}) {
                       <li key={i} className="text-xs text-gray-700 flex justify-between">
                         <span>• {item.repair}</span>
                         {item.price !== "a consultar" && (
-                          <span className="text-[#1E3A8A] font-semibold">${fmtPrice(item.price)}</span>
+                          <span className="text-(--tenant-primary) font-semibold">${fmtPrice(item.price)}</span>
                         )}
                       </li>
                     ))}
@@ -945,11 +945,11 @@ export default function ChatBot({ onClose }: { onClose?: () => void } = {}) {
                 onChange={(e) => setNameVal(e.target.value)}
                 placeholder="Tu nombre…"
                 maxLength={40}
-                className="flex-1 px-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#1E3A8A] placeholder:text-gray-400"
+                className="flex-1 px-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-(--tenant-primary) placeholder:text-gray-400"
               />
               <button
                 type="submit"
-                className="px-5 py-2.5 bg-[#1E3A8A] text-white text-sm font-bold rounded-xl hover:bg-blue-800 transition-colors"
+                className="px-5 py-2.5 bg-(--tenant-primary) text-white text-sm font-bold rounded-xl hover:bg-blue-800 transition-colors"
               >
                 Listo →
               </button>
@@ -980,7 +980,7 @@ export default function ChatBot({ onClose }: { onClose?: () => void } = {}) {
                   <button
                     type="button"
                     onClick={handleDesktopSubmit}
-                    className="flex items-center justify-center gap-2 bg-[#1E3A8A] hover:bg-blue-800 text-white font-bold text-sm px-5 py-3 rounded-xl transition-colors"
+                    className="flex items-center justify-center gap-2 bg-(--tenant-primary) hover:bg-blue-800 text-white font-bold text-sm px-5 py-3 rounded-xl transition-colors"
                   >
                     <MessageCircle className="w-4 h-4" />
                     Solicitar confirmación de presupuesto
@@ -1024,7 +1024,7 @@ function ActionBtn({ children, onClick, primary, danger, full, whatsapp, href, t
     "cm-opt flex items-center gap-2 px-3 py-2.5 text-sm font-medium rounded-xl border transition-colors",
     full ? "w-full justify-center" : "flex-1 basis-[calc(50%-4px)] min-w-28",
     primary
-      ? "bg-[#1E3A8A] text-white border-[#1E3A8A] hover:bg-blue-800"
+      ? "bg-(--tenant-primary) text-white border-(--tenant-primary) hover:bg-blue-800"
       : danger
         ? "bg-red-50 text-red-600 border-red-200 hover:bg-red-100"
         : whatsapp

@@ -217,7 +217,7 @@ export default function OrderDetailPage() {
         </p>
         <Link
           href="/account/orders"
-          className="text-sm text-[#1E3A8A] font-semibold hover:underline flex items-center gap-1"
+          className="text-sm text-(--tenant-primary) font-semibold hover:underline flex items-center gap-1"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Volver a mis pedidos
@@ -240,7 +240,7 @@ export default function OrderDetailPage() {
       {/* Back */}
       <button
         onClick={() => router.back()}
-        className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#1E3A8A] font-medium transition-colors"
+        className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-(--tenant-primary) font-medium transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         Mis compras
@@ -276,11 +276,11 @@ export default function OrderDetailPage() {
               return (
                 <div key={i} className="flex flex-col items-center gap-2 z-10">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${
-                    done ? "bg-[#1E3A8A] border-[#1E3A8A]" : "bg-white border-gray-200"
+                    done ? "bg-(--tenant-primary) border-(--tenant-primary)" : "bg-white border-gray-200"
                   } ${active ? "ring-4 ring-blue-100" : ""}`}>
                     <Icon className={`w-3.5 h-3.5 ${done ? "text-white" : "text-gray-300"}`} />
                   </div>
-                  <span className={`text-[10px] font-medium text-center ${done ? "text-[#1E3A8A]" : "text-gray-400"}`}>
+                  <span className={`text-[10px] font-medium text-center ${done ? "text-(--tenant-primary)" : "text-gray-400"}`}>
                     {step.label}
                   </span>
                 </div>
@@ -425,10 +425,10 @@ export default function OrderDetailPage() {
               <button
                 type="button"
                 onClick={() => { setShowReschedule(true); setActionError(""); }}
-                className="w-full flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:border-[#1E3A8A] hover:bg-blue-50 transition-all text-left"
+                className="w-full flex items-center gap-3 p-3 rounded-xl border border-gray-200 hover:border-(--tenant-primary) hover:bg-blue-50 transition-all text-left"
               >
                 <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-                  <CalendarDays className="w-4 h-4 text-[#1E3A8A]" />
+                  <CalendarDays className="w-4 h-4 text-(--tenant-primary)" />
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-gray-800">
@@ -443,9 +443,9 @@ export default function OrderDetailPage() {
 
             {/* Selector de fecha inline */}
             {showReschedule && (
-              <div className="rounded-xl border border-[#1E3A8A]/20 bg-blue-50/50 p-4 space-y-3">
+              <div className="rounded-xl border border-(--tenant-primary)/20 bg-blue-50/50 p-4 space-y-3">
                 <p className="text-sm font-semibold text-gray-800 flex items-center gap-2">
-                  <CalendarDays className="w-4 h-4 text-[#1E3A8A]" />
+                  <CalendarDays className="w-4 h-4 text-(--tenant-primary)" />
                   Elegí el nuevo día de entrega
                 </p>
                 <p className="text-xs text-gray-500">
@@ -465,8 +465,8 @@ export default function OrderDetailPage() {
                         onClick={() => setSelectedDate(str)}
                         className={`flex flex-col items-center shrink-0 w-14 py-2.5 rounded-xl border-2 transition-all ${
                           isSelected
-                            ? "border-[#1E3A8A] bg-[#1E3A8A]"
-                            : "border-gray-200 bg-white hover:border-[#1E3A8A]/50 hover:bg-blue-50"
+                            ? "border-(--tenant-primary) bg-(--tenant-primary)"
+                            : "border-gray-200 bg-white hover:border-(--tenant-primary)/50 hover:bg-blue-50"
                         }`}
                       >
                         <span className={`text-[10px] font-medium ${isSelected ? "text-blue-200" : "text-gray-500"}`}>
@@ -479,7 +479,7 @@ export default function OrderDetailPage() {
                           {MONTHS_ES[date.getMonth()]}
                         </span>
                         {isFirst && !isSelected && (
-                          <span className="text-[9px] text-[#1E3A8A] font-bold mt-0.5">antes</span>
+                          <span className="text-[9px] text-(--tenant-primary) font-bold mt-0.5">antes</span>
                         )}
                       </button>
                     );
@@ -487,7 +487,7 @@ export default function OrderDetailPage() {
                 </div>
 
                 {selectedDate !== "any" && (
-                  <p className="text-xs text-[#1E3A8A] font-semibold">
+                  <p className="text-xs text-(--tenant-primary) font-semibold">
                     ✓ Tu envío llegará el {formatDateLong(new Date(selectedDate + "T00:00:00"))}
                   </p>
                 )}
@@ -497,7 +497,7 @@ export default function OrderDetailPage() {
                     type="button"
                     onClick={rescheduleOrder}
                     disabled={actionLoading || selectedDate === "any"}
-                    className="flex-1 bg-[#1E3A8A] hover:bg-blue-800 text-white text-sm font-semibold py-2.5 rounded-xl transition-colors disabled:opacity-60"
+                    className="flex-1 bg-(--tenant-primary) hover:bg-blue-800 text-white text-sm font-semibold py-2.5 rounded-xl transition-colors disabled:opacity-60"
                   >
                     {actionLoading ? "Guardando..." : "Confirmar nueva fecha"}
                   </button>

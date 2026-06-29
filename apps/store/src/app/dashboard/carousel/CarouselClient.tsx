@@ -69,7 +69,7 @@ export default function CarouselClient({ initialImages }: Props) {
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <div className="flex items-start gap-3 mb-6">
           <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-            <ImageIcon className="w-4.5 h-4.5 text-[#1E3A8A]" />
+            <ImageIcon className="w-4.5 h-4.5 text-(--tenant-primary)" />
           </div>
           <div>
             <p className="text-sm font-semibold text-gray-900">Imágenes del carousel</p>
@@ -160,7 +160,7 @@ export default function CarouselClient({ initialImages }: Props) {
         <button
           onClick={save}
           disabled={saving}
-          className="bg-[#1E3A8A] text-white text-sm font-semibold px-6 py-2.5 rounded-xl hover:bg-blue-800 transition-colors disabled:opacity-60"
+          className="bg-(--tenant-primary) text-white text-sm font-semibold px-6 py-2.5 rounded-xl hover:bg-blue-800 transition-colors disabled:opacity-60"
         >
           {saving ? "Guardando..." : "Guardar cambios"}
         </button>

@@ -103,7 +103,7 @@ export default async function DashboardPage() {
         </div>
         <Link
           href="/dashboard/products/new"
-          className="flex items-center gap-2 bg-[#1E3A8A] text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-blue-800 transition-colors"
+          className="flex items-center gap-2 bg-(--tenant-primary) text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-blue-800 transition-colors"
         >
           <Plus className="w-4 h-4" />
           Nuevo producto
@@ -157,7 +157,7 @@ export default async function DashboardPage() {
             <p className="font-semibold text-gray-900 text-sm">Órdenes recientes</p>
             <Link
               href="/dashboard/orders"
-              className="flex items-center gap-1 text-xs text-[#1E3A8A] font-semibold hover:underline"
+              className="flex items-center gap-1 text-xs text-(--tenant-primary) font-semibold hover:underline"
             >
               Ver todas <ArrowRight className="w-3.5 h-3.5" />
             </Link>

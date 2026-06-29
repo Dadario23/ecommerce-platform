@@ -103,7 +103,7 @@ export default function EquipoClient({ users: initial }: { users: StaffUser[] })
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar por nombre o email…"
-            className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#1E3A8A] placeholder:text-gray-400"
+            className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-(--tenant-primary) placeholder:text-gray-400"
           />
         </div>
 
@@ -158,7 +158,7 @@ function UserRow({
               className={`text-xs font-semibold px-2.5 py-1.5 rounded-lg border transition-colors disabled:opacity-50 ${
                 action.role === "user"
                   ? "text-red-600 border-red-200 hover:bg-red-50"
-                  : "text-[#1E3A8A] border-blue-200 hover:bg-blue-50"
+                  : "text-(--tenant-primary) border-blue-200 hover:bg-blue-50"
               }`}
             >
               {isLoading ? "…" : action.label}

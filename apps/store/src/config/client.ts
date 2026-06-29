@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import { getModels } from "@/lib/tenant-models";
+import { getTenantTheme } from "@/config/tenant-themes";
 
 export interface ClientConfig {
   slug: string;
@@ -13,20 +14,16 @@ export interface ClientConfig {
   };
   theme: {
     primaryColor: string;
+    accentColor: string;
   };
 }
 
-const DEFAULT_CONFIG: Omit<ClientConfig, "slug" | "storeName"> = {
-  modules: {
-    repairs: false,
-    budgets: false,
-    shipping: true,
-    coupons: true,
-    analytics: true,
-  },
-  theme: {
-    primaryColor: "#1E3A8A",
-  },
+const DEFAULT_MODULES: ClientConfig["modules"] = {
+  repairs: false,
+  budgets: false,
+  shipping: true,
+  coupons: true,
+  analytics: true,
 };
 
 export async function getClientConfig(): Promise<ClientConfig> {
@@ -41,17 +38,15 @@ export async function getClientConfig(): Promise<ClientConfig> {
       slug,
       storeName: (setting?.storeName as string | undefined) ?? slug,
       modules: {
-        repairs: Boolean(setting?.modules_repairs ?? DEFAULT_CONFIG.modules.repairs),
-        budgets: Boolean(setting?.modules_budgets ?? DEFAULT_CONFIG.modules.budgets),
-        shipping: Boolean(setting?.modules_shipping ?? DEFAULT_CONFIG.modules.shipping),
-        coupons: Boolean(setting?.modules_coupons ?? DEFAULT_CONFIG.modules.coupons),
-        analytics: Boolean(setting?.modules_analytics ?? DEFAULT_CONFIG.modules.analytics),
+        repairs: Boolean(setting?.modules_repairs ?? DEFAULT_MODULES.repairs),
+        budgets: Boolean(setting?.modules_budgets ?? DEFAULT_MODULES.budgets),
+        shipping: Boolean(setting?.modules_shipping ?? DEFAULT_MODULES.shipping),
+        coupons: Boolean(setting?.modules_coupons ?? DEFAULT_MODULES.coupons),
+        analytics: Boolean(setting?.modules_analytics ?? DEFAULT_MODULES.analytics),
       },
-      theme: {
-        primaryColor: (setting?.primaryColor as string | undefined) ?? DEFAULT_CONFIG.theme.primaryColor,
-      },
+      theme: getTenantTheme(slug),
     };
   } catch {
-    return { slug, storeName: slug, ...DEFAULT_CONFIG };
+    return { slug, storeName: slug, modules: DEFAULT_MODULES, theme: getTenantTheme(slug) };
   }
 }

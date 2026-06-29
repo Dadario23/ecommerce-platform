@@ -166,7 +166,7 @@ export default function ChangePasswordForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-[#1E3A8A] hover:bg-blue-800 text-white font-semibold py-3 rounded-xl transition-colors disabled:opacity-70 text-sm mt-2"
+          className="w-full bg-(--tenant-primary) hover:bg-blue-800 text-white font-semibold py-3 rounded-xl transition-colors disabled:opacity-70 text-sm mt-2"
         >
           {loading ? "Guardando..." : "Actualizar contraseña"}
         </button>
