@@ -4,7 +4,7 @@ import { useState } from "react";
 import {
   Store, Mail, Phone, FileText, Truck, CheckCircle,
   AlertCircle, Instagram, Facebook, MessageCircle, User, Lock,
-  LayoutGrid, Tag, Wrench,
+  LayoutGrid, Tag,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -19,11 +19,6 @@ interface Settings {
   facebookUrl: string;
   whatsappNumber: string;
   homeFeaturedMode: "products" | "categories";
-  modules_repairs: boolean;
-  modules_budgets: boolean;
-  modules_shipping: boolean;
-  modules_coupons: boolean;
-  modules_analytics: boolean;
 }
 
 interface Props {
@@ -371,53 +366,6 @@ export default function SettingsClient({ initialSettings, adminName, adminEmail 
         <SaveBtn
           section="featuredMode"
           payload={{ homeFeaturedMode: data.homeFeaturedMode }}
-        />
-      </div>
-
-      {/* Modules */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <SectionTitle
-          icon={Wrench}
-          title="Módulos activos"
-          description="Activá o desactivá funcionalidades para esta tienda"
-        />
-        <div className="space-y-3">
-          {(
-            [
-              { key: "modules_repairs",  label: "Soporte técnico",  description: "Gestión de reparaciones y presupuestos" },
-              { key: "modules_budgets",  label: "Presupuestos",     description: "Módulo de presupuestos independiente" },
-              { key: "modules_shipping", label: "Envíos",           description: "Cálculo y gestión de envíos" },
-              { key: "modules_coupons",  label: "Cupones",          description: "Descuentos con código de cupón" },
-              { key: "modules_analytics",label: "Analíticas",       description: "Reportes y métricas de la tienda" },
-            ] as const
-          ).map(({ key, label, description }) => {
-            const active = data[key];
-            return (
-              <div key={key} className="flex items-center justify-between p-3.5 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors">
-                <div>
-                  <p className="text-sm font-semibold text-gray-800">{label}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">{description}</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setData((d) => ({ ...d, [key]: !d[key] }))}
-                  className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${active ? "bg-(--tenant-primary)" : "bg-gray-200"}`}
-                >
-                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${active ? "translate-x-5" : "translate-x-0"}`} />
-                </button>
-              </div>
-            );
-          })}
-        </div>
-        <SaveBtn
-          section="modules"
-          payload={{
-            modules_repairs:  data.modules_repairs,
-            modules_budgets:  data.modules_budgets,
-            modules_shipping: data.modules_shipping,
-            modules_coupons:  data.modules_coupons,
-            modules_analytics:data.modules_analytics,
-          }}
         />
       </div>
 
