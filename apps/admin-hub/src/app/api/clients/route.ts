@@ -2,10 +2,7 @@ import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { CLIENT_DISPLAY_NAMES } from "@/config/clients";
 
-// Lista de clientes registrados en la plataforma
-// En el futuro esto puede venir de una colección "platform_clients"
 const REGISTERED_CLIENTS = (process.env.PLATFORM_CLIENTS ?? "bitm-cel").split(",").map((s) => s.trim());
-
 const CLUSTER_URI = process.env.MONGODB_CLUSTER_URI!;
 
 async function getClusterConnection() {
@@ -17,35 +14,37 @@ async function getClusterConnection() {
 async function getClientStats(conn: mongoose.Connection, dbName: string) {
   const db = conn.useDb(dbName, { useCache: true });
 
-  const [orders, pendingOrders, membership, setting] = await Promise.all([
-    db.collection("orders").countDocuments(),
-    db.collection("orders").countDocuments({ status: { $in: ["pending", "confirmed", "processing"] } }),
+  const [membership, setting, productCount, orderCount, lastOrder] = await Promise.all([
     db.collection("memberships").findOne({}, { sort: { createdAt: -1 } }),
-    db.collection("settings").findOne({}, { projection: { storeName: 1 } }),
+    db.collection("settings").findOne({}, {
+      projection: {
+        storeName: 1,
+        modules_repairs: 1, modules_budgets: 1,
+        modules_shipping: 1, modules_coupons: 1, modules_analytics: 1,
+      },
+    }),
+    db.collection("products").countDocuments({ isActive: { $ne: false } }),
+    db.collection("orders").countDocuments(),
+    db.collection("orders").findOne({}, { sort: { createdAt: -1 }, projection: { createdAt: 1 } }),
   ]);
 
-  const revenueResult = await db.collection("orders").aggregate([
-    { $match: { status: { $ne: "cancelled" } } },
-    { $group: { _id: null, total: { $sum: "$total" } } },
-  ]).toArray();
-
-  const currentMonth = new Date();
-  currentMonth.setDate(1);
-  currentMonth.setHours(0, 0, 0, 0);
-
-  const monthlyRevenueResult = await db.collection("orders").aggregate([
-    { $match: { status: { $ne: "cancelled" }, createdAt: { $gte: currentMonth } } },
-    { $group: { _id: null, total: { $sum: "$total" } } },
-  ]).toArray();
+  const activeModules: string[] = [];
+  if (setting?.modules_repairs)   activeModules.push("Soporte técnico");
+  if (setting?.modules_budgets)   activeModules.push("Presupuestos");
+  if (setting?.modules_shipping ?? true)  activeModules.push("Envíos");
+  if (setting?.modules_coupons  ?? true)  activeModules.push("Cupones");
+  if (setting?.modules_analytics ?? true) activeModules.push("Analíticas");
 
   return {
     slug: dbName,
     storeName: CLIENT_DISPLAY_NAMES[dbName] ?? (setting?.storeName as string | undefined) ?? dbName,
-    orders: { total: orders, pending: pendingOrders },
-    revenue: { total: revenueResult[0]?.total ?? 0, thisMonth: monthlyRevenueResult[0]?.total ?? 0 },
     membership: membership
-      ? { status: membership.status, paidUntil: membership.paidUntil, lastPaymentDate: membership.lastPaymentDate }
+      ? { status: membership.status as string, paidUntil: membership.paidUntil ?? null, lastPaymentDate: membership.lastPaymentDate ?? null }
       : { status: "active", paidUntil: null, lastPaymentDate: null },
+    modules: activeModules,
+    productCount,
+    orderCount,
+    lastOrderDate: (lastOrder?.createdAt as Date | undefined)?.toISOString() ?? null,
   };
 }
 
