@@ -8,11 +8,13 @@ import Image from "next/image";
 import {
   Loader2, Eye, EyeOff, Key, CheckCircle, AlertCircle, ArrowLeft,
 } from "lucide-react";
+import { useStoreName } from "@/hooks/use-store-name";
 
 const INPUT =
   "w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 placeholder:text-gray-300 transition-colors";
 
 export default function ResetPasswordClient() {
+  const storeName = useStoreName();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const email = searchParams.get("email");
@@ -89,7 +91,7 @@ export default function ResetPasswordClient() {
         <div className="relative w-8 h-8 shrink-0">
           <Image src="/logo.svg" alt="Logo" fill className="object-contain brightness-0 invert" />
         </div>
-        <span className="text-white font-bold text-lg">Compumobile</span>
+        <span className="text-white font-bold text-lg">{storeName}</span>
       </Link>
       <div className="relative space-y-4">
         <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center">
@@ -103,7 +105,7 @@ export default function ResetPasswordClient() {
         </p>
       </div>
       <p className="text-blue-400 text-xs relative">
-        © {new Date().getFullYear()} Compumobile
+        © {new Date().getFullYear()} {storeName}
       </p>
     </div>
   );

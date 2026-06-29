@@ -5,6 +5,7 @@ import { type IProduct } from "@/models/Product";
 import ProductPageClient from "./ProductPageClient";
 import type { Metadata } from "next";
 import { getShippingEnabled } from "@/lib/getShippingEnabled";
+import { getClientConfig } from "@/config/client";
 
 export const revalidate = 60;
 
@@ -32,7 +33,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   if (!product) return { title: "Producto no encontrado" };
 
   return {
-    title: `${product.name} | Compumobile`,
+    title: `${product.name} | ${(await getClientConfig()).storeName}`,
     description: product.description?.slice(0, 160) ?? `Comprá ${product.name} al mejor precio.`,
     openGraph: {
       title: product.name,

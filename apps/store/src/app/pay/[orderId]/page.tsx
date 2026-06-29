@@ -44,7 +44,7 @@ export default async function PayPage({ params }: Props) {
         {/* Header */}
         <div className="bg-(--tenant-primary) px-6 py-5 text-center">
           <div className="relative w-32 h-10 mx-auto mb-2">
-            <Image src="/logo.svg" alt="Compumobile" fill className="object-contain brightness-0 invert" />
+            <Image src="/logo.svg" alt="logo" fill className="object-contain brightness-0 invert" />
           </div>
           <p className="text-blue-200 text-sm">Pago de pedido</p>
           <p className="text-white font-mono text-xs mt-1 opacity-70">#{orderId_.slice(-8).toUpperCase()}</p>

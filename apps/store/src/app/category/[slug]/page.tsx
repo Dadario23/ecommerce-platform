@@ -5,6 +5,7 @@ import CategoryClient from "@/components/category/CategoryClient";
 import type { Metadata } from "next";
 import { slugify } from "@/lib/slugify";
 import { getShippingEnabled } from "@/lib/getShippingEnabled";
+import { getClientConfig } from "@/config/client";
 
 export const revalidate = 60;
 
@@ -53,7 +54,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!data) return { title: "Categoría no encontrada" };
 
   return {
-    title: `${data.category.name} | Compumobile`,
+    title: `${data.category.name} | ${(await getClientConfig()).storeName}`,
     description: `Explorá nuestra selección de ${data.category.name}. Encontrá los mejores precios y opciones de financiación.`,
   };
 }

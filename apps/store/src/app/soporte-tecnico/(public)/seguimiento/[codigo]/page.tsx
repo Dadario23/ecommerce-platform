@@ -27,7 +27,7 @@ const ESTADO_MSG: Partial<Record<EstadoReparacion, string>> = {
   en_reparacion: "Tu equipo está siendo reparado por nuestros técnicos.",
   esperando_repuestos: "Estamos esperando la llegada de los repuestos necesarios para continuar.",
   listo: "¡Tu equipo está listo para retirar! Pasá por el taller cuando quieras.",
-  entregado: "Tu equipo fue entregado. ¡Gracias por confiar en Compumobile!",
+  entregado: "Tu equipo fue entregado. ¡Gracias por confiar en nosotros!",
   cancelado: "La reparación fue cancelada. Contactanos para más información.",
   sin_reparacion: "Lamentablemente el equipo no tiene reparación posible. Contactanos.",
 };

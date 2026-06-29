@@ -42,7 +42,7 @@ export default function SoporteTecnicoPage() {
       <section className="bg-(--tenant-primary) text-white pt-20 pb-12 md:pt-24 md:pb-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-blue-300 text-xs font-semibold uppercase tracking-widest mb-3">
-            Compumobile · Soporte Técnico
+            Soporte Técnico
           </p>
           <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-3">
             Tu equipo en buenas manos

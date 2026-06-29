@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
+import { useStoreName } from "@/hooks/use-store-name";
 import { MessageCircle, RefreshCw, Search, X } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -167,6 +168,7 @@ async function fetchCatalog(device: DeviceType): Promise<{ brands: string[]; mod
 
 // ── Main component ────────────────────────────────────────────────────
 export default function ChatBot({ onClose }: { onClose?: () => void } = {}) {
+  const storeName = useStoreName();
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [typing, setTyping] = useState(false);
   const [step, setStep] = useState<Step>("init");
@@ -224,8 +226,8 @@ export default function ChatBot({ onClose }: { onClose?: () => void } = {}) {
     const name = session?.user?.name ?? "";
     await botSay(
       name
-        ? `¡Hola, <strong>${name}</strong>! 👋 Soy el asistente de <strong>Compumobile</strong>.<br>Estoy aquí para ayudarte a obtener un presupuesto para la reparación de tu equipo en segundos.`
-        : "¡Hola! 👋 Soy el asistente de <strong>Compumobile</strong>.<br>Estoy aquí para ayudarte a obtener un presupuesto para la reparación de tu equipo en segundos.",
+        ? `¡Hola, <strong>${name}</strong>! 👋 Soy el asistente de <strong>${storeName}</strong>.<br>Estoy aquí para ayudarte a obtener un presupuesto para la reparación de tu equipo en segundos.`
+        : "¡Hola! 👋 Soy el asistente de <strong>${storeName}</strong>.<br>Estoy aquí para ayudarte a obtener un presupuesto para la reparación de tu equipo en segundos.",
       1000,
     );
     await sleep(200);

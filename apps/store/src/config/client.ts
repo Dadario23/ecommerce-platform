@@ -36,7 +36,7 @@ export async function getClientConfig(): Promise<ClientConfig> {
 
     return {
       slug,
-      storeName: (setting?.storeName as string | undefined) ?? slug,
+      storeName: getTenantTheme(slug).storeName || (setting?.storeName as string | undefined) || slug,
       modules: {
         repairs: Boolean(setting?.modules_repairs ?? DEFAULT_MODULES.repairs),
         budgets: Boolean(setting?.modules_budgets ?? DEFAULT_MODULES.budgets),

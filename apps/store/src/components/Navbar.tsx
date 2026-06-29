@@ -93,7 +93,7 @@ export default function Navbar({ initialCategories = [], showRepairs = false }: 
             <Link href="/" className="shrink-0">
               <Image
                 src="/logo.svg"
-                alt="Compumobile"
+                alt="logo"
                 width={160}
                 height={38}
                 priority

@@ -42,7 +42,7 @@ export default function SoporteNavbar() {
             <div className="relative w-28 h-7 shrink-0">
               <Image
                 src="/logo.svg"
-                alt="Compumobile"
+                alt="logo"
                 fill
                 className="object-contain object-left brightness-0 invert"
               />

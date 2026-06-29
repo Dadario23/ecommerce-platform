@@ -2,6 +2,7 @@ import RegisterForm from "@/components/auth/RegisterForm";
 import Image from "next/image";
 import Link from "next/link";
 import { Check } from "lucide-react";
+import { getClientConfig } from "@/config/client";
 
 const BENEFITS = [
   "Descuentos exclusivos para miembros",
@@ -9,7 +10,8 @@ const BENEFITS = [
   "Guardá tus direcciones favoritas",
 ];
 
-export default function RegisterPage() {
+export default async function RegisterPage() {
+  const { storeName } = await getClientConfig();
   return (
     <div className="min-h-screen bg-gray-50 pt-20 md:pt-28 pb-10 px-4">
       <div className="max-w-4xl mx-auto flex rounded-2xl overflow-hidden shadow-xl border border-gray-100">
@@ -22,7 +24,7 @@ export default function RegisterPage() {
             <div className="relative w-8 h-8 shrink-0">
               <Image src="/logo.svg" alt="Logo" fill className="object-contain brightness-0 invert" />
             </div>
-            <span className="text-white font-bold text-lg">Compumobile</span>
+            <span className="text-white font-bold text-lg">{storeName}</span>
           </Link>
 
           <div className="relative space-y-6">
@@ -47,7 +49,7 @@ export default function RegisterPage() {
           </div>
 
           <p className="text-blue-400 text-xs relative">
-            © {new Date().getFullYear()} Compumobile
+            © {new Date().getFullYear()} {storeName}
           </p>
         </div>
 

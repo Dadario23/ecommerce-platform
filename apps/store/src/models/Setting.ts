@@ -23,7 +23,7 @@ export interface ISetting extends Document {
 
 const SettingSchema = new Schema(
   {
-    storeName:             { type: String, default: "Compumobile" },
+    storeName:             { type: String, default: "" },
     storeEmail:            { type: String, default: "" },
     storePhone:            { type: String, default: "" },
     storeDescription:      { type: String, default: "" },

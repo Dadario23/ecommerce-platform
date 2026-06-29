@@ -35,7 +35,7 @@ async function getOrCreateMpLink(
           currency_id: "ARS",
         }],
         external_reference: orderId,
-        statement_descriptor: "Compumobile",
+        statement_descriptor: "bitm-cel",
         binary_mode: true,
       }),
     });

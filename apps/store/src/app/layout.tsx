@@ -43,7 +43,7 @@ export default async function RootLayout({
   const { primaryColor, accentColor } = clientConfig.theme;
 
   return (
-    <html lang="es" style={{ "--tenant-primary": primaryColor, "--tenant-accent": accentColor } as React.CSSProperties}>
+    <html lang="es" data-store-name={clientConfig.storeName} style={{ "--tenant-primary": primaryColor, "--tenant-accent": accentColor } as React.CSSProperties}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

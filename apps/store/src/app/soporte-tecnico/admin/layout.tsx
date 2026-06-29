@@ -65,7 +65,7 @@ function Sidebar({ collapsed, onToggle, role }: { collapsed: boolean; onToggle: 
           <Link href="/" className="relative flex-1 h-9 block">
             <Image
               src="/logo.svg"
-              alt="Compumobile"
+              alt="logo"
               fill
               className="object-contain object-center brightness-0 invert"
             />
@@ -229,7 +229,7 @@ export default function SoporteAdminLayout({ children }: { children: React.React
             <Link href="/" className="lg:hidden relative w-32 h-7 shrink-0">
               <Image
                 src="/logo.svg"
-                alt="Compumobile"
+                alt="logo"
                 fill
                 className="object-contain object-left"
               />
