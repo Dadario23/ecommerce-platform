@@ -25,7 +25,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 interface NavChild {
   href: string;
@@ -85,19 +85,16 @@ const UTILITY_LINKS = [
 interface SidebarProps {
   collapsed?: boolean;
   onToggle?: () => void;
+  repairsEnabled?: boolean;
 }
 
-export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
+export default function Sidebar({ collapsed = false, onToggle, repairsEnabled = true }: SidebarProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
 
-  const [repairsEnabled, setRepairsEnabled] = useState(true);
-  useEffect(() => {
-    setRepairsEnabled(document.documentElement.getAttribute("data-module-repairs") === "1");
-  }, []);
-
-  const visibleSections = NAV_SECTIONS.filter(
-    (s) => s.label !== "Soporte técnico" || repairsEnabled,
+  const visibleSections = useMemo(
+    () => NAV_SECTIONS.filter((s) => s.label !== "Soporte técnico" || repairsEnabled),
+    [repairsEnabled],
   );
 
   const isCatalogActive =
