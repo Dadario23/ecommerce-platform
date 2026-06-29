@@ -7,7 +7,9 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import TrackingSearch from "../TrackingSearch";
+import { getClientConfig } from "@/config/client";
 
 export const revalidate = 300;
 
@@ -34,7 +36,9 @@ const ENTERPRISE_SERVICES = [
   "Contratos de soporte mensual",
 ];
 
-export default function SoporteTecnicoPage() {
+export default async function SoporteTecnicoPage() {
+  const { modules } = await getClientConfig();
+  if (!modules.repairs) notFound();
   return (
     <main className="pb-20 bg-gray-50 min-h-screen">
 

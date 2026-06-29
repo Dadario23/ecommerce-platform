@@ -6,6 +6,7 @@ import HomeCategoriesSection from "@/components/home/HomeCategoriesSection";
 import SupportBanner from "@/components/home/SupportBanner";
 
 import { getModels } from "@/lib/tenant-models";
+import { getClientConfig } from "@/config/client";
 
 export const revalidate = 60;
 
@@ -55,7 +56,8 @@ async function getPageData() {
 }
 
 export default async function HomePage() {
-  const { categories, categoriesWithImages, carouselImages, homeFeaturedMode } = await getPageData();
+  const [{ categories, categoriesWithImages, carouselImages, homeFeaturedMode }, { modules }] =
+    await Promise.all([getPageData(), getClientConfig()]);
 
   return (
     <main className="pt-20 md:pt-32">
@@ -66,9 +68,11 @@ export default async function HomePage() {
       <BenefitsBar />
 
       <div className="px-4 max-w-7xl mx-auto">
-        <div className="mt-6 mb-6">
-          <SupportBanner />
-        </div>
+        {modules.repairs && (
+          <div className="mt-6 mb-6">
+            <SupportBanner />
+          </div>
+        )}
         <CategoriesGrid categories={categories} />
 
         {homeFeaturedMode === "categories"
