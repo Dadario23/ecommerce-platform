@@ -25,7 +25,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 
 interface NavChild {
   href: string;
@@ -91,14 +91,13 @@ export default function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
 
-  const repairsEnabled = useMemo(() => {
-    if (typeof document === "undefined") return true;
-    return document.documentElement.getAttribute("data-module-repairs") === "1";
+  const [repairsEnabled, setRepairsEnabled] = useState(true);
+  useEffect(() => {
+    setRepairsEnabled(document.documentElement.getAttribute("data-module-repairs") === "1");
   }, []);
 
-  const visibleSections = useMemo(
-    () => NAV_SECTIONS.filter((s) => s.label !== "Soporte técnico" || repairsEnabled),
-    [repairsEnabled],
+  const visibleSections = NAV_SECTIONS.filter(
+    (s) => s.label !== "Soporte técnico" || repairsEnabled,
   );
 
   const isCatalogActive =
