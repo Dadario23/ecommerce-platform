@@ -3,6 +3,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import User from "@/models/User";
 import { getModels } from "@/lib/tenant-models";
+import { z } from "zod";
+
+const FavoriteSchema = z.object({ productId: z.string().min(1) });
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -22,9 +25,10 @@ export async function POST(req: NextRequest) {
     if (!session?.user?.email)
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
 
-    const { productId } = await req.json();
-    if (!productId)
+    const parsed = FavoriteSchema.safeParse(await req.json());
+    if (!parsed.success)
       return NextResponse.json({ error: "productId requerido" }, { status: 400 });
+    const { productId } = parsed.data;
 
     const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
 

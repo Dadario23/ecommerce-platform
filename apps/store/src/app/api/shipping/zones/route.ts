@@ -4,6 +4,22 @@ import { authOptions } from "@/lib/auth";
 import ShippingConfig from "@/models/ShippingConfig";
 import { isAdmin } from "@/lib/roles";
 import { getModels } from "@/lib/tenant-models";
+import { z } from "zod";
+
+const ZonesSchema = z.object({
+  zones: z.array(
+    z.object({
+      id: z.string().min(1),
+      name: z.string().min(1),
+      localities: z.array(z.string()).default([]),
+      zipRanges: z
+        .array(z.object({ min: z.number(), max: z.number() }))
+        .default([]),
+      flex: z.number().nonnegative(),
+      standard: z.number().nonnegative(),
+    })
+  ),
+});
 
 const DEFAULT_ZONES = [
   {
@@ -74,10 +90,11 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "No autorizado" }, { status: 403 });
     }
 
-    const { zones } = await req.json();
-    if (!Array.isArray(zones)) {
+    const parsed = ZonesSchema.safeParse(await req.json());
+    if (!parsed.success) {
       return NextResponse.json({ error: "Formato inválido" }, { status: 400 });
     }
+    const { zones } = parsed.data;
 
     const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
     const config = await ShippingConfig.findOneAndUpdate(

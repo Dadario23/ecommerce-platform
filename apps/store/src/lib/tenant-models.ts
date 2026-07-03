@@ -10,6 +10,7 @@ import GlobalNotification from "@/models/Notification";
 import GlobalOrder from "@/models/Order";
 import GlobalPresupuesto from "@/models/Presupuesto";
 import GlobalProduct from "@/models/Product";
+import GlobalRateLimit from "@/models/RateLimit";
 import GlobalRepairCatalog from "@/models/RepairCatalog";
 import GlobalReparacion from "@/models/Reparacion";
 import GlobalReview from "@/models/Review";
@@ -43,6 +44,7 @@ export async function getModels() {
     Order: bind(conn, GlobalOrder),
     Presupuesto: bind(conn, GlobalPresupuesto),
     Product: bind(conn, GlobalProduct),
+    RateLimit: bind(conn, GlobalRateLimit),
     RepairCatalog: bind(conn, GlobalRepairCatalog),
     Reparacion: bind(conn, GlobalReparacion),
     Review: bind(conn, GlobalReview),

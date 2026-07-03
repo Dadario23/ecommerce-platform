@@ -4,6 +4,15 @@ import Category from "@/models/Category";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getModels } from "@/lib/tenant-models";
+import { z } from "zod";
+
+const CategoryCreateSchema = z.object({
+  name: z.string().trim().min(1),
+  description: z.string().optional(),
+  status: z.enum(["published", "draft"]).optional(),
+  thumbnail: z.string().optional(),
+  bannerImage: z.string().optional(),
+});
 
 function isAdmin(role: string | undefined) {
   return role === "admin" || role === "superadmin";
@@ -17,13 +26,11 @@ export async function POST(req: Request) {
     }
 
     const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
-    const body = await req.json();
-
-    const { name, description, status, thumbnail, bannerImage } = body;
-
-    if (!name) {
-      return NextResponse.json({ error: "Name is required" }, { status: 400 });
+    const parsed = CategoryCreateSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Datos de categoría inválidos" }, { status: 400 });
     }
+    const { name, description, status, thumbnail, bannerImage } = parsed.data;
 
     const category = await Category.create({
       name,

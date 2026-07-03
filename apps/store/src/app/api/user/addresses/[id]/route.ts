@@ -4,6 +4,23 @@ import { getServerSession } from "next-auth";
 import User from "@/models/User";
 import { authOptions } from "@/lib/auth";
 import { getModels } from "@/lib/tenant-models";
+import { z } from "zod";
+
+const AddressInputSchema = z.object({
+  title: z.string().trim().min(1),
+  firstName: z.string().trim().min(1),
+  lastName: z.string().trim().min(1),
+  street: z.string().trim().min(1),
+  betweenStreets: z.string().optional(),
+  city: z.string().trim().min(1),
+  state: z.string().trim().min(1),
+  zipCode: z.string().trim().min(1),
+  country: z.string().trim().min(1).default("Argentina"),
+  phone: z.string().optional(),
+  lat: z.number().optional(),
+  lng: z.number().optional(),
+  isDefault: z.boolean().optional().default(false),
+});
 
 export async function PUT(
   request: NextRequest,
@@ -18,7 +35,11 @@ export async function PUT(
     }
 
     const { id } = await context.params;
-    const addressData = await request.json();
+    const parsed = AddressInputSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Dirección inválida" }, { status: 400 });
+    }
+    const addressData = parsed.data;
 
     // Si se marca como default, quitar el default de las demás
     if (addressData.isDefault) {

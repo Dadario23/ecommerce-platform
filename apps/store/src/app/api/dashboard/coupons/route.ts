@@ -3,6 +3,16 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import Coupon from "@/models/Coupon";
 import { getModels } from "@/lib/tenant-models";
+import { z } from "zod";
+
+const CouponCreateSchema = z.object({
+  code: z.string().trim().min(1),
+  type: z.enum(["percentage", "fixed"]),
+  value: z.coerce.number().nonnegative(),
+  minOrder: z.coerce.number().nonnegative().optional(),
+  maxUses: z.coerce.number().int().positive().optional(),
+  expiresAt: z.string().optional(),
+});
 
 async function isAdmin() {
   const session = await getServerSession(authOptions);
@@ -25,20 +35,19 @@ export async function POST(request: NextRequest) {
   }
 
   const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
-  const body = await request.json();
-  const { code, type, value, minOrder, maxUses, expiresAt } = body;
-
-  if (!code || !type || value == null) {
+  const parsed = CouponCreateSchema.safeParse(await request.json());
+  if (!parsed.success) {
     return NextResponse.json({ error: "Campos requeridos: code, type, value" }, { status: 400 });
   }
+  const { code, type, value, minOrder, maxUses, expiresAt } = parsed.data;
 
   try {
     const coupon = await Coupon.create({
       code: code.trim().toUpperCase(),
       type,
-      value: Number(value),
-      minOrder: minOrder ? Number(minOrder) : 0,
-      maxUses: maxUses ? Number(maxUses) : undefined,
+      value,
+      minOrder: minOrder ?? 0,
+      maxUses,
       expiresAt: expiresAt ? new Date(expiresAt) : undefined,
     });
     return NextResponse.json(coupon, { status: 201 });

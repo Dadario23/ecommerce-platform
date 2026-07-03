@@ -4,7 +4,13 @@ import { getServerSession } from "next-auth";
 import User from "@/models/User";
 import { authOptions } from "@/lib/auth";
 import bcrypt from "bcryptjs";
+import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
+
+const ChangePasswordSchema = z.object({
+  currentPassword: z.string().min(1),
+  newPassword: z.string().min(6),
+});
 
 export async function PATCH(request: NextRequest) {
   try {
@@ -15,22 +21,14 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
-    const { currentPassword, newPassword } = await request.json();
-
-    // Validaciones
-    if (!currentPassword || !newPassword) {
-      return NextResponse.json(
-        { error: "Todos los campos son requeridos" },
-        { status: 400 }
-      );
-    }
-
-    if (newPassword.length < 6) {
+    const parsed = ChangePasswordSchema.safeParse(await request.json());
+    if (!parsed.success) {
       return NextResponse.json(
         { error: "La nueva contraseña debe tener al menos 6 caracteres" },
         { status: 400 }
       );
     }
+    const { currentPassword, newPassword } = parsed.data;
 
     // Buscar usuario
     const user = await User.findOne({ email: session.user.email });

@@ -1,6 +1,18 @@
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
+import crypto from "crypto";
 import { CLIENT_DISPLAY_NAMES } from "@/config/clients";
+
+// Comparación en tiempo constante: hashea ambos lados a 32 bytes fijos para no
+// filtrar ni la longitud ni el contenido del secreto por timing.
+function isAuthorized(req: Request): boolean {
+  const secret = process.env.ADMIN_HUB_SECRET;
+  if (!secret) return false;
+  const provided = req.headers.get("authorization") ?? "";
+  const a = crypto.createHash("sha256").update(provided).digest();
+  const b = crypto.createHash("sha256").update(`Bearer ${secret}`).digest();
+  return crypto.timingSafeEqual(a, b);
+}
 
 const REGISTERED_CLIENTS = (process.env.PLATFORM_CLIENTS ?? "bitm-cel").split(",").map((s) => s.trim());
 const CLUSTER_URI = process.env.MONGODB_CLUSTER_URI!;
@@ -49,8 +61,7 @@ async function getClientStats(conn: mongoose.Connection, dbName: string) {
 }
 
 export async function GET(req: Request) {
-  const authHeader = req.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.ADMIN_HUB_SECRET}`) {
+  if (!isAuthorized(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -65,8 +76,7 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const authHeader = req.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.ADMIN_HUB_SECRET}`) {
+  if (!isAuthorized(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

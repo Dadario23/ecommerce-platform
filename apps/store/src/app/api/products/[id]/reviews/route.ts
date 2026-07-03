@@ -5,7 +5,14 @@ import Product from "@/models/Product";
 import Review from "@/models/Review";
 import Order from "@/models/Order";
 import mongoose from "mongoose";
+import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
+
+const ReviewSchema = z.object({
+  rating: z.number().int().min(1).max(5),
+  title: z.string().trim().min(1).max(120),
+  body: z.string().trim().min(1).max(2000),
+});
 
 export async function GET(
   _req: NextRequest,
@@ -34,14 +41,14 @@ export async function POST(
     }
 
     const { id } = await context.params;
-    const { rating, title, body } = await request.json();
-
-    if (!rating || rating < 1 || rating > 5) {
-      return NextResponse.json({ error: "Rating inválido (1-5)" }, { status: 400 });
+    const parsed = ReviewSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Reseña inválida (rating 1-5, título y comentario requeridos)" },
+        { status: 400 }
+      );
     }
-    if (!title?.trim() || !body?.trim()) {
-      return NextResponse.json({ error: "Título y comentario son obligatorios" }, { status: 400 });
-    }
+    const { rating, title, body } = parsed.data;
 
     if (!session.user.id || !mongoose.isValidObjectId(session.user.id)) {
       return NextResponse.json({ error: "Sesión inválida, volvé a iniciar sesión" }, { status: 401 });

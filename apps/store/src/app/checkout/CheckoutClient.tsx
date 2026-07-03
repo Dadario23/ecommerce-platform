@@ -228,7 +228,9 @@ export default function CheckoutClient({ shippingEnabled = true }: CheckoutClien
           setErrorMsg(
             res.status === 409 && Array.isArray(body.details)
               ? body.details.join("\n")
-              : "Error al crear preferencia de pago",
+              : res.status === 422 && body.error
+                ? body.error
+                : "Error al crear preferencia de pago",
           );
           setIsProcessing(false);
           return;
@@ -247,7 +249,9 @@ export default function CheckoutClient({ shippingEnabled = true }: CheckoutClien
           setErrorMsg(
             res.status === 409 && Array.isArray(body.details)
               ? body.details.join("\n")
-              : "Error al crear la orden",
+              : res.status === 422 && body.error
+                ? body.error
+                : "Error al crear la orden",
           );
           setIsProcessing(false);
           return;

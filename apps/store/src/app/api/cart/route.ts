@@ -3,6 +3,19 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import Cart from "@/models/Cart";
 import { getModels } from "@/lib/tenant-models";
+import { z } from "zod";
+
+const CartBodySchema = z.object({
+  items: z.array(
+    z.object({
+      id: z.string().min(1),
+      name: z.string().optional().default(""),
+      price: z.number(),
+      image: z.string().optional().default(""),
+      quantity: z.number().int().min(1),
+    })
+  ),
+});
 
 const normalizeItems = (items: any) => {
   if (!items) return [];
@@ -48,16 +61,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { items } = body || {};
-
-    if (!Array.isArray(items)) {
-      console.warn("[API CART] Formato inválido de items:", items);
+    const parsed = CartBodySchema.safeParse(await request.json());
+    if (!parsed.success) {
       return NextResponse.json(
         { error: "Formato de items inválido" },
         { status: 400 }
       );
     }
+    const { items } = parsed.data;
 
     const cart = await Cart.findOneAndUpdate(
       { userId: session.user.id },

@@ -2,20 +2,36 @@
 import { NextRequest, NextResponse } from "next/server";
 import User from "@/models/User";
 import crypto from "crypto";
+import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
+import { getClientIp, hitRateLimit } from "@/lib/rate-limit";
+
+const VerifySchema = z.object({
+  token: z.string().min(1),
+  email: z.string().email(),
+});
 
 export async function POST(request: NextRequest) {
   try {
-    const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
-    const { token, email } = await request.json();
+    const ip = getClientIp(request.headers);
+    const rl = await hitRateLimit(`verify-reset:${ip}`, 20, 60 * 60 * 1000);
+    if (rl.limited) {
+      return NextResponse.json(
+        { error: "Demasiados intentos. Probá de nuevo más tarde." },
+        { status: 429, headers: { "Retry-After": String(rl.retryAfterSec) } }
+      );
+    }
 
-    // Validaciones
-    if (!token || !email) {
+    const parsed = VerifySchema.safeParse(await request.json());
+    if (!parsed.success) {
       return NextResponse.json(
         { error: "Token y email son requeridos" },
         { status: 400 }
       );
     }
+    const { token, email } = parsed.data;
+
+    const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
 
     // Buscar usuario
     const user = await User.findOne({ email });

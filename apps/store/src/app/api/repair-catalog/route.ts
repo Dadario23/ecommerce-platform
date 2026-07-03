@@ -2,7 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import RepairCatalog from "@/models/RepairCatalog";
+import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
+
+const RepairCatalogSchema = z.object({
+  deviceType: z.enum(["celular", "laptop", "pc"]),
+  brand: z.string().trim().min(1),
+  model: z.string().trim().min(1),
+  active: z.boolean().optional().default(true),
+  repairs: z
+    .array(z.object({ type: z.string().min(1), price: z.number().nonnegative() }))
+    .default([]),
+});
 
 // GET /api/repair-catalog?device=celular  → chatbot (public)
 // GET /api/repair-catalog                 → admin list
@@ -51,20 +62,19 @@ export async function POST(request: NextRequest) {
   }
 
   const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
-  const body = await request.json();
-  const { deviceType, brand, model, active, repairs } = body;
-
-  if (!deviceType || !brand?.trim() || !model?.trim()) {
+  const parsed = RepairCatalogSchema.safeParse(await request.json());
+  if (!parsed.success) {
     return NextResponse.json({ error: "deviceType, brand y model son obligatorios" }, { status: 400 });
   }
+  const { deviceType, brand, model, active, repairs } = parsed.data;
 
   try {
     const entry = await RepairCatalog.create({
       deviceType,
-      brand: brand.trim(),
-      model: model.trim(),
-      active: active ?? true,
-      repairs: repairs ?? [],
+      brand,
+      model,
+      active,
+      repairs,
     });
     return NextResponse.json(entry, { status: 201 });
   } catch (err: unknown) {

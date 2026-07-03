@@ -2,20 +2,30 @@
 import { NextRequest, NextResponse } from "next/server";
 import User from "@/models/User";
 import crypto from "crypto";
+import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
+import { getClientIp, hitRateLimit } from "@/lib/rate-limit";
+
+const ForgotSchema = z.object({ email: z.string().email() });
 
 export async function POST(request: NextRequest) {
   try {
-    const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
-    const { email } = await request.json();
-
-    // Validar email
-    if (!email) {
+    const ip = getClientIp(request.headers);
+    const rl = await hitRateLimit(`forgot:${ip}`, 5, 60 * 60 * 1000);
+    if (rl.limited) {
       return NextResponse.json(
-        { error: "Email es requerido" },
-        { status: 400 }
+        { error: "Demasiados intentos. Probá de nuevo más tarde." },
+        { status: 429, headers: { "Retry-After": String(rl.retryAfterSec) } }
       );
     }
+
+    const parsed = ForgotSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Email inválido" }, { status: 400 });
+    }
+    const { email } = parsed.data;
+
+    const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
 
     // Buscar usuario
     const user = await User.findOne({ email });

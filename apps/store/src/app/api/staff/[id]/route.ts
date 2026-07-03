@@ -4,8 +4,11 @@ import { authOptions } from "@/lib/auth";
 import User from "@/models/User";
 import { isAdmin } from "@/lib/roles";
 import { getModels } from "@/lib/tenant-models";
+import { z } from "zod";
 
-const ASSIGNABLE_ROLES = ["user", "technician", "receptionist"];
+const UpdateRoleSchema = z.object({
+  role: z.enum(["user", "technician", "receptionist"]),
+});
 
 export async function PATCH(
   request: NextRequest,
@@ -17,11 +20,11 @@ export async function PATCH(
   }
 
   const { id } = await params;
-  const { role } = await request.json();
-
-  if (!ASSIGNABLE_ROLES.includes(role)) {
+  const parsed = UpdateRoleSchema.safeParse(await request.json());
+  if (!parsed.success) {
     return NextResponse.json({ error: "Rol inválido" }, { status: 400 });
   }
+  const { role } = parsed.data;
 
   const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
   const user = await User.findByIdAndUpdate(

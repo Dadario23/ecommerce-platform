@@ -4,6 +4,23 @@ import { getServerSession } from "next-auth";
 import User from "@/models/User";
 import { authOptions } from "@/lib/auth";
 import { getModels } from "@/lib/tenant-models";
+import { z } from "zod";
+
+const AddressInputSchema = z.object({
+  title: z.string().trim().min(1),
+  firstName: z.string().trim().min(1),
+  lastName: z.string().trim().min(1),
+  street: z.string().trim().min(1),
+  betweenStreets: z.string().optional(),
+  city: z.string().trim().min(1),
+  state: z.string().trim().min(1),
+  zipCode: z.string().trim().min(1),
+  country: z.string().trim().min(1).default("Argentina"),
+  phone: z.string().optional(),
+  lat: z.number().optional(),
+  lng: z.number().optional(),
+  isDefault: z.boolean().optional().default(false),
+});
 
 export async function GET(request: NextRequest) {
   try {
@@ -41,7 +58,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
-    const addressData = await request.json();
+    const parsed = AddressInputSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Dirección inválida" }, { status: 400 });
+    }
+    const addressData = parsed.data;
 
     const existingUser = await User.findOne({ email: session.user.email }).select("addresses").lean<{ addresses: { isDefault: boolean }[] }>();
     const hasAddresses = (existingUser?.addresses?.length ?? 0) > 0;

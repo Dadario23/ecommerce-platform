@@ -8,9 +8,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 
-const FALLBACK_IMAGES = [
-  "https://i.ibb.co/KzwgFL8H/Chat-GPT-Image-25-may-2026-03-23-52-p-m.png",
-];
+const FALLBACK_IMAGES = ["/carousel-placeholder.png"];
 
 export default function Carousel({
   images = FALLBACK_IMAGES,

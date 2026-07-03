@@ -3,6 +3,15 @@ import Category from "@/models/Category";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getModels } from "@/lib/tenant-models";
+import { z } from "zod";
+
+const CategoryUpdateSchema = z.object({
+  name: z.string().trim().min(1).optional(),
+  description: z.string().optional(),
+  status: z.enum(["published", "draft"]).optional(),
+  thumbnail: z.string().optional(),
+  bannerImage: z.string().optional(),
+});
 
 function isAdmin(role: string | undefined) {
   return role === "admin" || role === "superadmin";
@@ -27,8 +36,9 @@ export async function GET(
 
     return NextResponse.json(category);
   } catch (error) {
+    console.error("Error fetching category:", error);
     return NextResponse.json(
-      { message: "Error fetching category", error },
+      { message: "Error fetching category" },
       { status: 500 }
     );
   }
@@ -47,13 +57,14 @@ export async function PUT(
 
     const { id } = await context.params;
     const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
-    const body = await req.json();
-
-    const { name, description, status, thumbnail, bannerImage } = body;
+    const parsed = CategoryUpdateSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Datos de categoría inválidos" }, { status: 400 });
+    }
 
     const updated = await Category.findByIdAndUpdate(
       id,
-      { name, description, status, thumbnail, bannerImage },
+      parsed.data,
       { new: true }
     );
 

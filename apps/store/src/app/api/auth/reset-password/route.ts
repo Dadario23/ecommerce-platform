@@ -3,27 +3,37 @@ import { NextRequest, NextResponse } from "next/server";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
+import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
+import { getClientIp, hitRateLimit } from "@/lib/rate-limit";
+
+const ResetSchema = z.object({
+  token: z.string().min(1),
+  email: z.string().email(),
+  newPassword: z.string().min(6),
+});
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIp(request.headers);
+    const rl = await hitRateLimit(`reset:${ip}`, 10, 60 * 60 * 1000);
+    if (rl.limited) {
+      return NextResponse.json(
+        { error: "Demasiados intentos. Probá de nuevo más tarde." },
+        { status: 429, headers: { "Retry-After": String(rl.retryAfterSec) } }
+      );
+    }
+
+    const parsed = ResetSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Datos inválidos. La contraseña debe tener al menos 6 caracteres." },
+        { status: 400 }
+      );
+    }
+    const { token, email, newPassword } = parsed.data;
+
     const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
-    const { token, email, newPassword } = await request.json();
-
-    // Validaciones
-    if (!token || !email || !newPassword) {
-      return NextResponse.json(
-        { error: "Todos los campos son requeridos" },
-        { status: 400 }
-      );
-    }
-
-    if (newPassword.length < 6) {
-      return NextResponse.json(
-        { error: "La contraseña debe tener al menos 6 caracteres" },
-        { status: 400 }
-      );
-    }
 
     // Buscar usuario
     const user = await User.findOne({ email });

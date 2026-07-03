@@ -2,7 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import RepairCatalog from "@/models/RepairCatalog";
+import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
+
+const RepairCatalogUpdateSchema = z
+  .object({
+    deviceType: z.enum(["celular", "laptop", "pc"]),
+    brand: z.string().trim().min(1),
+    model: z.string().trim().min(1),
+    active: z.boolean(),
+    repairs: z.array(z.object({ type: z.string().min(1), price: z.number().nonnegative() })),
+  })
+  .partial();
 
 async function requireAdmin() {
   const session = await getServerSession(authOptions);
@@ -32,10 +43,13 @@ export async function PATCH(
   }
   const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
   const { id } = await params;
-  const body = await request.json();
+  const parsed = RepairCatalogUpdateSchema.safeParse(await request.json());
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
+  }
 
   try {
-    const entry = await RepairCatalog.findByIdAndUpdate(id, body, { new: true, runValidators: true });
+    const entry = await RepairCatalog.findByIdAndUpdate(id, parsed.data, { new: true, runValidators: true });
     if (!entry) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
     return NextResponse.json(entry);
   } catch (err: unknown) {

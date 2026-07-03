@@ -35,6 +35,9 @@ export async function PATCH(
     const { id } = await params;
     const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
     const body = await request.json();
+    if (body == null || typeof body !== "object" || Object.keys(body).some((k) => k.startsWith("$"))) {
+      return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
+    }
     const pres = await Presupuesto.findByIdAndUpdate(id, body, { new: true });
     if (!pres) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
     return NextResponse.json(pres);

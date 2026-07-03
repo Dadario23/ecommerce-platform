@@ -1,15 +1,32 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
+import { z } from "zod";
 import User from "@/models/User";
 import { getModels } from "@/lib/tenant-models";
+import { getClientIp, hitRateLimit } from "@/lib/rate-limit";
+
+const RegisterSchema = z.object({
+  name: z.string().trim().min(1).max(120),
+  email: z.string().email(),
+  password: z.string().min(6).max(200),
+});
 
 export async function POST(req: Request) {
   try {
-    const { name, email, password } = await req.json();
-
-    if (!name || !email || !password) {
-      return NextResponse.json({ error: "Faltan campos" }, { status: 400 });
+    const ip = getClientIp(req.headers);
+    const rl = await hitRateLimit(`register:${ip}`, 5, 60 * 60 * 1000);
+    if (rl.limited) {
+      return NextResponse.json(
+        { error: "Demasiados intentos. Probá de nuevo más tarde." },
+        { status: 429, headers: { "Retry-After": String(rl.retryAfterSec) } }
+      );
     }
+
+    const parsed = RegisterSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
+    }
+    const { name, email, password } = parsed.data;
 
     const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
 

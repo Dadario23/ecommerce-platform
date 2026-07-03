@@ -1,8 +1,17 @@
 import type { AuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { z } from "zod";
 import { verifyPassword } from "@/lib/auth-helpers";
 import { getModels } from "@/lib/tenant-models";
+import { peekRateLimit, hitRateLimit, resetRateLimit } from "@/lib/rate-limit";
+
+const LOGIN_LIMIT = 8;
+const LOGIN_WINDOW_MS = 15 * 60 * 1000;
+const CredentialsSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1),
+});
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -17,15 +26,27 @@ export const authOptions: AuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
+        const creds = CredentialsSchema.safeParse(credentials);
+        if (!creds.success) return null;
+        const { email, password } = creds.data;
+
+        const rlKey = `login:${email.toLowerCase().trim()}`;
+        if ((await peekRateLimit(rlKey, LOGIN_LIMIT)).limited) return null;
 
         const { User } = await getModels();
-        const user = await User.findOne({ email: credentials.email });
-        if (!user) return null;
+        const user = await User.findOne({ email });
+        if (!user) {
+          await hitRateLimit(rlKey, LOGIN_LIMIT, LOGIN_WINDOW_MS);
+          return null;
+        }
 
-        const isValid = await verifyPassword(credentials.password, user.password);
-        if (!isValid) return null;
+        const isValid = await verifyPassword(password, user.password);
+        if (!isValid) {
+          await hitRateLimit(rlKey, LOGIN_LIMIT, LOGIN_WINDOW_MS);
+          return null;
+        }
 
+        await resetRateLimit(rlKey);
         return {
           id: user._id.toString(),
           email: user.email,

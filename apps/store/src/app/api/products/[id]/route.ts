@@ -56,8 +56,9 @@ export async function DELETE(
     await Product.findByIdAndDelete(id);
     return NextResponse.json({ message: "Producto eliminado" });
   } catch (error) {
+    console.error("Error al eliminar producto:", error);
     return NextResponse.json(
-      { error: (error as Error).message },
+      { error: "Error al eliminar producto" },
       { status: 500 }
     );
   }
@@ -76,6 +77,9 @@ export async function PATCH(
 
     const { id } = await context.params;
     const body = await req.json();
+    if (body == null || typeof body !== "object" || Object.keys(body).some((k) => k.startsWith("$"))) {
+      return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
+    }
     const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
 
     const product = await Product.findByIdAndUpdate(
@@ -90,7 +94,8 @@ export async function PATCH(
 
     return NextResponse.json(product);
   } catch (error) {
-    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+    console.error("Error al actualizar producto (PATCH):", error);
+    return NextResponse.json({ error: "Error al actualizar producto" }, { status: 500 });
   }
 }
 
@@ -107,6 +112,9 @@ export async function PUT(
 
     const { id } = await context.params;
     const body = await req.json();
+    if (body == null || typeof body !== "object" || Object.keys(body).some((k) => k.startsWith("$"))) {
+      return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
+    }
     const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
 
     if (body.name) {
@@ -130,8 +138,9 @@ export async function PUT(
 
     return NextResponse.json(product);
   } catch (error) {
+    console.error("Error al actualizar producto (PUT):", error);
     return NextResponse.json(
-      { error: (error as Error).message },
+      { error: "Error al actualizar producto" },
       { status: 500 }
     );
   }

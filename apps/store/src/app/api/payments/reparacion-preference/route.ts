@@ -2,16 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { Preference } from "mercadopago";
 import client from "@/lib/mercadopago";
 import Reparacion from "@/models/Reparacion";
+import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
 
 const PAYABLE_ESTADOS = ["diagnosticado", "en_reparacion", "esperando_repuestos", "listo"];
 
+const PreferenceSchema = z.object({ codigo: z.string().trim().min(1) });
+
 export async function POST(req: NextRequest) {
   try {
-    const { codigo } = await req.json();
-    if (!codigo) {
+    const parsed = PreferenceSchema.safeParse(await req.json());
+    if (!parsed.success) {
       return NextResponse.json({ error: "Código requerido" }, { status: 400 });
     }
+    const { codigo } = parsed.data;
 
     const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
 

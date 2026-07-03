@@ -7,15 +7,35 @@ import Order from "@/models/Order";
 import User from "@/models/User";
 import Product from "@/models/Product";
 import mongoose from "mongoose";
+import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
 
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  image: string;
-  quantity: number;
-}
+const OrderItemSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().optional().default(""),
+  price: z.number().optional(),
+  image: z.string().optional().default(""),
+  quantity: z.number().int().positive(),
+});
+
+const AddressSchema = z.object({
+  firstName: z.string(),
+  lastName: z.string(),
+  street: z.string(),
+  city: z.string(),
+  state: z.string(),
+  zipCode: z.string(),
+  country: z.string(),
+  phone: z.string(),
+});
+
+const PreferencePayloadSchema = z.object({
+  items: z.array(OrderItemSchema).min(1),
+  couponCode: z.string().optional(),
+  shippingMethod: z.string().optional(),
+  notes: z.string().optional(),
+  shippingAddress: AddressSchema,
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,21 +46,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
-    const orderData = await request.json();
-    const items: CartItem[] = orderData.items;
+    const parsed = PreferencePayloadSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Pedido inválido" }, { status: 400 });
+    }
+    const orderData = parsed.data;
+    const items = orderData.items;
 
     // Validar stock antes de crear la preferencia
     const productIds = items.map((item) => new mongoose.Types.ObjectId(item.id));
     const products = await Product.find({ _id: { $in: productIds } })
-      .select("_id name stock")
-      .lean<{ _id: mongoose.Types.ObjectId; name: string; stock: number }[]>();
+      .select("_id name stock price isActive")
+      .lean<{ _id: mongoose.Types.ObjectId; name: string; stock: number; price: number; isActive?: boolean }[]>();
 
     const productMap = new Map(products.map((p) => [String(p._id), p]));
     const stockErrors: string[] = [];
 
     for (const item of items) {
       const product = productMap.get(item.id);
-      if (!product) {
+      if (!product || product.isActive === false) {
         stockErrors.push(`"${item.name}" ya no está disponible`);
         continue;
       }
@@ -63,25 +87,60 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 });
     }
 
-    const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    // Recalcular ítems, subtotal, descuento y total SIEMPRE desde la base.
+    // Nunca confiar en los montos que envía el cliente.
+    const authoritativeItems = items.map((item) => {
+      const product = productMap.get(item.id)!; // garantizado por la validación de stock
+      return {
+        productId: new mongoose.Types.ObjectId(item.id),
+        name: product.name,
+        price: product.price,
+        image: item.image,
+        quantity: item.quantity,
+      };
+    });
 
-    const transformedItems = items.map((item) => ({
-      productId: new mongoose.Types.ObjectId(item.id),
-      name: item.name,
-      price: item.price,
-      image: item.image,
-      quantity: item.quantity,
-    }));
+    const subtotal = authoritativeItems.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+
+    // Revalidar el cupón contra la base y recalcular el descuento del lado servidor
+    let discount = 0;
+    if (orderData.couponCode?.trim()) {
+      const coupon = await Coupon.findOne({
+        code: orderData.couponCode.trim().toUpperCase(),
+        isActive: true,
+      });
+      const now = new Date();
+      const invalid =
+        !coupon ||
+        (coupon.expiresAt && coupon.expiresAt < now) ||
+        (coupon.maxUses != null && coupon.usedCount >= coupon.maxUses) ||
+        (coupon.minOrder && subtotal < coupon.minOrder);
+      if (invalid) {
+        return NextResponse.json(
+          { error: "El cupón ya no es válido" },
+          { status: 422 }
+        );
+      }
+      discount =
+        coupon.type === "percentage"
+          ? Math.round((subtotal * coupon.value) / 100)
+          : Math.min(coupon.value, subtotal);
+    }
+
+    const total = Math.max(subtotal - discount, 0);
 
     const order = new Order({
       userId: user._id,
       customerEmail: session.user.email,
-      items: transformedItems,
+      items: authoritativeItems,
       subtotal,
       shipping: 0,
       tax: 0,
-      discount: orderData.discount ?? 0,
-      total: orderData.total,
+      discount,
+      total,
       shippingAddress: orderData.shippingAddress,
       payment: {
         method: "mercadopago",
@@ -96,13 +155,28 @@ export async function POST(request: NextRequest) {
 
     const preference = new Preference(client);
 
-    const mpItems = items.map((item) => ({
-      id: item.id,
-      title: item.name,
-      quantity: item.quantity,
-      unit_price: item.price,
-      currency_id: "ARS",
-    }));
+    // Con cupón aplicado, Mercado Pago cobra el total ya rebajado como un único
+    // concepto (Checkout Pro no admite líneas de descuento con precio negativo).
+    // El detalle por producto queda en el checkout de la tienda, igual que en
+    // Tiendanube o Shopify. Sin descuento se mantiene el detalle por producto.
+    const mpItems =
+      discount > 0
+        ? [
+            {
+              id: String(order._id),
+              title: `Pedido ${order.orderNumber}`,
+              quantity: 1,
+              unit_price: total,
+              currency_id: "ARS",
+            },
+          ]
+        : authoritativeItems.map((item) => ({
+            id: String(item.productId),
+            title: item.name,
+            quantity: item.quantity,
+            unit_price: item.price,
+            currency_id: "ARS",
+          }));
 
     const baseUrl =
       process.env.NEXT_PUBLIC_URL ||
@@ -131,10 +205,9 @@ export async function POST(request: NextRequest) {
       orderId: order._id,
     });
   } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : "Error desconocido";
     console.error("Error creando preferencia MP:", error);
     return NextResponse.json(
-      { error: "Error creando preferencia", details: msg },
+      { error: "Error creando preferencia" },
       { status: 500 }
     );
   }

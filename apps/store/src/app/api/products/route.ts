@@ -39,10 +39,7 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error("Error al obtener productos:", error);
     return NextResponse.json(
-      {
-        error: "Error al obtener productos",
-        details: (error as Error).message,
-      },
+      { error: "Error al obtener productos" },
       { status: 500 },
     );
   }
@@ -77,7 +74,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error("Error al crear producto:", error);
     return NextResponse.json(
-      { error: (error as Error).message },
+      { error: "Error al crear producto" },
       { status: 500 },
     );
   }
