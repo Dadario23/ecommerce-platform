@@ -36,7 +36,7 @@ const ProductSchema: Schema = new Schema(
     slug: { type: String, required: true, unique: true },
     price: { type: Number, required: true },
     compareAtPrice: { type: Number },
-    description: { type: String, required: true },
+    description: { type: String, default: "" },
 
     images: {
       type: [String],
