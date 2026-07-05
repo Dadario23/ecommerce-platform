@@ -2,4 +2,5 @@
 export const CLIENT_DISPLAY_NAMES: Record<string, string> = {
   "bitm-cel": "Bitm-Cel",
   "kameleba": "Kameleba",
+  "compumobile": "Compumobile",
 };

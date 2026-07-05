@@ -21,6 +21,11 @@ const THEMES: Record<string, TenantTheme> = {
     primaryColor: "#9333EA",
     accentColor: "#EC4899",
   },
+  "compumobile": {
+    storeName: "Compumobile",
+    primaryColor: "#1E3A8A",
+    accentColor: "#3B82F6",
+  },
 };
 
 export function getTenantTheme(slug: string): TenantTheme {
