@@ -37,7 +37,7 @@ export default function CategoriesGrid({ categories }: { categories: Category[] 
               href={`/category/${slug}`}
               className="group flex flex-col items-center gap-2"
             >
-              <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-gray-100 border border-gray-200 group-hover:border-blue-400 group-hover:shadow-md transition-all duration-200">
+              <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-gray-100 border border-gray-200 group-hover:border-(--tenant-primary)/40 group-hover:shadow-md transition-all duration-200">
                 {hasThumbnail ? (
                   <Image
                     src={cat.thumbnail!}
@@ -52,7 +52,7 @@ export default function CategoriesGrid({ categories }: { categories: Category[] 
                   </div>
                 )}
               </div>
-              <span className="text-xs sm:text-sm font-medium text-gray-700 group-hover:text-blue-600 text-center leading-tight transition-colors">
+              <span className="text-xs sm:text-sm font-medium text-gray-700 group-hover:text-(--tenant-primary) text-center leading-tight transition-colors">
                 {cat.name}
               </span>
             </Link>

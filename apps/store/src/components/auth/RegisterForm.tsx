@@ -182,7 +182,7 @@ export default function RegisterForm() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full bg-(--tenant-primary) text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-blue-800 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+        className="w-full bg-(--tenant-primary) text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-(--tenant-primary-hover) transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
       >
         {isSubmitting ? (
           <><Loader2 className="w-4 h-4 animate-spin" /> Creando cuenta...</>

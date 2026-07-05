@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { getModels } from "@/lib/tenant-models";
-import { getTenantTheme } from "@/config/tenant-themes";
+import { getTenantTheme, type TenantTheme } from "@/config/tenant-themes";
 
 export interface ClientConfig {
   slug: string;
@@ -12,10 +12,7 @@ export interface ClientConfig {
     coupons: boolean;
     analytics: boolean;
   };
-  theme: {
-    primaryColor: string;
-    accentColor: string;
-  };
+  theme: TenantTheme;
 }
 
 const DEFAULT_MODULES: ClientConfig["modules"] = {

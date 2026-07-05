@@ -41,7 +41,7 @@ export default function CategoryProductCard({ product, listView = false, shippin
     return (
       <Link
         href={`/products/${product.slug}`}
-        className="group bg-white rounded-xl border border-gray-100 hover:border-blue-200 hover:shadow-md transition-all duration-200 flex items-stretch gap-4 p-3 overflow-hidden"
+        className="group bg-white rounded-xl border border-gray-100 hover:border-(--tenant-primary)/30 hover:shadow-md transition-all duration-200 flex items-stretch gap-4 p-3 overflow-hidden"
       >
         {/* Imagen */}
         <div className="relative w-36 sm:w-44 aspect-square shrink-0 rounded-lg bg-gray-50 overflow-hidden border border-gray-100">
@@ -69,7 +69,7 @@ export default function CategoryProductCard({ product, listView = false, shippin
         <div className="flex-1 min-w-0 flex flex-col justify-between py-1 gap-1">
           <div>
             {product.brand && (
-              <p className="text-xs font-semibold uppercase tracking-wide text-blue-600 mb-0.5">
+              <p className="text-xs font-semibold uppercase tracking-wide text-(--tenant-primary) mb-0.5">
                 {product.brand}
               </p>
             )}
@@ -88,7 +88,7 @@ export default function CategoryProductCard({ product, listView = false, shippin
               ${product.price.toLocaleString("es-AR")}
             </p>
             {!outOfStock && (
-              <p className="text-xs text-blue-700 font-medium">
+              <p className="text-xs text-(--tenant-primary) font-medium">
                 {INSTALLMENTS.max}x ${installment.toLocaleString("es-AR")}
                 {INSTALLMENTS.sinInteres && " sin interés"}
               </p>
@@ -121,7 +121,7 @@ export default function CategoryProductCard({ product, listView = false, shippin
   return (
     <Link
       href={`/products/${product.slug}`}
-      className="group bg-white rounded-xl border border-gray-100 hover:border-blue-200 hover:shadow-md transition-all duration-200 flex flex-col overflow-hidden"
+      className="group bg-white rounded-xl border border-gray-100 hover:border-(--tenant-primary)/30 hover:shadow-md transition-all duration-200 flex flex-col overflow-hidden"
     >
       <div className="relative w-full aspect-square bg-gray-50 overflow-hidden">
         {hasDiscount && (
@@ -151,7 +151,7 @@ export default function CategoryProductCard({ product, listView = false, shippin
 
       <div className="p-3 flex flex-col gap-1 flex-1">
         {product.brand && (
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-blue-600">
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-(--tenant-primary)">
             {product.brand}
           </p>
         )}
@@ -169,7 +169,7 @@ export default function CategoryProductCard({ product, listView = false, shippin
             ${product.price.toLocaleString("es-AR")}
           </p>
           {!outOfStock && (
-            <p className="text-[10px] text-blue-700 font-medium">
+            <p className="text-[10px] text-(--tenant-primary) font-medium">
               12x ${installment.toLocaleString("es-AR")}
             </p>
           )}

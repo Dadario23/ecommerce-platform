@@ -31,7 +31,7 @@ export default function HomeProductCard({
   return (
     <Link
       href={`/products/${slug}`}
-      className="group bg-white rounded-xl border border-gray-100 hover:border-blue-200 hover:shadow-md transition-all duration-200 flex flex-col overflow-hidden"
+      className="group bg-white rounded-xl border border-gray-100 hover:border-(--tenant-primary)/30 hover:shadow-md transition-all duration-200 flex flex-col overflow-hidden"
     >
       {/* Image */}
       <div className="relative w-full aspect-square bg-gray-50 overflow-hidden">
@@ -53,7 +53,7 @@ export default function HomeProductCard({
       {/* Info */}
       <div className="p-3 flex flex-col gap-1 flex-1">
         {brand && (
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-blue-600">
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-(--tenant-primary)">
             {brand}
           </p>
         )}
@@ -70,7 +70,7 @@ export default function HomeProductCard({
           <p className="text-base font-bold text-gray-900">
             ${price.toLocaleString("es-AR")}
           </p>
-          <p className="text-[10px] text-blue-700 font-medium">
+          <p className="text-[10px] text-(--tenant-primary) font-medium">
             {INSTALLMENTS.max}x ${installment.toLocaleString("es-AR")}
             {INSTALLMENTS.sinInteres && " sin interés"}
           </p>

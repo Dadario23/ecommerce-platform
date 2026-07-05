@@ -158,7 +158,7 @@ export default function CategoryClient({ categoryName, initialProducts, shipping
                 <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-100 rounded-xl shadow-lg z-20 overflow-hidden">
                   {(Object.keys(SORT_LABELS) as SortOption[]).map((key) => (
                     <button key={key} onClick={() => { setSort(key); setSortOpen(false); setPage(1); }}
-                      className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${sort === key ? "bg-blue-50 text-(--tenant-primary) font-semibold" : "text-gray-700 hover:bg-gray-50"}`}>
+                      className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${sort === key ? "bg-(--tenant-tint) text-(--tenant-primary) font-semibold" : "text-gray-700 hover:bg-gray-50"}`}>
                       {SORT_LABELS[key]}
                     </button>
                   ))}
@@ -245,7 +245,7 @@ export default function CategoryClient({ categoryName, initialProducts, shipping
             </div>
             <div className="sticky bottom-0 bg-white border-t px-4 py-4">
               <button onClick={() => setMobileFiltersOpen(false)}
-                className="w-full bg-(--tenant-primary) text-white font-semibold py-3 rounded-xl hover:bg-blue-800 transition-colors">
+                className="w-full bg-(--tenant-primary) text-white font-semibold py-3 rounded-xl hover:bg-(--tenant-primary-hover) transition-colors">
                 Ver {filteredProducts.length} resultado{filteredProducts.length !== 1 ? "s" : ""}
               </button>
             </div>

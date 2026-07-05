@@ -26,7 +26,7 @@ export default function ProductBreadcrumb({ product }: { product: IProduct }) {
       <nav className="flex md:hidden items-center mb-4">
         <Link
           href={category ? `/category/${category.slug}` : "/"}
-          className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 font-medium"
+          className="flex items-center gap-1 text-sm text-(--tenant-primary) hover:text-(--tenant-primary-hover) font-medium"
         >
           <ChevronLeft className="w-4 h-4" />
           {category ? category.name : "Inicio"}
@@ -35,7 +35,7 @@ export default function ProductBreadcrumb({ product }: { product: IProduct }) {
 
       {/* Desktop: full breadcrumb */}
       <nav className="hidden md:flex items-center gap-1 text-sm text-gray-500 mb-6 flex-wrap">
-        <Link href="/" className="flex items-center gap-1 hover:text-blue-600 transition-colors">
+        <Link href="/" className="flex items-center gap-1 hover:text-(--tenant-primary) transition-colors">
           <Home className="w-3.5 h-3.5" />
           Inicio
         </Link>
@@ -45,7 +45,7 @@ export default function ProductBreadcrumb({ product }: { product: IProduct }) {
             <ChevronRight className="w-3.5 h-3.5 text-gray-300 shrink-0" />
             <Link
               href={`/category/${category.slug}`}
-              className="hover:text-blue-600 transition-colors capitalize"
+              className="hover:text-(--tenant-primary) transition-colors capitalize"
             >
               {category.name}
             </Link>

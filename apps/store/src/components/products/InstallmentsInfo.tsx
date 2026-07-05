@@ -35,20 +35,20 @@ export default function InstallmentsInfo({ price }: { price: number }) {
 
   // Phase 1 — con interés, solo comunicación visual
   return (
-    <div className="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 space-y-2">
-      <div className="flex items-center gap-2 text-blue-700">
+    <div className="rounded-xl border border-black/5 bg-(--tenant-tint) px-4 py-3 space-y-2">
+      <div className="flex items-center gap-2 text-(--tenant-primary)">
         <CreditCard className="w-4 h-4 shrink-0" />
         <span className="text-sm font-semibold">Hasta {max} cuotas con tarjeta</span>
       </div>
       <div className="flex flex-wrap gap-x-5 gap-y-1">
         {plans.map((n) => (
-          <span key={n} className="text-sm text-blue-800">
+          <span key={n} className="text-sm text-gray-800">
             <span className="font-bold">{n}x</span>{" "}
             {ars(Math.ceil(price / n))}
           </span>
         ))}
       </div>
-      <p className="text-[11px] text-blue-400 leading-tight">
+      <p className="text-[11px] text-gray-400 leading-tight">
         Montos estimados. El interés lo define tu banco al momento del pago.
       </p>
     </div>

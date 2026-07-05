@@ -45,13 +45,13 @@ export default async function SoporteTecnicoPage() {
       {/* ── HERO ── */}
       <section className="bg-(--tenant-primary) text-white pt-20 pb-12 md:pt-24 md:pb-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <p className="text-blue-300 text-xs font-semibold uppercase tracking-widest mb-3">
+          <p className="text-(--tenant-on-primary)/80 text-xs font-semibold uppercase tracking-widest mb-3">
             Soporte Técnico
           </p>
           <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-3">
             Tu equipo en buenas manos
           </h1>
-          <p className="text-blue-200 text-sm md:text-base max-w-lg mx-auto">
+          <p className="text-(--tenant-on-primary)/70 text-sm md:text-base max-w-lg mx-auto">
             Reparamos celulares y computadoras con repuestos de calidad.
             También brindamos soporte técnico a empresas y pymes.
           </p>
@@ -65,7 +65,7 @@ export default async function SoporteTecnicoPage() {
           {/* Particulares */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
+              <div className="w-9 h-9 rounded-xl bg-(--tenant-tint) flex items-center justify-center">
                 <Smartphone className="w-4.5 h-4.5 text-(--tenant-primary)" />
               </div>
               <div>
@@ -86,7 +86,7 @@ export default async function SoporteTecnicoPage() {
           {/* Empresas */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
+              <div className="w-9 h-9 rounded-xl bg-(--tenant-tint) flex items-center justify-center">
                 <Building2 className="w-4.5 h-4.5 text-(--tenant-primary)" />
               </div>
               <div>
@@ -106,7 +106,7 @@ export default async function SoporteTecnicoPage() {
               href={WA_EMPRESA}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 bg-(--tenant-primary) hover:bg-blue-800 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors"
+              className="flex items-center justify-center gap-2 bg-(--tenant-primary) hover:bg-(--tenant-primary-hover) text-(--tenant-on-primary) text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors"
             >
               <MessageCircle className="w-4 h-4" />
               Consultar para mi empresa
@@ -143,7 +143,7 @@ export default async function SoporteTecnicoPage() {
         </div>
 
         {/* ── TRACKING ── */}
-        <div className="mt-4 rounded-2xl border-2 border-(--tenant-primary) bg-linear-to-br from-blue-50 to-white shadow-sm overflow-hidden">
+        <div className="mt-4 rounded-2xl border-2 border-(--tenant-primary) bg-linear-to-br from-(--tenant-tint) to-white shadow-sm overflow-hidden">
           <div className="px-5 pt-5 pb-2 flex items-start gap-3">
             <div className="w-10 h-10 rounded-xl bg-(--tenant-primary) flex items-center justify-center shrink-0 shadow-md">
               <span className="text-lg">🔍</span>

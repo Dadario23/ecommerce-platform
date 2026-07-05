@@ -27,7 +27,7 @@ export default function ProductInfo({ product }: { product: IProduct }) {
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 flex-wrap">
           {product.brand && (
-            <span className="text-xs font-semibold uppercase tracking-widest text-blue-600">
+            <span className="text-xs font-semibold uppercase tracking-widest text-(--tenant-primary)">
               {product.brand}
             </span>
           )}

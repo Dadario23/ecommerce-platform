@@ -127,7 +127,7 @@ export default function ProductForm({ product, loading, onSubmit, actionLabel }:
         <button
           type="submit"
           disabled={loading}
-          className="bg-(--tenant-primary) text-white text-sm font-semibold px-6 py-2.5 rounded-xl hover:bg-blue-800 transition-colors disabled:opacity-60 flex items-center gap-2"
+          className="bg-(--tenant-primary) text-white text-sm font-semibold px-6 py-2.5 rounded-xl hover:bg-(--tenant-primary-hover) transition-colors disabled:opacity-60 flex items-center gap-2"
         >
           {loading ? (
             <><Loader2 className="w-4 h-4 animate-spin" /> Guardando...</>

@@ -44,7 +44,7 @@ export default function CategoryBlock({
             className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-r from-blue-800 to-blue-600" />
+          <div className="w-full h-full bg-gradient-to-r from-(--tenant-primary) to-(--tenant-primary-hover)" />
         )}
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />

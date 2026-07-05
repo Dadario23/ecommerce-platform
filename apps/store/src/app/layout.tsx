@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Manrope, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "@/providers/SessionProvider";
 import CartDrawer from "@/components/cart/CartDrawer";
@@ -10,6 +10,7 @@ import { getPublicCategories } from "@/lib/getPublicCategories";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getClientConfig } from "@/config/client";
+import type { FontKey } from "@/config/tenant-themes";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,6 +21,24 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+const manrope = Manrope({
+  variable: "--font-manrope",
+  subsets: ["latin"],
+  preload: false,
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  preload: false,
+});
+
+const FONT_VARS: Record<FontKey, { sans: string; display: string }> = {
+  geist: { sans: "var(--font-geist-sans)", display: "var(--font-geist-sans)" },
+  manrope: { sans: "var(--font-manrope)", display: "var(--font-manrope)" },
+  editorial: { sans: "var(--font-geist-sans)", display: "var(--font-playfair)" },
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   const { storeName } = await getClientConfig();
@@ -40,23 +59,41 @@ export default async function RootLayout({
     getClientConfig(),
   ]);
 
-  const { primaryColor, accentColor } = clientConfig.theme;
+  const { theme } = clientConfig;
+  const fonts = FONT_VARS[theme.font];
 
   return (
     <html
       lang="es"
       data-store-name={clientConfig.storeName}
       data-module-repairs={clientConfig.modules.repairs ? "1" : "0"}
-      style={{ "--tenant-primary": primaryColor, "--tenant-accent": accentColor } as React.CSSProperties}
+      style={{
+        "--tenant-primary": theme.colors.primary,
+        "--tenant-primary-hover": theme.colors.primaryHover,
+        "--tenant-on-primary": theme.colors.onPrimary,
+        "--tenant-tint": theme.colors.tint,
+        "--tenant-accent": theme.colors.accent,
+        "--tenant-font-sans": fonts.sans,
+        "--tenant-font-display": fonts.display,
+        "--radius": theme.radius,
+      } as React.CSSProperties}
     >
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${manrope.variable} ${playfair.variable} antialiased`}
       >
         <AuthProvider session={session}>
           <ToastProvider>
             <CartProvider>
               <CartDrawer />
-              <LayoutWrapper categories={categories} showRepairs={clientConfig.modules.repairs}>{children}</LayoutWrapper>
+              <LayoutWrapper
+                categories={categories}
+                showRepairs={clientConfig.modules.repairs}
+                storeName={clientConfig.storeName}
+                logo={theme.logo}
+                promoItems={theme.promoItems}
+              >
+                {children}
+              </LayoutWrapper>
             </CartProvider>
           </ToastProvider>
         </AuthProvider>

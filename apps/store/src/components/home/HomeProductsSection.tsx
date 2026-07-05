@@ -30,16 +30,36 @@ async function getFeaturedProducts(): Promise<ProductDoc[]> {
     .lean<ProductDoc[]>();
 }
 
-export default async function HomeProductsSection() {
+export default async function HomeProductsSection({
+  layout = "dense",
+}: {
+  layout?: "dense" | "airy";
+}) {
   const products = await getFeaturedProducts();
 
   if (products.length === 0) return null;
 
-  return (
-    <section className="mt-10 space-y-5">
-      <h2 className="text-xl font-bold text-gray-900">Productos destacados</h2>
+  const airy = layout === "airy";
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+  return (
+    <section className={airy ? "mt-14 space-y-8" : "mt-10 space-y-5"}>
+      <h2
+        className={
+          airy
+            ? "font-brand text-2xl md:text-3xl text-gray-900 text-center"
+            : "text-xl font-bold text-gray-900"
+        }
+      >
+        Productos destacados
+      </h2>
+
+      <div
+        className={
+          airy
+            ? "grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8"
+            : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
+        }
+      >
         {products.map((p) => (
           <HomeProductCard
             key={String(p._id)}

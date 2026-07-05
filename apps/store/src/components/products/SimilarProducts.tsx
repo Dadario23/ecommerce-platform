@@ -25,7 +25,7 @@ function ProductCard({ p }: { p: SimilarProduct }) {
   return (
     <Link
       href={`/products/${p.slug}`}
-      className="group flex flex-col bg-white border border-gray-100 rounded-2xl overflow-hidden hover:border-blue-200 hover:shadow-md transition-all"
+      className="group flex flex-col bg-white border border-gray-100 rounded-2xl overflow-hidden hover:border-(--tenant-primary)/30 hover:shadow-md transition-all"
     >
       <div className="relative aspect-square bg-gray-50 overflow-hidden">
         {p.images?.[0] ? (

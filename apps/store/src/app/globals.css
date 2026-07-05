@@ -72,6 +72,8 @@
 }
 
 @theme inline {
+  --font-sans: var(--tenant-font-sans);
+  --font-brand: var(--tenant-font-display);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -111,7 +113,12 @@
 
 :root {
   --tenant-primary: #1E3A8A;
+  --tenant-primary-hover: #1E40AF;
+  --tenant-on-primary: #FFFFFF;
+  --tenant-tint: #EFF6FF;
   --tenant-accent: #3B82F6;
+  --tenant-font-sans: var(--font-geist-sans);
+  --tenant-font-display: var(--tenant-font-sans);
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);

@@ -36,6 +36,7 @@ import { useCartUI } from "@/store/useCartUI";
 import { useCartStore } from "@/store/useCartStore";
 import { useFavoritesSync } from "@/hooks/useFavoritesSync";
 import Image from "next/image";
+import type { TenantTheme } from "@/config/tenant-themes";
 
 interface Category {
   _id: string;
@@ -55,7 +56,19 @@ function getSlug(cat: Category) {
   );
 }
 
-export default function Navbar({ initialCategories = [], showRepairs = false }: { initialCategories?: Category[]; showRepairs?: boolean }) {
+export default function Navbar({
+  initialCategories = [],
+  showRepairs = false,
+  storeName,
+  logo,
+  promoItems,
+}: {
+  initialCategories?: Category[];
+  showRepairs?: boolean;
+  storeName: string;
+  logo: TenantTheme["logo"];
+  promoItems: TenantTheme["promoItems"];
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const { data: session } = useSession();
@@ -89,16 +102,22 @@ export default function Navbar({ initialCategories = [], showRepairs = false }: 
               <Menu className="w-6 h-6" />
             </button>
 
-            {/* Logo */}
+            {/* Logo o wordmark */}
             <Link href="/" className="shrink-0">
-              <Image
-                src="/logo.svg"
-                alt="logo"
-                width={160}
-                height={38}
-                priority
-                className="brightness-0 invert"
-              />
+              {logo ? (
+                <Image
+                  src={logo.src}
+                  alt={storeName || "logo"}
+                  width={160}
+                  height={38}
+                  priority
+                  className={logo.invert ? "brightness-0 invert" : ""}
+                />
+              ) : (
+                <span className="font-brand text-2xl tracking-tight text-(--tenant-on-primary)">
+                  {storeName}
+                </span>
+              )}
             </Link>
 
             {/* Search — desktop */}
@@ -133,7 +152,7 @@ export default function Navbar({ initialCategories = [], showRepairs = false }: 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button className="flex items-center gap-1.5 text-white/90 hover:text-white text-sm font-medium px-2 py-1.5 rounded-lg hover:bg-white/10 transition-colors">
-                      <div className="w-7 h-7 rounded-full bg-blue-400 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                      <div className="w-7 h-7 rounded-full bg-(--tenant-accent) flex items-center justify-center text-white text-xs font-bold shrink-0">
                         {(session.user?.name || "U")[0].toUpperCase()}
                       </div>
                       <span className="hidden md:inline max-w-25 truncate">
@@ -182,8 +201,8 @@ export default function Navbar({ initialCategories = [], showRepairs = false }: 
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
                           <Link href="/dashboard" className="flex items-center gap-2">
-                            <LayoutDashboard className="w-4 h-4 text-blue-500" />
-                            <span className="text-blue-600 font-medium">Dashboard</span>
+                            <LayoutDashboard className="w-4 h-4 text-(--tenant-primary)" />
+                            <span className="text-(--tenant-primary) font-medium">Dashboard</span>
                           </Link>
                         </DropdownMenuItem>
                       </>
@@ -234,7 +253,7 @@ export default function Navbar({ initialCategories = [], showRepairs = false }: 
 
         {/* ── MOBILE SEARCH ── */}
         {mobileSearchOpen && (
-          <div className="md:hidden bg-[#1a3278] px-4 pb-3">
+          <div className="md:hidden bg-(--tenant-primary-hover) px-4 pb-3">
             <NavbarSearch />
           </div>
         )}
@@ -247,7 +266,7 @@ export default function Navbar({ initialCategories = [], showRepairs = false }: 
                 <button
                   key={cat._id}
                   onClick={() => goToCategory(cat)}
-                  className="px-3.5 py-2.5 whitespace-nowrap text-sm text-gray-600 hover:text-(--tenant-primary) hover:bg-blue-50 font-medium transition-colors rounded-md shrink-0"
+                  className="px-3.5 py-2.5 whitespace-nowrap text-sm text-gray-600 hover:text-(--tenant-primary) hover:bg-(--tenant-tint) font-medium transition-colors rounded-md shrink-0"
                 >
                   {cat.name}
                 </button>
@@ -257,7 +276,7 @@ export default function Navbar({ initialCategories = [], showRepairs = false }: 
                   <div className="w-px h-4 bg-gray-200 mx-1 shrink-0" />
                   <Link
                     href="/soporte-tecnico"
-                    className="flex items-center gap-1.5 px-3.5 py-2.5 whitespace-nowrap text-sm text-(--tenant-primary) hover:bg-blue-50 font-semibold transition-colors rounded-md shrink-0"
+                    className="flex items-center gap-1.5 px-3.5 py-2.5 whitespace-nowrap text-sm text-(--tenant-primary) hover:bg-(--tenant-tint) font-semibold transition-colors rounded-md shrink-0"
                   >
                     <Wrench className="w-3.5 h-3.5" />
                     Soporte Técnico
@@ -268,7 +287,7 @@ export default function Navbar({ initialCategories = [], showRepairs = false }: 
           </div>
         </nav>
         {/* ── PROMO BAR — solo en páginas de producto ── */}
-        {pathname.startsWith("/products/") && <PromoBar />}
+        {pathname.startsWith("/products/") && <PromoBar items={promoItems} />}
       </header>
 
       {/* ── MOBILE DRAWER ── */}
@@ -289,14 +308,14 @@ export default function Navbar({ initialCategories = [], showRepairs = false }: 
             <div className="bg-(--tenant-primary) px-4 py-5 flex items-center justify-between shrink-0">
               {session ? (
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-blue-400 flex items-center justify-center text-white font-bold text-base">
+                  <div className="w-10 h-10 rounded-full bg-(--tenant-accent) flex items-center justify-center text-white font-bold text-base">
                     {(session.user?.name || "U")[0].toUpperCase()}
                   </div>
                   <div>
                     <p className="text-white font-semibold text-sm leading-tight">
                       {session.user?.name?.split(" ")[0] || "Usuario"}
                     </p>
-                    <p className="text-blue-200 text-xs truncate max-w-40">
+                    <p className="text-(--tenant-on-primary)/70 text-xs truncate max-w-40">
                       {session.user?.email}
                     </p>
                   </div>
@@ -329,7 +348,7 @@ export default function Navbar({ initialCategories = [], showRepairs = false }: 
                   <li key={cat._id}>
                     <button
                       onClick={() => goToCategory(cat)}
-                      className="w-full flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-(--tenant-primary) transition-colors text-left"
+                      className="w-full flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:bg-(--tenant-tint) hover:text-(--tenant-primary) transition-colors text-left"
                     >
                       {cat.name}
                       <ChevronRight className="w-4 h-4 text-gray-300 shrink-0" />
@@ -341,7 +360,7 @@ export default function Navbar({ initialCategories = [], showRepairs = false }: 
                     <Link
                       href="/soporte-tecnico"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 text-sm text-(--tenant-primary) font-semibold hover:bg-blue-50"
+                      className="flex items-center gap-3 px-4 py-3 text-sm text-(--tenant-primary) font-semibold hover:bg-(--tenant-tint)"
                     >
                       <Wrench className="w-4 h-4" />
                       Soporte Técnico
@@ -361,7 +380,7 @@ export default function Navbar({ initialCategories = [], showRepairs = false }: 
                       <Link
                         href="/account/profile"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-blue-50"
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-(--tenant-tint)"
                       >
                         <UserCircle className="w-4 h-4 text-gray-400" />
                         Mi perfil
@@ -371,7 +390,7 @@ export default function Navbar({ initialCategories = [], showRepairs = false }: 
                       <Link
                         href="/account/orders"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-blue-50"
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-(--tenant-tint)"
                       >
                         <ClipboardList className="w-4 h-4 text-gray-400" />
                         Mis compras
@@ -381,7 +400,7 @@ export default function Navbar({ initialCategories = [], showRepairs = false }: 
                       <Link
                         href="/account/favorites"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-blue-50"
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-(--tenant-tint)"
                       >
                         <Heart className="w-4 h-4 text-gray-400" />
                         Mis favoritos
@@ -392,7 +411,7 @@ export default function Navbar({ initialCategories = [], showRepairs = false }: 
                         <Link
                           href="/dashboard"
                           onClick={() => setMobileMenuOpen(false)}
-                          className="flex items-center gap-3 px-4 py-3 text-sm text-blue-600 font-medium hover:bg-blue-50"
+                          className="flex items-center gap-3 px-4 py-3 text-sm text-(--tenant-primary) font-medium hover:bg-(--tenant-tint)"
                         >
                           <LayoutDashboard className="w-4 h-4" />
                           Dashboard

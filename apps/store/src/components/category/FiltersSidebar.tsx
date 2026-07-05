@@ -63,7 +63,7 @@ export default function FiltersSidebar({
         {hasActiveFilters && (
           <button
             onClick={resetFilters}
-            className="text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors"
+            className="text-xs text-(--tenant-primary) hover:text-(--tenant-primary-hover) font-medium transition-colors"
           >
             Limpiar todo
           </button>
@@ -90,7 +90,7 @@ export default function FiltersSidebar({
                   }}
                   min={priceRange.min}
                   max={filters.maxPrice}
-                  className="w-full border border-gray-200 rounded-lg pl-6 pr-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400"
+                  className="w-full border border-gray-200 rounded-lg pl-6 pr-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-(--tenant-primary)/20 focus:border-(--tenant-primary)/50"
                 />
               </div>
             </div>
@@ -108,7 +108,7 @@ export default function FiltersSidebar({
                   }}
                   min={filters.minPrice}
                   max={priceRange.max}
-                  className="w-full border border-gray-200 rounded-lg pl-6 pr-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400"
+                  className="w-full border border-gray-200 rounded-lg pl-6 pr-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-(--tenant-primary)/20 focus:border-(--tenant-primary)/50"
                 />
               </div>
             </div>

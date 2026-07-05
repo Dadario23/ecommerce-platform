@@ -85,7 +85,7 @@ export default function NavbarSearch() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Buscar productos, marcas..."
-          className="w-full rounded-full bg-white border-0 pl-4 pr-12 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-sm"
+          className="w-full rounded-full bg-white border-0 pl-4 pr-12 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-(--tenant-accent)/50 shadow-sm"
           onKeyDown={(e) => {
             if (e.key === "Enter") handleSearch();
             if (e.key === "Escape") setShow(false);
@@ -95,7 +95,7 @@ export default function NavbarSearch() {
         <button
           type="button"
           onClick={handleSearch}
-          className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 bg-(--tenant-primary) hover:bg-blue-700 rounded-full flex items-center justify-center text-white transition-colors shrink-0"
+          className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 bg-(--tenant-primary) hover:bg-(--tenant-primary-hover) rounded-full flex items-center justify-center text-white transition-colors shrink-0"
         >
           {loading ? (
             <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -113,7 +113,7 @@ export default function NavbarSearch() {
               <li
                 key={p._id}
                 onClick={() => handleSelect(p.slug)}
-                className="flex items-center gap-3 cursor-pointer px-3 py-2.5 hover:bg-blue-50 transition-colors"
+                className="flex items-center gap-3 cursor-pointer px-3 py-2.5 hover:bg-(--tenant-tint) transition-colors"
               >
                 {/* Imagen */}
                 <div className="relative w-12 h-12 shrink-0 rounded-lg overflow-hidden border bg-gray-100">
@@ -136,7 +136,7 @@ export default function NavbarSearch() {
                     {p.name}
                   </p>
                   <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-sm font-bold text-blue-700">
+                    <span className="text-sm font-bold text-(--tenant-primary)">
                       ${p.price.toLocaleString("es-AR")}
                     </span>
                     {p.avgRating && p.avgRating > 0 ? (
@@ -156,7 +156,7 @@ export default function NavbarSearch() {
           {/* Footer: ir a resultados completos */}
           <button
             onClick={handleSearch}
-            className="w-full px-4 py-2.5 text-xs text-blue-600 hover:bg-blue-50 text-left border-t font-medium transition-colors"
+            className="w-full px-4 py-2.5 text-xs text-(--tenant-primary) hover:bg-(--tenant-tint) text-left border-t font-medium transition-colors"
           >
             Ver todos los resultados para &ldquo;{query}&rdquo;
           </button>
