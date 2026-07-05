@@ -70,7 +70,7 @@ const THEMES: Record<string, TenantTheme> = {
     },
     radius: "0.375rem",
     font: "manrope",
-    logo: { src: "/logo-compumobile.png" },
+    logo: { src: "/logo.svg", invert: true },
     homeVariant: "tech",
     benefits: [
       { icon: "truck", title: "Envíos a todo el país", subtitle: "Rápidos y seguros" },
