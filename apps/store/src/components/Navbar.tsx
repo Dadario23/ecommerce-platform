@@ -99,7 +99,7 @@ export default function Navbar({
     <>
       <header className="fixed top-0 left-0 w-full z-50">
         {/* ── TOP BAR ── */}
-        <div className={light ? "bg-white border-b border-gray-200" : "bg-(--tenant-primary)"}>
+        <div className={light ? "bg-background bg-pattern border-b border-gray-200" : "bg-(--tenant-primary)"}>
           <div className="max-w-7xl mx-auto px-4 flex items-center gap-3 py-3 md:py-3.5">
             {/* Mobile: hamburger */}
             <button
@@ -266,7 +266,7 @@ export default function Navbar({
         {mobileSearchOpen && (
           <div
             className={`md:hidden px-4 pb-3 ${
-              light ? "bg-white border-b border-gray-200" : "bg-(--tenant-primary-hover)"
+              light ? "bg-background bg-pattern border-b border-gray-200" : "bg-(--tenant-primary-hover)"
             }`}
           >
             <NavbarSearch light={light} />

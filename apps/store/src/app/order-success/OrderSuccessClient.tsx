@@ -65,7 +65,7 @@ export default function OrderSuccessClient() {
 
   if (isLoading) {
     return (
-      <div className="pt-20 md:pt-32 min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="pt-20 md:pt-32 min-h-screen bg-gray-50 minimal:bg-transparent flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="w-12 h-12 rounded-full border-4 border-green-200 border-t-green-500 animate-spin" />
           <p className="text-sm text-gray-500">Cargando tu pedido...</p>
@@ -75,7 +75,7 @@ export default function OrderSuccessClient() {
   }
 
   return (
-    <main className="pt-20 md:pt-32 pb-16 min-h-screen bg-gray-50">
+    <main className="pt-20 md:pt-32 pb-16 min-h-screen bg-gray-50 minimal:bg-transparent">
       <div className="max-w-lg mx-auto px-4">
 
         {/* Success card */}

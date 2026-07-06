@@ -86,6 +86,8 @@ export default async function RootLayout({
         "--tenant-font-sans": fonts.sans,
         "--tenant-font-display": fonts.display,
         "--radius": theme.radius,
+        ...(theme.colors.background && { "--background": theme.colors.background }),
+        ...(theme.backgroundPattern && { "--background-pattern": `url(${theme.backgroundPattern})` }),
       } as React.CSSProperties}
     >
       <body

@@ -19,7 +19,9 @@ export type TenantTheme = {
     onPrimary: string;    // texto/íconos sobre primary
     tint: string;         // fondo suave (hovers claros, gradientes)
     accent: string;       // avatar, badges, detalles
+    background?: string;  // fondo de página; sin definir → blanco
   };
+  backgroundPattern?: string; // PNG translúcido que se repite sobre el fondo
   radius: string;
   font: FontKey;
   logo: { src: string; invert?: boolean } | null; // null → wordmark storeName en font-brand
@@ -104,11 +106,13 @@ const THEMES: Record<string, TenantTheme> = {
       onPrimary: "#FFFFFF",
       tint: "#F5F5F5",
       accent: "#DB2777",
+      background: "#FAF6EE",
     },
     radius: "0.125rem",
     font: "urban",
     logo: { src: "/logo-kameleba.png" },
     favicon: "/favicon-kameleba.png",
+    backgroundPattern: "/pattern-kameleba.png",
     navStyle: "light",
     cardStyle: "minimal",
     homeVariant: "editorial",

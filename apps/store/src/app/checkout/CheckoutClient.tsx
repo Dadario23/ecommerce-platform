@@ -270,7 +270,7 @@ export default function CheckoutClient({ shippingEnabled = true }: CheckoutClien
 
   if (authStatus === "loading") {
     return (
-      <div className="pt-20 md:pt-32 flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="pt-20 md:pt-32 flex items-center justify-center min-h-screen bg-gray-50 minimal:bg-transparent">
         <Spinner />
       </div>
     );
@@ -278,7 +278,7 @@ export default function CheckoutClient({ shippingEnabled = true }: CheckoutClien
 
   if (step === "init-loading") {
     return (
-      <main className="pt-20 md:pt-32 pb-16 min-h-screen bg-gray-50">
+      <main className="pt-20 md:pt-32 pb-16 min-h-screen bg-gray-50 minimal:bg-transparent">
         <div className="max-w-lg mx-auto px-4">
           <CheckoutInitLoader />
         </div>
@@ -288,7 +288,7 @@ export default function CheckoutClient({ shippingEnabled = true }: CheckoutClien
 
   if (isProcessing) {
     return (
-      <main className="pt-20 md:pt-32 pb-16 min-h-screen bg-gray-50">
+      <main className="pt-20 md:pt-32 pb-16 min-h-screen bg-gray-50 minimal:bg-transparent">
         <div className="max-w-lg mx-auto px-4">
           <CheckoutProcessingLoader />
         </div>
@@ -302,7 +302,7 @@ export default function CheckoutClient({ shippingEnabled = true }: CheckoutClien
 
   if (step === "trans-date") {
     return (
-      <main className="pt-20 md:pt-32 pb-16 min-h-screen bg-gray-50">
+      <main className="pt-20 md:pt-32 pb-16 min-h-screen bg-gray-50 minimal:bg-transparent">
         <div className="max-w-lg mx-auto px-4">
           <CheckoutTransitionLoader message="Calculando opciones de entrega..." />
         </div>
@@ -312,7 +312,7 @@ export default function CheckoutClient({ shippingEnabled = true }: CheckoutClien
 
   if (step === "trans-payment") {
     return (
-      <main className="pt-20 md:pt-32 pb-16 min-h-screen bg-gray-50">
+      <main className="pt-20 md:pt-32 pb-16 min-h-screen bg-gray-50 minimal:bg-transparent">
         <div className="max-w-lg mx-auto px-4">
           <CheckoutTransitionLoader message="Cargando métodos de pago..." />
         </div>
@@ -329,7 +329,7 @@ export default function CheckoutClient({ shippingEnabled = true }: CheckoutClien
   // ── Render ────────────────────────────────────────────────────────────────────
 
   return (
-    <main className="pt-20 md:pt-32 pb-16 min-h-screen bg-gray-50">
+    <main className="pt-20 md:pt-32 pb-16 min-h-screen bg-gray-50 minimal:bg-transparent">
       <div className="max-w-lg mx-auto px-4">
         <CheckoutStepBar step={step} />
 

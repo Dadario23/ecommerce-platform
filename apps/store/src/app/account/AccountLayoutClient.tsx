@@ -23,7 +23,7 @@ export default function AccountLayoutClient({
 
   if (!session) {
     return (
-      <div className="pt-20 md:pt-32 min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="pt-20 md:pt-32 min-h-screen bg-gray-50 minimal:bg-transparent flex items-center justify-center px-4">
         <div className="text-center">
           <p className="text-lg font-semibold text-gray-700 mb-4">
             Iniciá sesión para ver tu cuenta
@@ -47,7 +47,7 @@ export default function AccountLayoutClient({
     .toUpperCase();
 
   return (
-    <main className="pt-20 md:pt-32 pb-16 min-h-screen bg-gray-50">
+    <main className="pt-20 md:pt-32 pb-16 min-h-screen bg-gray-50 minimal:bg-transparent">
       <div className="max-w-6xl mx-auto px-4">
 
         {/* Mobile: horizontal tab bar */}

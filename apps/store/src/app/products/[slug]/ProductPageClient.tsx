@@ -31,7 +31,7 @@ export default function ProductPageClient({
   return (
     // pt-28 mobile (64px navbar + 32px promobar + 16px buffer)
     // md:pt-44 desktop (106px navbar + 32px promobar + 38px buffer)
-    <div className="pt-28 md:pt-44 pb-20 min-h-screen bg-white">
+    <div className="pt-28 md:pt-44 pb-20 min-h-screen bg-white minimal:bg-transparent">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
         <ProductBreadcrumb product={product} />
