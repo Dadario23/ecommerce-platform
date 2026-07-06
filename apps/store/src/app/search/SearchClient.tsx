@@ -58,9 +58,10 @@ function ProductSkeleton() {
 
 interface Props {
   shippingEnabled?: boolean;
+  gridCards?: boolean;
 }
 
-export default function SearchClient({ shippingEnabled = true }: Props) {
+export default function SearchClient({ shippingEnabled = true, gridCards = false }: Props) {
   const searchParams = useSearchParams();
   const query = searchParams.get("q") ?? "";
   const shippingZone = useShippingZone();
@@ -261,9 +262,9 @@ export default function SearchClient({ shippingEnabled = true }: Props) {
                 ))}
               </div>
             ) : paginatedProducts.length > 0 ? (
-              <div className="flex flex-col gap-3">
+              <div className={gridCards ? "grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8" : "flex flex-col gap-3"}>
                 {paginatedProducts.map((product) => (
-                  <CategoryProductCard key={product._id} product={product} listView shippingZone={shippingZone} shippingEnabled={shippingEnabled} />
+                  <CategoryProductCard key={product._id} product={product} listView={!gridCards} shippingZone={shippingZone} shippingEnabled={shippingEnabled} />
                 ))}
               </div>
             ) : (

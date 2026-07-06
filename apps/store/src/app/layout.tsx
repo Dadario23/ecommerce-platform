@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Manrope, Playfair_Display } from "next/font/google";
+import { Geist, Geist_Mono, Manrope, Playfair_Display, Anton } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "@/providers/SessionProvider";
 import CartDrawer from "@/components/cart/CartDrawer";
@@ -34,10 +34,18 @@ const playfair = Playfair_Display({
   preload: false,
 });
 
+const anton = Anton({
+  variable: "--font-anton",
+  subsets: ["latin"],
+  weight: "400",
+  preload: false,
+});
+
 const FONT_VARS: Record<FontKey, { sans: string; display: string }> = {
   geist: { sans: "var(--font-geist-sans)", display: "var(--font-geist-sans)" },
   manrope: { sans: "var(--font-manrope)", display: "var(--font-manrope)" },
   editorial: { sans: "var(--font-geist-sans)", display: "var(--font-playfair)" },
+  urban: { sans: "var(--font-geist-sans)", display: "var(--font-anton)" },
 };
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -67,6 +75,7 @@ export default async function RootLayout({
       lang="es"
       data-store-name={clientConfig.storeName}
       data-module-repairs={clientConfig.modules.repairs ? "1" : "0"}
+      data-card-style={theme.cardStyle}
       style={{
         "--tenant-primary": theme.colors.primary,
         "--tenant-primary-hover": theme.colors.primaryHover,
@@ -79,7 +88,7 @@ export default async function RootLayout({
       } as React.CSSProperties}
     >
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${manrope.variable} ${playfair.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${manrope.variable} ${playfair.variable} ${anton.variable} antialiased`}
       >
         <AuthProvider session={session}>
           <ToastProvider>
@@ -90,6 +99,7 @@ export default async function RootLayout({
                 showRepairs={clientConfig.modules.repairs}
                 storeName={clientConfig.storeName}
                 logo={theme.logo}
+                navStyle={theme.navStyle}
                 promoItems={theme.promoItems}
               >
                 {children}

@@ -61,12 +61,14 @@ export default function Navbar({
   showRepairs = false,
   storeName,
   logo,
+  navStyle = "solid",
   promoItems,
 }: {
   initialCategories?: Category[];
   showRepairs?: boolean;
   storeName: string;
   logo: TenantTheme["logo"];
+  navStyle?: TenantTheme["navStyle"];
   promoItems: TenantTheme["promoItems"];
 }) {
   const router = useRouter();
@@ -83,6 +85,11 @@ export default function Navbar({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
+  const light = navStyle === "light";
+  const iconBtn = light
+    ? "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+    : "text-white/90 hover:text-white hover:bg-white/10";
+
   const goToCategory = (cat: Category) => {
     setMobileMenuOpen(false);
     router.push(`/category/${getSlug(cat)}`);
@@ -92,11 +99,11 @@ export default function Navbar({
     <>
       <header className="fixed top-0 left-0 w-full z-50">
         {/* ── TOP BAR ── */}
-        <div className="bg-(--tenant-primary)">
+        <div className={light ? "bg-white border-b border-gray-200" : "bg-(--tenant-primary)"}>
           <div className="max-w-7xl mx-auto px-4 flex items-center gap-3 py-3 md:py-3.5">
             {/* Mobile: hamburger */}
             <button
-              className="md:hidden text-white/80 hover:text-white"
+              className={`md:hidden ${light ? "text-gray-700 hover:text-gray-900" : "text-white/80 hover:text-white"}`}
               onClick={() => setMobileMenuOpen(true)}
             >
               <Menu className="w-6 h-6" />
@@ -111,10 +118,14 @@ export default function Navbar({
                   width={160}
                   height={38}
                   priority
-                  className={logo.invert ? "brightness-0 invert" : ""}
+                  className={`h-9.5 w-auto ${logo.invert && !light ? "brightness-0 invert" : ""}`}
                 />
               ) : (
-                <span className="font-brand text-2xl tracking-tight text-(--tenant-on-primary)">
+                <span
+                  className={`font-brand text-2xl tracking-tight ${
+                    light ? "text-gray-900 uppercase" : "text-(--tenant-on-primary)"
+                  }`}
+                >
                   {storeName}
                 </span>
               )}
@@ -122,14 +133,14 @@ export default function Navbar({
 
             {/* Search — desktop */}
             <div className="hidden md:flex flex-1 mx-4">
-              <NavbarSearch />
+              <NavbarSearch light={light} />
             </div>
 
             {/* Right actions */}
             <div className="ml-auto flex items-center gap-1 md:gap-3">
               {/* Mobile: search toggle */}
               <button
-                className="md:hidden p-2 text-white/80 hover:text-white rounded-full hover:bg-white/10 transition-colors"
+                className={`md:hidden p-2 rounded-full transition-colors ${iconBtn}`}
                 onClick={() => setMobileSearchOpen((p) => !p)}
               >
                 {mobileSearchOpen ? (
@@ -143,7 +154,7 @@ export default function Navbar({
               {!session ? (
                 <Link
                   href="/login"
-                  className="flex items-center gap-1.5 text-white/90 hover:text-white text-sm font-medium px-2 py-1.5 rounded-lg hover:bg-white/10 transition-colors"
+                  className={`flex items-center gap-1.5 text-sm font-medium px-2 py-1.5 rounded-lg transition-colors ${iconBtn}`}
                 >
                   <User className="w-5 h-5" />
                   <span className="hidden md:inline">Ingresar</span>
@@ -151,7 +162,7 @@ export default function Navbar({
               ) : (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="flex items-center gap-1.5 text-white/90 hover:text-white text-sm font-medium px-2 py-1.5 rounded-lg hover:bg-white/10 transition-colors">
+                    <button className={`flex items-center gap-1.5 text-sm font-medium px-2 py-1.5 rounded-lg transition-colors ${iconBtn}`}>
                       <div className="w-7 h-7 rounded-full bg-(--tenant-accent) flex items-center justify-center text-white text-xs font-bold shrink-0">
                         {(session.user?.name || "U")[0].toUpperCase()}
                       </div>
@@ -224,7 +235,7 @@ export default function Navbar({
               {session && (
                 <Link
                   href="/account/favorites"
-                  className="hidden md:flex relative p-2 text-white/90 hover:text-white rounded-full hover:bg-white/10 transition-colors"
+                  className={`hidden md:flex relative p-2 rounded-full transition-colors ${iconBtn}`}
                   aria-label="Mis favoritos"
                 >
                   <Heart className="w-5 h-5" />
@@ -238,7 +249,7 @@ export default function Navbar({
               <button
                 onClick={toggle}
                 disabled={isLoading}
-                className="relative p-2 text-white/90 hover:text-white rounded-full hover:bg-white/10 transition-colors"
+                className={`relative p-2 rounded-full transition-colors ${iconBtn}`}
               >
                 <ShoppingCart className="w-5 h-5" />
                 {!isLoading && itemsCount > 0 && (
@@ -253,20 +264,28 @@ export default function Navbar({
 
         {/* ── MOBILE SEARCH ── */}
         {mobileSearchOpen && (
-          <div className="md:hidden bg-(--tenant-primary-hover) px-4 pb-3">
-            <NavbarSearch />
+          <div
+            className={`md:hidden px-4 pb-3 ${
+              light ? "bg-white border-b border-gray-200" : "bg-(--tenant-primary-hover)"
+            }`}
+          >
+            <NavbarSearch light={light} />
           </div>
         )}
 
         {/* ── CATEGORY BAR (desktop) ── */}
         <nav className="hidden md:block bg-white border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4">
-            <div className="flex items-center overflow-x-auto scrollbar-none gap-1">
+            <div className={`flex items-center overflow-x-auto scrollbar-none ${light ? "gap-2 justify-center" : "gap-1"}`}>
               {initialCategories.map((cat) => (
                 <button
                   key={cat._id}
                   onClick={() => goToCategory(cat)}
-                  className="px-3.5 py-2.5 whitespace-nowrap text-sm text-gray-600 hover:text-(--tenant-primary) hover:bg-(--tenant-tint) font-medium transition-colors rounded-md shrink-0"
+                  className={
+                    light
+                      ? "px-3.5 py-3 whitespace-nowrap text-xs font-bold uppercase tracking-wider text-gray-900 hover:text-(--tenant-accent) transition-colors shrink-0"
+                      : "px-3.5 py-2.5 whitespace-nowrap text-sm text-gray-600 hover:text-(--tenant-primary) hover:bg-(--tenant-tint) font-medium transition-colors rounded-md shrink-0"
+                  }
                 >
                   {cat.name}
                 </button>

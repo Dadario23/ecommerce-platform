@@ -33,6 +33,7 @@ interface CategoryClientProps {
   categoryName: string;
   initialProducts: Product[];
   shippingEnabled?: boolean;
+  gridCards?: boolean;
 }
 
 type SortOption = "newest" | "price-asc" | "price-desc" | "discount";
@@ -46,7 +47,7 @@ const SORT_LABELS: Record<SortOption, string> = {
 
 const ITEMS_PER_PAGE = 12;
 
-export default function CategoryClient({ categoryName, initialProducts, shippingEnabled = true }: CategoryClientProps) {
+export default function CategoryClient({ categoryName, initialProducts, shippingEnabled = true, gridCards = false }: CategoryClientProps) {
   const [page, setPage]                   = useState(1);
   const [sort, setSort]                   = useState<SortOption>("newest");
   const [sortOpen, setSortOpen]           = useState(false);
@@ -174,15 +175,15 @@ export default function CategoryClient({ categoryName, initialProducts, shipping
             <FiltersSidebar availableBrands={availableBrands} priceRange={priceRange} filters={filters} onChange={handleFilterChange} />
           </aside>
 
-          {/* Products — siempre lista, 1 por fila */}
+          {/* Products — lista 1 por fila, o grilla si gridCards */}
           <section className="flex-1 min-w-0">
             {paginatedProducts.length > 0 ? (
-              <div className="flex flex-col gap-3">
+              <div className={gridCards ? "grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8" : "flex flex-col gap-3"}>
                 {paginatedProducts.map((product) => (
                   <CategoryProductCard
                     key={product._id}
                     product={product}
-                    listView
+                    listView={!gridCards}
                     shippingZone={shippingZone}
                     shippingEnabled={shippingEnabled}
                   />

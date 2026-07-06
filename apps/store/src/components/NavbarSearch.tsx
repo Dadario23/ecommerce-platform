@@ -15,7 +15,7 @@ interface SuggestProduct {
   reviewCount?: number;
 }
 
-export default function NavbarSearch() {
+export default function NavbarSearch({ light = false }: { light?: boolean }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SuggestProduct[]>([]);
   const [loading, setLoading] = useState(false);
@@ -85,7 +85,9 @@ export default function NavbarSearch() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Buscar productos, marcas..."
-          className="w-full rounded-full bg-white border-0 pl-4 pr-12 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-(--tenant-accent)/50 shadow-sm"
+          className={`w-full rounded-full pl-4 pr-12 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-(--tenant-accent)/50 ${
+            light ? "bg-gray-100 border border-gray-200" : "bg-white border-0 shadow-sm"
+          }`}
           onKeyDown={(e) => {
             if (e.key === "Enter") handleSearch();
             if (e.key === "Escape") setShow(false);

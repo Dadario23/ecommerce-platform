@@ -46,7 +46,7 @@ export default async function HomeProductsSection({
       <h2
         className={
           airy
-            ? "font-brand text-2xl md:text-3xl text-gray-900 text-center"
+            ? "font-brand text-2xl md:text-3xl text-gray-900 text-center uppercase tracking-wide"
             : "text-xl font-bold text-gray-900"
         }
       >
@@ -66,6 +66,7 @@ export default async function HomeProductsSection({
             id={String(p._id)}
             slug={p.slug}
             image={p.images?.[0] ?? ""}
+            hoverImage={p.images?.[1]}
             name={p.name}
             price={p.price}
             compareAtPrice={p.compareAtPrice}

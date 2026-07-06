@@ -14,7 +14,7 @@ export default function EditorialCategories({
 
   return (
     <section className="mt-14">
-      <h2 className="font-brand text-2xl md:text-3xl text-gray-900 text-center mb-8">
+      <h2 className="font-brand text-2xl md:text-3xl text-gray-900 text-center mb-8 uppercase tracking-wide">
         Categorías
       </h2>
       <div className={`grid gap-4 md:gap-6 ${featured.length >= 3 ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
@@ -24,7 +24,7 @@ export default function EditorialCategories({
             <Link
               key={cat._id}
               href={`/category/${cat.slug || slugify(cat.name)}`}
-              className="group relative block aspect-[4/5] overflow-hidden rounded-lg bg-gray-100"
+              className="group relative block aspect-[4/5] overflow-hidden bg-gray-100"
             >
               {image && (
                 <Image
@@ -36,7 +36,7 @@ export default function EditorialCategories({
                 />
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-              <span className="absolute bottom-5 left-0 right-0 text-center font-brand text-xl md:text-2xl text-white tracking-tight">
+              <span className="absolute bottom-5 left-0 right-0 text-center font-brand text-xl md:text-2xl text-white uppercase tracking-wide">
                 {cat.name}
               </span>
             </Link>

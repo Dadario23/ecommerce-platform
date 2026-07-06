@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import Sidebar from "@/components/dashboard/Sidebar";
+import type { TenantTheme } from "@/config/tenant-themes";
 import { Menu, X, Store, LogOut } from "lucide-react";
 import Link from "next/link";
 
@@ -25,9 +26,13 @@ const PAGE_TITLES: Record<string, string> = {
 export default function DashboardShell({
   children,
   repairsEnabled,
+  logo,
+  storeName,
 }: {
   children: React.ReactNode;
   repairsEnabled: boolean;
+  logo: TenantTheme["logo"];
+  storeName: string;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -54,6 +59,8 @@ export default function DashboardShell({
           collapsed={sidebarCollapsed}
           onToggle={() => setSidebarCollapsed((p) => !p)}
           repairsEnabled={repairsEnabled}
+          logo={logo}
+          storeName={storeName}
         />
       </div>
 
@@ -65,7 +72,7 @@ export default function DashboardShell({
             onClick={() => setMobileOpen(false)}
           />
           <div className="relative flex">
-            <Sidebar repairsEnabled={repairsEnabled} />
+            <Sidebar repairsEnabled={repairsEnabled} logo={logo} storeName={storeName} />
             <button
               onClick={() => setMobileOpen(false)}
               className="absolute top-4 right-4 text-slate-400 hover:text-white"

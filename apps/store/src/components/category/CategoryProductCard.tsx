@@ -121,11 +121,11 @@ export default function CategoryProductCard({ product, listView = false, shippin
   return (
     <Link
       href={`/products/${product.slug}`}
-      className="group bg-white rounded-xl border border-gray-100 hover:border-(--tenant-primary)/30 hover:shadow-md transition-all duration-200 flex flex-col overflow-hidden"
+      className="group bg-white rounded-xl border border-gray-100 hover:border-(--tenant-primary)/30 hover:shadow-md transition-all duration-200 flex flex-col overflow-hidden minimal:rounded-none minimal:border-0 minimal:bg-transparent minimal:hover:shadow-none"
     >
-      <div className="relative w-full aspect-square bg-gray-50 overflow-hidden">
+      <div className="relative w-full aspect-square bg-gray-50 overflow-hidden minimal:aspect-3/4 minimal:bg-gray-100">
         {hasDiscount && (
-          <span className="absolute top-2 left-2 z-10 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
+          <span className="absolute top-2 left-2 z-10 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded minimal:bg-(--tenant-accent) minimal:rounded-none">
             -{discountPct}%
           </span>
         )}
@@ -145,17 +145,26 @@ export default function CategoryProductCard({ product, listView = false, shippin
           alt={product.name}
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          className="object-contain p-3 group-hover:scale-105 transition-transform duration-300"
+          className="object-contain p-3 group-hover:scale-105 transition-transform duration-300 minimal:object-cover minimal:p-0"
         />
+        {product.images?.[1] && (
+          <Image
+            src={product.images[1]}
+            alt={product.name}
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            className="hidden minimal:block object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          />
+        )}
       </div>
 
-      <div className="p-3 flex flex-col gap-1 flex-1">
+      <div className="p-3 flex flex-col gap-1 flex-1 minimal:px-0 minimal:pt-2.5 minimal:pb-0">
         {product.brand && (
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-(--tenant-primary)">
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-(--tenant-primary) minimal:text-gray-500">
             {product.brand}
           </p>
         )}
-        <h3 className="text-xs font-medium text-gray-800 line-clamp-2 leading-snug flex-1">
+        <h3 className="text-xs font-medium text-gray-800 line-clamp-2 leading-snug flex-1 minimal:text-sm">
           {product.name}
         </h3>
 

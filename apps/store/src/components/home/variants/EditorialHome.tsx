@@ -21,10 +21,7 @@ export default function EditorialHome({
 }: EditorialHomeProps) {
   return (
     <main className="pt-16 md:pt-28">
-      <EditorialHero
-        image={carouselImages[0] ?? "/carousel-placeholder.png"}
-        storeName={storeName}
-      />
+      <EditorialHero images={carouselImages} storeName={storeName} />
 
       <BenefitsBar items={benefits} variant="light" />
 

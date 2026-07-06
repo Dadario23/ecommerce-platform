@@ -1,5 +1,7 @@
 export type HomeVariant = "tech" | "editorial";
-export type FontKey = "geist" | "manrope" | "editorial";
+export type FontKey = "geist" | "manrope" | "editorial" | "urban";
+export type NavStyle = "solid" | "light";
+export type CardStyle = "boxed" | "minimal";
 export type BenefitIcon =
   | "truck"
   | "creditCard"
@@ -21,6 +23,8 @@ export type TenantTheme = {
   radius: string;
   font: FontKey;
   logo: { src: string; invert?: boolean } | null; // null → wordmark storeName en font-brand
+  navStyle: NavStyle; // solid → barra en primary; light → barra blanca con texto oscuro
+  cardStyle: CardStyle; // boxed → card con borde y foto contain; minimal → sin borde, foto 3/4 cover (variante CSS `minimal:`)
   homeVariant: HomeVariant;
   benefits: { icon: BenefitIcon; title: string; subtitle: string }[];
   promoItems: { icon: BenefitIcon; text: string }[];
@@ -38,6 +42,8 @@ const DEFAULT_THEME: TenantTheme = {
   radius: "0.625rem",
   font: "geist",
   logo: null,
+  navStyle: "solid",
+  cardStyle: "boxed",
   homeVariant: "tech",
   benefits: [
     { icon: "truck", title: "Envío gratis", subtitle: "A todo el país" },
@@ -71,6 +77,8 @@ const THEMES: Record<string, TenantTheme> = {
     radius: "0.375rem",
     font: "manrope",
     logo: { src: "/logo.svg", invert: true },
+    navStyle: "solid",
+    cardStyle: "boxed",
     homeVariant: "tech",
     benefits: [
       { icon: "truck", title: "Envíos a todo el país", subtitle: "Rápidos y seguros" },
@@ -88,15 +96,17 @@ const THEMES: Record<string, TenantTheme> = {
   "kameleba": {
     storeName: "Kameleba",
     colors: {
-      primary: "#1C1917",
-      primaryHover: "#292524",
-      onPrimary: "#FAFAF9",
-      tint: "#FAF5F2",
+      primary: "#0A0A0A",
+      primaryHover: "#262626",
+      onPrimary: "#FFFFFF",
+      tint: "#F5F5F5",
       accent: "#DB2777",
     },
     radius: "0.125rem",
-    font: "editorial",
-    logo: null,
+    font: "urban",
+    logo: { src: "/logo-kameleba.png" },
+    navStyle: "light",
+    cardStyle: "minimal",
     homeVariant: "editorial",
     benefits: [
       { icon: "refresh", title: "Cambios sin cargo", subtitle: "Hasta 30 días" },

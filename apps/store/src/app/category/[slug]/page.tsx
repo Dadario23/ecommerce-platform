@@ -61,9 +61,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CategoryPage({ params }: Props) {
   const { slug } = await params;
-  const [data, shippingEnabled] = await Promise.all([
+  const [data, shippingEnabled, { theme }] = await Promise.all([
     getCategoryAndProducts(slug),
     getShippingEnabled(),
+    getClientConfig(),
   ]);
 
   if (!data) notFound();
@@ -73,6 +74,7 @@ export default async function CategoryPage({ params }: Props) {
       categoryName={data.category.name}
       initialProducts={data.products}
       shippingEnabled={shippingEnabled}
+      gridCards={theme.cardStyle === "minimal"}
     />
   );
 }

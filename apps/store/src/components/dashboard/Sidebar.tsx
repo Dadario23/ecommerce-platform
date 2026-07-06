@@ -25,6 +25,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { TenantTheme } from "@/config/tenant-themes";
 import { useState, useEffect, useMemo } from "react";
 
 interface NavChild {
@@ -86,9 +87,11 @@ interface SidebarProps {
   collapsed?: boolean;
   onToggle?: () => void;
   repairsEnabled?: boolean;
+  logo?: TenantTheme["logo"];
+  storeName?: string;
 }
 
-export default function Sidebar({ collapsed = false, onToggle, repairsEnabled = true }: SidebarProps) {
+export default function Sidebar({ collapsed = false, onToggle, repairsEnabled = true, logo = null, storeName = "" }: SidebarProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
 
@@ -129,14 +132,23 @@ export default function Sidebar({ collapsed = false, onToggle, repairsEnabled = 
         )}
       >
         {!collapsed && (
-          <div className="relative flex-1 h-9">
-            <Image
-              src="/logo.svg"
-              alt="Logo"
-              fill
-              className="object-contain object-center brightness-0 invert"
-            />
-          </div>
+          logo ? (
+            <div className="relative flex-1 h-9">
+              <Image
+                src={logo.src}
+                alt={storeName || "Logo"}
+                fill
+                className={cn(
+                  "object-contain object-center",
+                  logo.invert && "brightness-0 invert",
+                )}
+              />
+            </div>
+          ) : (
+            <span className="flex-1 font-brand text-lg text-white uppercase tracking-tight truncate">
+              {storeName}
+            </span>
+          )
         )}
         <button
           onClick={onToggle}

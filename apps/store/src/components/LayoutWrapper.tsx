@@ -11,6 +11,7 @@ export default function LayoutWrapper({
   showRepairs,
   storeName,
   logo,
+  navStyle,
   promoItems,
 }: {
   children: React.ReactNode;
@@ -18,6 +19,7 @@ export default function LayoutWrapper({
   showRepairs: boolean;
   storeName: string;
   logo: TenantTheme["logo"];
+  navStyle: TenantTheme["navStyle"];
   promoItems: TenantTheme["promoItems"];
 }) {
   const pathname = usePathname();
@@ -34,6 +36,7 @@ export default function LayoutWrapper({
           showRepairs={showRepairs}
           storeName={storeName}
           logo={logo}
+          navStyle={navStyle}
           promoItems={promoItems}
         />
       )}

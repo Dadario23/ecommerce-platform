@@ -4,6 +4,7 @@
 @import "swiper/css/pagination";
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant minimal (&:is([data-card-style="minimal"] *));
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
