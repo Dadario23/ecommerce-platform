@@ -13,7 +13,7 @@ const BENEFITS = [
 export default async function RegisterPage() {
   const { storeName } = await getClientConfig();
   return (
-    <div className="min-h-screen bg-gray-50 pt-20 md:pt-28 pb-10 px-4">
+    <div className="min-h-screen bg-gray-50 minimal:bg-transparent pt-20 md:pt-28 pb-10 px-4">
       <div className="max-w-4xl mx-auto flex rounded-2xl overflow-hidden shadow-xl border border-gray-100">
         {/* Left panel */}
         <div className="hidden lg:flex lg:w-5/12 bg-(--tenant-primary) flex-col justify-between p-10 relative overflow-hidden">

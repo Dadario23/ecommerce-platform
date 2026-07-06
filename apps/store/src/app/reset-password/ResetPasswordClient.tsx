@@ -113,7 +113,7 @@ export default function ResetPasswordClient() {
   /* Loading token check */
   if (tokenValid === null) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-20 md:pt-28 pb-10 px-4">
+      <div className="min-h-screen bg-gray-50 minimal:bg-transparent pt-20 md:pt-28 pb-10 px-4">
         <div className="max-w-4xl mx-auto flex rounded-2xl overflow-hidden shadow-xl border border-gray-100">
           <LeftPanel />
           <div className="flex-1 bg-white flex items-center justify-center px-8 py-16">
@@ -130,7 +130,7 @@ export default function ResetPasswordClient() {
   /* Invalid token */
   if (!tokenValid) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-20 md:pt-28 pb-10 px-4">
+      <div className="min-h-screen bg-gray-50 minimal:bg-transparent pt-20 md:pt-28 pb-10 px-4">
         <div className="max-w-4xl mx-auto flex rounded-2xl overflow-hidden shadow-xl border border-gray-100">
           <LeftPanel />
           <div className="flex-1 bg-white flex flex-col justify-center px-8 py-10">
@@ -161,7 +161,7 @@ export default function ResetPasswordClient() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20 md:pt-28 pb-10 px-4">
+    <div className="min-h-screen bg-gray-50 minimal:bg-transparent pt-20 md:pt-28 pb-10 px-4">
       <div className="max-w-4xl mx-auto flex rounded-2xl overflow-hidden shadow-xl border border-gray-100">
         <LeftPanel />
 
