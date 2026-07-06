@@ -104,6 +104,7 @@ export default async function RootLayout({
                 logo={theme.logo}
                 navStyle={theme.navStyle}
                 promoItems={theme.promoItems}
+                contact={clientConfig.contact}
               >
                 {children}
               </LayoutWrapper>

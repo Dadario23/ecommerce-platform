@@ -12,6 +12,14 @@ export interface ClientConfig {
     coupons: boolean;
     analytics: boolean;
   };
+  contact: {
+    email: string;
+    phone: string;
+    whatsapp: string;
+    instagram: string;
+    facebook: string;
+    description: string;
+  };
   theme: TenantTheme;
 }
 
@@ -21,6 +29,15 @@ const DEFAULT_MODULES: ClientConfig["modules"] = {
   shipping: true,
   coupons: true,
   analytics: true,
+};
+
+const EMPTY_CONTACT: ClientConfig["contact"] = {
+  email: "",
+  phone: "",
+  whatsapp: "",
+  instagram: "",
+  facebook: "",
+  description: "",
 };
 
 export async function getClientConfig(): Promise<ClientConfig> {
@@ -41,9 +58,17 @@ export async function getClientConfig(): Promise<ClientConfig> {
         coupons: Boolean(setting?.modules_coupons ?? DEFAULT_MODULES.coupons),
         analytics: Boolean(setting?.modules_analytics ?? DEFAULT_MODULES.analytics),
       },
+      contact: {
+        email: (setting?.storeEmail as string) || "",
+        phone: (setting?.storePhone as string) || "",
+        whatsapp: (setting?.whatsappNumber as string) || "",
+        instagram: (setting?.instagramUrl as string) || "",
+        facebook: (setting?.facebookUrl as string) || "",
+        description: (setting?.storeDescription as string) || "",
+      },
       theme: getTenantTheme(slug),
     };
   } catch {
-    return { slug, storeName: slug, modules: DEFAULT_MODULES, theme: getTenantTheme(slug) };
+    return { slug, storeName: slug, modules: DEFAULT_MODULES, contact: EMPTY_CONTACT, theme: getTenantTheme(slug) };
   }
 }

@@ -2,8 +2,10 @@
 
 import { usePathname } from "next/navigation";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import type { PublicCategory } from "@/lib/getPublicCategories";
 import type { TenantTheme } from "@/config/tenant-themes";
+import type { ClientConfig } from "@/config/client";
 
 export default function LayoutWrapper({
   children,
@@ -13,6 +15,7 @@ export default function LayoutWrapper({
   logo,
   navStyle,
   promoItems,
+  contact,
 }: {
   children: React.ReactNode;
   categories: PublicCategory[];
@@ -21,6 +24,7 @@ export default function LayoutWrapper({
   logo: TenantTheme["logo"];
   navStyle: TenantTheme["navStyle"];
   promoItems: TenantTheme["promoItems"];
+  contact: ClientConfig["contact"];
 }) {
   const pathname = usePathname();
 
@@ -41,6 +45,15 @@ export default function LayoutWrapper({
         />
       )}
       {children}
+      {!hideNavbar && (
+        <Footer
+          categories={categories}
+          storeName={storeName}
+          logo={logo}
+          showRepairs={showRepairs}
+          contact={contact}
+        />
+      )}
     </>
   );
 }
