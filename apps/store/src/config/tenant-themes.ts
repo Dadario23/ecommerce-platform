@@ -23,6 +23,7 @@ export type TenantTheme = {
   radius: string;
   font: FontKey;
   logo: { src: string; invert?: boolean } | null; // null → wordmark storeName en font-brand
+  favicon: string | null; // null → /favicon.ico genérico
   navStyle: NavStyle; // solid → barra en primary; light → barra blanca con texto oscuro
   cardStyle: CardStyle; // boxed → card con borde y foto contain; minimal → sin borde, foto 3/4 cover (variante CSS `minimal:`)
   homeVariant: HomeVariant;
@@ -42,6 +43,7 @@ const DEFAULT_THEME: TenantTheme = {
   radius: "0.625rem",
   font: "geist",
   logo: null,
+  favicon: null,
   navStyle: "solid",
   cardStyle: "boxed",
   homeVariant: "tech",
@@ -77,6 +79,7 @@ const THEMES: Record<string, TenantTheme> = {
     radius: "0.375rem",
     font: "manrope",
     logo: { src: "/logo.svg", invert: true },
+    favicon: null,
     navStyle: "solid",
     cardStyle: "boxed",
     homeVariant: "tech",
@@ -105,6 +108,7 @@ const THEMES: Record<string, TenantTheme> = {
     radius: "0.125rem",
     font: "urban",
     logo: { src: "/logo-kameleba.png" },
+    favicon: "/favicon-kameleba.png",
     navStyle: "light",
     cardStyle: "minimal",
     homeVariant: "editorial",

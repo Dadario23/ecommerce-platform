@@ -49,10 +49,11 @@ const FONT_VARS: Record<FontKey, { sans: string; display: string }> = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { storeName } = await getClientConfig();
+  const { storeName, theme } = await getClientConfig();
   return {
     title: storeName,
     description: `${storeName} — Tu tienda de confianza`,
+    icons: { icon: theme.favicon ?? "/favicon.ico" },
   };
 }
 

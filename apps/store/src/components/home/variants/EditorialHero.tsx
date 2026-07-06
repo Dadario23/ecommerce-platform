@@ -7,12 +7,16 @@ import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 
+import type { TenantTheme } from "@/config/tenant-themes";
+
 export default function EditorialHero({
   images,
   storeName,
+  logo,
 }: {
   images: string[];
   storeName: string;
+  logo: TenantTheme["logo"];
 }) {
   const slides = images.length ? images : ["/carousel-placeholder.png"];
 
@@ -43,9 +47,23 @@ export default function EditorialHero({
 
       <div className="absolute inset-0 z-10 bg-black/30 pointer-events-none" />
       <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center px-4 pointer-events-none">
-        <h1 className="font-brand text-5xl md:text-7xl text-white uppercase tracking-wide">
-          {storeName}
-        </h1>
+        {logo ? (
+          <>
+            <Image
+              src={logo.src}
+              alt=""
+              width={463}
+              height={160}
+              priority
+              className="w-64 md:w-96 h-auto drop-shadow-lg"
+            />
+            <h1 className="sr-only">{storeName}</h1>
+          </>
+        ) : (
+          <h1 className="font-brand text-5xl md:text-7xl text-white uppercase tracking-wide">
+            {storeName}
+          </h1>
+        )}
         <p className="mt-3 text-white/80 text-sm md:text-base uppercase tracking-[0.25em]">
           Nueva colección
         </p>

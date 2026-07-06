@@ -53,6 +53,7 @@ export default async function HomePage() {
     <EditorialHome
       {...data}
       storeName={storeName}
+      logo={theme.logo}
       showSupport={modules.repairs}
       benefits={theme.benefits}
     />

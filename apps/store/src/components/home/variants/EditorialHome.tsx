@@ -8,6 +8,7 @@ import type { HomeData } from "./types";
 
 type EditorialHomeProps = HomeData & {
   storeName: string;
+  logo: TenantTheme["logo"];
   showSupport: boolean;
   benefits: TenantTheme["benefits"];
 };
@@ -16,12 +17,13 @@ export default function EditorialHome({
   categoriesWithImages,
   carouselImages,
   storeName,
+  logo,
   showSupport,
   benefits,
 }: EditorialHomeProps) {
   return (
     <main className="pt-16 md:pt-28">
-      <EditorialHero images={carouselImages} storeName={storeName} />
+      <EditorialHero images={carouselImages} storeName={storeName} logo={logo} />
 
       <BenefitsBar items={benefits} variant="light" />
 
