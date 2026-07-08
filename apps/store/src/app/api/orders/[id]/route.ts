@@ -7,7 +7,7 @@ import type { ICoupon } from "@/models/Coupon";
 import { authOptions } from "@/lib/auth";
 import { notifyOrderStatusChange } from "@/lib/notify";
 import { getModels } from "@/lib/tenant-models";
-import { releaseStock } from "@/lib/stock";
+import { releaseStock, reserveStock, type StockLine } from "@/lib/stock";
 
 // Devuelve stock y uso de cupón según qué se haya contabilizado:
 // contraentrega descuenta al crear la orden; MP reserva stock al crear la
@@ -36,6 +36,33 @@ async function restoreOnCancel(
       : []),
   ]);
   order.stockReserved = false;
+}
+
+// Espejo de restoreOnCancel para des-cancelar: vuelve a descontar stock y
+// cupón con el mismo criterio. MP pendiente no re-reserva: ese pago ya no
+// va a llegar y su reserva original expiró.
+async function redeductOnUncancel(
+  order: IOrder,
+  Product: Model<IProduct>,
+  Coupon: Model<ICoupon>
+): Promise<{ ok: true } | { ok: false; failed: StockLine }> {
+  const shouldHoldStock =
+    order.payment.method !== "mercadopago" ||
+    order.payment.status === "completed";
+
+  if (shouldHoldStock) {
+    const result = await reserveStock(Product, order.items);
+    if (!result.ok) return result;
+    order.stockReserved = true;
+  }
+
+  if (order.couponCode && shouldHoldStock) {
+    await Coupon.findOneAndUpdate(
+      { code: order.couponCode },
+      { $inc: { usedCount: 1 } }
+    );
+  }
+  return { ok: true };
 }
 
 export async function GET(
@@ -99,6 +126,15 @@ export async function PATCH(
       const prevStatus = order.status;
       if (body.status === "cancelled" && prevStatus !== "cancelled") {
         await restoreOnCancel(order, Product, Coupon);
+      }
+      if (prevStatus === "cancelled" && body.status !== "cancelled") {
+        const result = await redeductOnUncancel(order, Product, Coupon);
+        if (!result.ok) {
+          return NextResponse.json(
+            { error: `Sin stock para reactivar la orden: ${result.failed.name}` },
+            { status: 409 }
+          );
+        }
       }
       order.status = body.status;
       await order.save();
