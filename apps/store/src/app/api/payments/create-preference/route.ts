@@ -105,6 +105,7 @@ export async function POST(request: NextRequest) {
 
     // Revalidar el cupón contra la base y recalcular el descuento del lado servidor
     let discount = 0;
+    let appliedCouponCode: string | undefined;
     if (orderData.couponCode?.trim()) {
       const coupon = await Coupon.findOne({
         code: orderData.couponCode.trim().toUpperCase(),
@@ -126,6 +127,7 @@ export async function POST(request: NextRequest) {
         coupon.type === "percentage"
           ? Math.round((subtotal * coupon.value) / 100)
           : Math.min(coupon.value, subtotal);
+      appliedCouponCode = coupon.code;
     }
 
     const total = Math.max(subtotal - discount, 0);
@@ -138,6 +140,7 @@ export async function POST(request: NextRequest) {
       shipping: 0,
       tax: 0,
       discount,
+      couponCode: appliedCouponCode,
       total,
       shippingAddress: orderData.shippingAddress,
       payment: {

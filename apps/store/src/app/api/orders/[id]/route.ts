@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import Order, { IOrderItem } from "@/models/Order";
-import Product from "@/models/Product";
+import type { IOrderItem } from "@/models/Order";
 import { authOptions } from "@/lib/auth";
 import { notifyOrderStatusChange } from "@/lib/notify";
 import { getModels } from "@/lib/tenant-models";
@@ -11,7 +10,7 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
+    const { Order } = await getModels();
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -48,7 +47,7 @@ export async function PATCH(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
+    const { Coupon, Order, Product } = await getModels();
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
 
@@ -87,17 +86,21 @@ export async function PATCH(
         );
       }
 
-      // Restaurar stock si ya fue descontado
+      // Restaurar stock y uso de cupón si ya fueron contabilizados
+      // (contraentrega: al crear la orden; MP: al aprobarse el pago)
       const stockWasDeducted =
         order.payment.method !== "mercadopago" ||
         order.payment.status === "completed";
 
       if (stockWasDeducted) {
-        await Promise.all(
-          order.items.map((item: IOrderItem) =>
+        await Promise.all([
+          ...order.items.map((item: IOrderItem) =>
             Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } })
-          )
-        );
+          ),
+          ...(order.couponCode
+            ? [Coupon.findOneAndUpdate({ code: order.couponCode }, { $inc: { usedCount: -1 } })]
+            : []),
+        ]);
       }
 
       order.status = "cancelled";

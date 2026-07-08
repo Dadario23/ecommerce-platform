@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Firma inválida" }, { status: 401 });
     }
 
-    const { Order, Product, Reparacion } = await getModels();
+    const { Coupon, Order, Product, Reparacion } = await getModels();
 
     const body = JSON.parse(rawBody) as { type: string; data: { id: string } };
     const { type, data } = body;
@@ -106,11 +106,14 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({ success: true });
         }
 
-        // Descontar stock y enviar email al confirmar el pago
+        // Descontar stock, contabilizar cupón y enviar email al confirmar el pago
         await Promise.all([
           ...order.items.map((item: IOrderItem) =>
             Product.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } })
           ),
+          ...(order.couponCode
+            ? [Coupon.findOneAndUpdate({ code: order.couponCode }, { $inc: { usedCount: 1 } })]
+            : []),
           sendOrderConfirmation({
             orderNumber: order.orderNumber,
             customerEmail: order.customerEmail,

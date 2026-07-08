@@ -22,6 +22,7 @@ export interface IOrder extends Document {
   shipping: number;
   tax: number;
   discount: number;
+  couponCode?: string;
   total: number;
   shippingAddress: {
     firstName: string;
@@ -96,6 +97,7 @@ const OrderSchema = new Schema(
     shipping: { type: Number, required: true, default: 0 },
     tax: { type: Number, required: true, default: 0 },
     discount: { type: Number, required: true, default: 0 },
+    couponCode: { type: String },
     total: { type: Number, required: true },
     shippingAddress: {
       firstName: { type: String, required: true },

@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import Order from "@/models/Order";
-import User from "@/models/User";
-import Product from "@/models/Product";
-import Coupon from "@/models/Coupon";
 import { authOptions } from "@/lib/auth";
 import { sendOrderConfirmation } from "@/lib/email";
 import mongoose from "mongoose";
@@ -40,7 +36,7 @@ const OrderPayloadSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
+    const { Coupon, Order, Product, User } = await getModels();
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -135,6 +131,39 @@ export async function POST(request: NextRequest) {
 
     const total = Math.max(subtotal - discount, 0);
 
+    // Reservar stock de forma atómica ANTES de crear la orden. La condición
+    // stock >= quantity evita que dos órdenes concurrentes pasen la validación
+    // de arriba con las mismas unidades (la lectura inicial es solo informativa).
+    const reserved: typeof authoritativeItems = [];
+    const rollbackStock = () =>
+      Promise.all(
+        reserved.map((item) =>
+          Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } })
+        )
+      );
+
+    for (const item of authoritativeItems) {
+      const claimed = await Product.findOneAndUpdate(
+        {
+          _id: item.productId,
+          isActive: { $ne: false },
+          stock: { $gte: item.quantity },
+        },
+        { $inc: { stock: -item.quantity } }
+      );
+      if (!claimed) {
+        await rollbackStock();
+        return NextResponse.json(
+          {
+            error: "Problemas de stock",
+            details: [`"${item.name}" no tiene stock suficiente`],
+          },
+          { status: 409 }
+        );
+      }
+      reserved.push(item);
+    }
+
     const order = new Order({
       userId: user._id,
       customerEmail: session.user.email,
@@ -143,6 +172,7 @@ export async function POST(request: NextRequest) {
       shipping: 0,
       tax: 0,
       discount,
+      couponCode: appliedCouponCode,
       total,
       shippingAddress: orderData.shippingAddress,
       payment: {
@@ -154,20 +184,20 @@ export async function POST(request: NextRequest) {
       notes: orderData.notes,
     });
 
-    await order.save();
+    try {
+      await order.save();
+    } catch (err) {
+      await rollbackStock();
+      throw err;
+    }
 
-    // Descontar stock y marcar uso de cupón
-    await Promise.all([
-      ...authoritativeItems.map((item) =>
-        Product.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } })
-      ),
-      appliedCouponCode
-        ? Coupon.findOneAndUpdate(
-            { code: appliedCouponCode },
-            { $inc: { usedCount: 1 } }
-          )
-        : Promise.resolve(),
-    ]);
+    // Marcar uso de cupón
+    if (appliedCouponCode) {
+      await Coupon.findOneAndUpdate(
+        { code: appliedCouponCode },
+        { $inc: { usedCount: 1 } }
+      );
+    }
 
     // Email de confirmación (no bloquea la respuesta si falla)
     sendOrderConfirmation({
