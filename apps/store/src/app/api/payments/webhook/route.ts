@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import Order, { IOrderItem } from "@/models/Order";
-import Product from "@/models/Product";
-import Reparacion from "@/models/Reparacion";
+import type { IOrderItem } from "@/models/Order";
 import { Payment } from "mercadopago";
 import client from "@/lib/mercadopago";
 import { sendOrderConfirmation } from "@/lib/email";
@@ -31,7 +29,10 @@ function verifyMercadoPagoSignature(request: NextRequest): boolean {
   const signedTemplate = `id:${dataId ?? ""};request-id:${xRequestId};ts:${ts};`;
   const expected = crypto.createHmac("sha256", secret).update(signedTemplate).digest("hex");
 
-  return crypto.timingSafeEqual(Buffer.from(v1), Buffer.from(expected));
+  // Hashear ambos lados fija la longitud: timingSafeEqual lanza si difieren
+  const a = crypto.createHash("sha256").update(v1).digest();
+  const b = crypto.createHash("sha256").update(expected).digest();
+  return crypto.timingSafeEqual(a, b);
 }
 
 export async function POST(request: NextRequest) {
@@ -42,7 +43,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Firma inválida" }, { status: 401 });
     }
 
-    const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
+    const { Order, Product, Reparacion } = await getModels();
 
     const body = JSON.parse(rawBody) as { type: string; data: { id: string } };
     const { type, data } = body;
@@ -61,6 +62,10 @@ export async function POST(request: NextRequest) {
         if (!rep) {
           return NextResponse.json({ error: "Reparación no encontrada" }, { status: 404 });
         }
+        // Reintento de MP sobre un pago ya registrado: no reprocesar
+        if (rep.pago?.estado === "aprobado") {
+          return NextResponse.json({ success: true });
+        }
         if (paymentStatus === "approved") {
           rep.pago = { estado: "aprobado", mpId: String(paymentData.id), fecha: new Date() };
         } else if (paymentStatus === "rejected") {
@@ -72,20 +77,34 @@ export async function POST(request: NextRequest) {
 
       // ── Pago de orden de tienda ─────────────────────────────────────
       const orderId = externalRef;
-      const order = await Order.findById(orderId);
-      if (!order) {
-        return NextResponse.json(
-          { error: "Orden no encontrada" },
-          { status: 404 },
-        );
-      }
 
       if (paymentStatus === "approved") {
-        order.payment.status = "completed";
-        order.payment.transactionId = String(paymentData.id);
-        order.payment.paymentDate = new Date();
-        order.status = "confirmed";
-        await order.save();
+        // Claim atómico: solo el primer webhook que llega descuenta stock
+        // y envía el email; los reintentos de MP no matchean la condición
+        const order = await Order.findOneAndUpdate(
+          { _id: orderId, "payment.status": { $ne: "completed" } },
+          {
+            $set: {
+              "payment.status": "completed",
+              "payment.transactionId": String(paymentData.id),
+              "payment.paymentDate": new Date(),
+              status: "confirmed",
+            },
+          },
+          { new: true },
+        );
+
+        if (!order) {
+          const exists = await Order.exists({ _id: orderId });
+          if (!exists) {
+            return NextResponse.json(
+              { error: "Orden no encontrada" },
+              { status: 404 },
+            );
+          }
+          // Ya procesada por un webhook anterior
+          return NextResponse.json({ success: true });
+        }
 
         // Descontar stock y enviar email al confirmar el pago
         await Promise.all([
@@ -106,9 +125,17 @@ export async function POST(request: NextRequest) {
           }).catch(() => {}),
         ]);
       } else if (paymentStatus === "rejected") {
-        order.payment.status = "failed";
-        order.status = "cancelled";
-        await order.save();
+        // No degradar una orden ya completada por un reintento fuera de orden
+        const order = await Order.findOneAndUpdate(
+          { _id: orderId, "payment.status": { $ne: "completed" } },
+          { $set: { "payment.status": "failed", status: "cancelled" } },
+        );
+        if (!order && !(await Order.exists({ _id: orderId }))) {
+          return NextResponse.json(
+            { error: "Orden no encontrada" },
+            { status: 404 },
+          );
+        }
       }
     }
 
