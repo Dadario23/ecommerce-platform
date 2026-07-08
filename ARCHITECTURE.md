@@ -172,9 +172,19 @@ reserveStock: por ítem, findOneAndUpdate({stock ≥ qty}, {$inc: -qty})  // at�
 
 ---
 
+## Tests y CI
+
+- CI en GitHub Actions (`.github/workflows/ci.yml`): typecheck de ambas apps +
+  Vitest de store + build de producción, en cada push a main y en PRs
+- Tests (Vitest, `apps/store/src/lib/__tests__/`): solo lógica crítica de
+  negocio — membresías, schemas de checkout, descuento de cupón, y stock
+  (reserva atómica/concurrencia) contra `mongodb-memory-server`
+- Criterio: no perseguir cobertura; testear donde un bug cuesta plata o
+  suspende a un cliente. `lib/stock.ts` recibe los modelos por parámetro
+  justamente para poder testearse sin el contexto multi-tenant
+
 ## Deuda técnica conocida
 
-- **Sin tests ni CI** — no hay runner instalado; el gate actual es `tsc --noEmit` manual
 - Registro de tenants estático (`TENANT_DOMAINS` / `PLATFORM_CLIENTS` env) —
   con 40+ clientes conviene migrarlo a una colección de plataforma
 - Suspensión de membresía es manual (sin trigger automático al vencer la gracia)
