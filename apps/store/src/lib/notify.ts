@@ -1,4 +1,4 @@
-import Notification from "@/models/Notification";
+import { getModels } from "@/lib/tenant-models";
 import { ESTADO_LABEL } from "@/lib/reparacion-config";
 import {
   sendOrderStatusUpdate,
@@ -34,6 +34,7 @@ export async function notifyOrderStatusChange(
     });
 
     if (order.userId) {
+      const { Notification } = await getModels();
       await Notification.create({
         userId: order.userId,
         type: "order_status",
@@ -72,6 +73,7 @@ export async function notifyRepairStatusChange(
     }
 
     if (repair.userId) {
+      const { Notification } = await getModels();
       await Notification.create({
         userId: repair.userId,
         type: "repair_status",
