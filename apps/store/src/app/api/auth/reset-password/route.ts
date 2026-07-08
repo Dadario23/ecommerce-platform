@@ -1,6 +1,5 @@
 // app/api/auth/reset-password/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { z } from "zod";

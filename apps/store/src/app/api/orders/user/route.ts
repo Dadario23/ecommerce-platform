@@ -1,7 +1,6 @@
 // app/api/orders/user/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import Order from "@/models/Order";
 import { authOptions } from "@/lib/auth";
 import { getModels } from "@/lib/tenant-models";
 

@@ -1,6 +1,5 @@
 // app/api/auth/verify-reset-token/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import User from "@/models/User";
 import crypto from "crypto";
 import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";

@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import Order from "@/models/Order";
-import User from "@/models/User";
-import Product from "@/models/Product";
 import { getModels } from "@/lib/tenant-models";
 
 export async function GET() {

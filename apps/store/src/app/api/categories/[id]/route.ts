@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import Category from "@/models/Category";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getModels } from "@/lib/tenant-models";

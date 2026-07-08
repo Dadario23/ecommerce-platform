@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import Notification from "@/models/Notification";
 import { getModels } from "@/lib/tenant-models";
 
 export async function GET() {

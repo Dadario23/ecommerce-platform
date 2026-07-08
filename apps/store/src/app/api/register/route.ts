@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
-import User from "@/models/User";
 import { getModels } from "@/lib/tenant-models";
 import { getClientIp, hitRateLimit } from "@/lib/rate-limit";
 

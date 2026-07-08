@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import Cart from "@/models/Cart";
 import { getModels } from "@/lib/tenant-models";
 
 export async function DELETE(

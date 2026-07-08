@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import Coupon from "@/models/Coupon";
 import { getModels } from "@/lib/tenant-models";
 
 const ValidateCouponSchema = z.object({

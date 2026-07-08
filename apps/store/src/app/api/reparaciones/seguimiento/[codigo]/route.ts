@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import Reparacion from "@/models/Reparacion";
 import { getModels } from "@/lib/tenant-models";
 
 export async function GET(

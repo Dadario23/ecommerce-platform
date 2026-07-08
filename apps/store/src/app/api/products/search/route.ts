@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server";
-import Product from "@/models/Product";
-import Category from "@/models/Category";
 import { getModels } from "@/lib/tenant-models";
 
 const SELECT_FIELDS =

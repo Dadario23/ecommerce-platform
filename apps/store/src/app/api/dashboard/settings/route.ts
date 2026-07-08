@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import Setting from "@/models/Setting";
 import { isAdmin } from "@/lib/roles";
 import { getModels } from "@/lib/tenant-models";
 

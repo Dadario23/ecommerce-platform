@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import Reparacion from "@/models/Reparacion";
-import User from "@/models/User";
 import { isReceptionist, isStaff } from "@/lib/roles";
 import { getModels } from "@/lib/tenant-models";
 

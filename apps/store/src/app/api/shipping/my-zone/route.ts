@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import User from "@/models/User";
-import ShippingConfig from "@/models/ShippingConfig";
 import { getModels } from "@/lib/tenant-models";
 
 interface IpApiResponse {

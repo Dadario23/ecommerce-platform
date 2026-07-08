@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import Product from "@/models/Product";
-import Review from "@/models/Review";
-import Order from "@/models/Order";
 import mongoose from "mongoose";
 import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";

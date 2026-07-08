@@ -1,7 +1,6 @@
 // app/api/user/addresses/[id]/default/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import User from "@/models/User";
 import { authOptions } from "@/lib/auth";
 import { getModels } from "@/lib/tenant-models";
 

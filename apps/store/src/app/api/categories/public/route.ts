@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import Category from "@/models/Category";
 import { getModels } from "@/lib/tenant-models";
 
 export async function GET() {

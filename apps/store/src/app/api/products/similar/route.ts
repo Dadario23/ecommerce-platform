@@ -1,4 +1,3 @@
-import Product from "@/models/Product";
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { getModels } from "@/lib/tenant-models";

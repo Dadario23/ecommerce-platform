@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import Presupuesto from "@/models/Presupuesto";
-import User from "@/models/User";
 import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
 
