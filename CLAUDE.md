@@ -105,14 +105,16 @@ Cada tenant puede tener módulos habilitados o deshabilitados. La configuración
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`                              | OAuth Google                                                  |
 | `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | Imágenes                                                      |
 | `RESEND_API_KEY`                                                         | Emails transaccionales                                        |
-| `FROM_EMAIL`                                                             | Remitente de emails                                           |
-| `MP_ACCESS_TOKEN` / `MP_PUBLIC_KEY`                                      | Pagos Mercado Pago                                            |
-| `MP_WEBHOOK_SECRET`                                                      | Verificación de webhooks MP                                   |
-| `MP_ALIAS` / `MP_CVU`                                                    | Datos de transferencia                                        |
-| `NEXT_PUBLIC_URL`                                                        | URL pública de la app                                         |
-| `NEXT_PUBLIC_WHATSAPP_NUMBER`                                            | WhatsApp de contacto                                          |
+| `FROM_EMAIL`                                                             | Remitente de emails (fallback)                                |
+| `MP_ACCESS_TOKEN` / `MP_PUBLIC_KEY`                                      | Pagos Mercado Pago (fallback)                                 |
+| `MP_WEBHOOK_SECRET`                                                      | Verificación de webhooks MP (fallback)                        |
+| `MP_ALIAS` / `MP_CVU`                                                    | Datos de transferencia (fallback)                             |
+| `NEXT_PUBLIC_URL`                                                        | URL pública de la app (fallback)                              |
+| `NEXT_PUBLIC_WHATSAPP_NUMBER`                                            | WhatsApp de contacto (fallback)                               |
 
 > En producción `TENANT_SLUG` no se usa — el tenant se resuelve por `TENANT_DOMAINS` (ej: `bitm-cel.com.ar:bitm-cel,kameleba.com.ar:kameleba,www.compumobile.com.ar:compumobile`). La comparación de hostname es exacta: si un cliente entra con y sin `www`, ambos hostnames necesitan su entrada.
+
+> **Credenciales por tenant:** las credenciales de MP, el remitente de emails, los datos de transferencia y el WhatsApp se leen del documento `Setting` de cada tenant (`mpAccessToken`, `mpWebhookSecret`, `fromEmail`, `transferAlias`, `transferCvu`, `whatsappNumber`) vía `getTenantSecrets()` / `getClientConfig()`. Las env vars marcadas "(fallback)" solo se usan si el campo del Setting está vacío. La URL pública se deriva del host de la request (`getBaseUrl()`).
 
 ---
 
@@ -151,6 +153,7 @@ npm run dev:admin
 3. Agregar `<slug>` a `PLATFORM_CLIENTS` en admin-hub
 4. Apuntar el dominio del cliente a Vercel
 5. Configurar los módulos del tenant en su documento `Setting` en la DB
+6. Cargar en el mismo `Setting` las credenciales del tenant: `mpAccessToken`, `mpWebhookSecret`, `fromEmail`, `transferAlias`, `transferCvu`, `whatsappNumber`
 
 No se crea una app nueva. No se hace un deployment nuevo.
 

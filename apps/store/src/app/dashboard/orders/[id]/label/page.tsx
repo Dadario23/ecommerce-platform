@@ -2,6 +2,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import { getModels } from "@/lib/tenant-models";
+import { getTenantSecrets } from "@/lib/tenant-secrets";
+import { getClientConfig } from "@/config/client";
 import Link from "next/link";
 import PrintButton from "./PrintButton";
 import { resolveShippingLocation } from "@/lib/cp-lookup";
@@ -17,7 +19,10 @@ async function getOrCreateMpLink(
 ): Promise<string | null> {
   if (order.mpPaymentLink) return order.mpPaymentLink;
 
-  const token = process.env.MP_ACCESS_TOKEN;
+  const [{ mpAccessToken: token }, { storeName }] = await Promise.all([
+    getTenantSecrets(),
+    getClientConfig(),
+  ]);
   if (!token) return null;
 
   try {
@@ -35,7 +40,7 @@ async function getOrCreateMpLink(
           currency_id: "ARS",
         }],
         external_reference: orderId,
-        statement_descriptor: "bitm-cel",
+        statement_descriptor: storeName,
         binary_mode: true,
       }),
     });
@@ -89,7 +94,7 @@ export default async function LabelPage({
   const addr        = order.shippingAddress;
   const isCash      = order.payment.method === "cash";
   const isTransfer  = order.payment.method === "transfer";
-  const mpAlias     = process.env.MP_ALIAS ?? "";
+  const { transferAlias: mpAlias } = await getTenantSecrets();
 
   const shippingConfig = await ShippingConfig.findOne().lean<{ zones: { id: string; name: string; zipRanges?: { min: number; max: number }[] }[] }>();
   const shippingLocation = addr.zipCode

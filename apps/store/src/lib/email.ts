@@ -1,8 +1,7 @@
 import { Resend } from "resend";
 import { getBaseUrl } from "@/lib/base-url";
-
-const FROM_EMAIL = process.env.FROM_EMAIL ?? "bitm-cel <no-reply@bitm-cel.com.ar>";
-const STORE_NAME = process.env.NEXT_PUBLIC_STORE_NAME ?? "bitm-cel";
+import { getClientConfig } from "@/config/client";
+import { getTenantSecrets } from "@/lib/tenant-secrets";
 
 interface OrderItem {
   name: string;
@@ -11,8 +10,30 @@ interface OrderItem {
   image?: string;
 }
 
-const TRANSFER_ALIAS = "tiendita.compu";
-const TRANSFER_CVU   = "0000003100006137240775";
+type EmailContext = {
+  storeUrl: string;
+  storeName: string;
+  fromEmail: string;
+  transferAlias: string;
+  transferCvu: string;
+};
+
+// Identidad del tenant activo al momento del envío — los emails siempre
+// se disparan dentro de una request, así que el contexto está disponible.
+async function getEmailContext(): Promise<EmailContext> {
+  const [config, secrets, storeUrl] = await Promise.all([
+    getClientConfig(),
+    getTenantSecrets(),
+    getBaseUrl(),
+  ]);
+  return {
+    storeUrl,
+    storeName: config.storeName,
+    fromEmail: secrets.fromEmail,
+    transferAlias: secrets.transferAlias,
+    transferCvu: secrets.transferCvu,
+  };
+}
 
 interface OrderEmailData {
   orderNumber: string;
@@ -32,7 +53,7 @@ interface OrderEmailData {
   };
 }
 
-function buildOrderConfirmationHtml(data: OrderEmailData, storeUrl: string): string {
+function buildOrderConfirmationHtml(data: OrderEmailData, ctx: EmailContext): string {
   const isTransfer = data.paymentMethod === "transfer";
   const paymentLabel =
     data.paymentMethod === "mercadopago"
@@ -42,7 +63,7 @@ function buildOrderConfirmationHtml(data: OrderEmailData, storeUrl: string): str
       : "Efectivo (contraentrega)";
 
   const payPageUrl = data.orderId
-    ? `${storeUrl}/pay/${data.orderId}`
+    ? `${ctx.storeUrl}/pay/${data.orderId}`
     : null;
 
   const transferBlock = isTransfer ? `
@@ -57,13 +78,13 @@ function buildOrderConfirmationHtml(data: OrderEmailData, storeUrl: string): str
         <tr>
           <td style="padding:8px 12px;background:#fff;border-radius:6px 6px 0 0;border:1px solid #d1fae5;border-bottom:none;">
             <p style="margin:0;font-size:11px;color:#888;text-transform:uppercase;">Alias</p>
-            <p style="margin:4px 0 0;font-size:16px;font-weight:bold;color:#166534;font-family:monospace;">${TRANSFER_ALIAS}</p>
+            <p style="margin:4px 0 0;font-size:16px;font-weight:bold;color:#166534;font-family:monospace;">${ctx.transferAlias}</p>
           </td>
         </tr>
         <tr>
           <td style="padding:8px 12px;background:#fff;border-radius:0 0 6px 6px;border:1px solid #d1fae5;">
             <p style="margin:0;font-size:11px;color:#888;text-transform:uppercase;">CVU</p>
-            <p style="margin:4px 0 0;font-size:13px;color:#374151;font-family:monospace;">${TRANSFER_CVU}</p>
+            <p style="margin:4px 0 0;font-size:13px;color:#374151;font-family:monospace;">${ctx.transferCvu}</p>
           </td>
         </tr>
       </table>
@@ -109,7 +130,7 @@ function buildOrderConfirmationHtml(data: OrderEmailData, storeUrl: string): str
           <!-- Header -->
           <tr>
             <td style="background:#1E3A8A;padding:28px 40px;text-align:center;">
-              <h1 style="color:#fff;margin:0;font-size:22px;">${STORE_NAME}</h1>
+              <h1 style="color:#fff;margin:0;font-size:22px;">${ctx.storeName}</h1>
               <p style="color:#93c5fd;margin:6px 0 0;font-size:13px;">Confirmación de pedido</p>
             </td>
           </tr>
@@ -162,7 +183,7 @@ function buildOrderConfirmationHtml(data: OrderEmailData, storeUrl: string): str
 
               <!-- CTA -->
               <div style="text-align:center;margin-top:32px;">
-                <a href="${storeUrl}/account/orders"
+                <a href="${ctx.storeUrl}/account/orders"
                   style="display:inline-block;background:#1E3A8A;color:#fff;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:14px;font-weight:bold;">
                   Ver mis pedidos
                 </a>
@@ -173,7 +194,7 @@ function buildOrderConfirmationHtml(data: OrderEmailData, storeUrl: string): str
           <tr>
             <td style="background:#f8fafc;padding:20px 40px;text-align:center;border-top:1px solid #e2e8f0;">
               <p style="margin:0;font-size:12px;color:#aaa;">
-                © ${new Date().getFullYear()} ${STORE_NAME}. Todos los derechos reservados.
+                © ${new Date().getFullYear()} ${ctx.storeName}. Todos los derechos reservados.
               </p>
             </td>
           </tr>
@@ -213,7 +234,7 @@ export interface OrderStatusData {
   newStatus: string;
 }
 
-function buildOrderStatusHtml(data: OrderStatusData, storeUrl: string): string {
+function buildOrderStatusHtml(data: OrderStatusData, ctx: EmailContext): string {
   const label = ORDER_STATUS_LABEL[data.newStatus] ?? data.newStatus;
   const icon = ORDER_STATUS_ICON[data.newStatus] ?? "📋";
   return `
@@ -227,7 +248,7 @@ function buildOrderStatusHtml(data: OrderStatusData, storeUrl: string): string {
         <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);">
           <tr>
             <td style="background:#1E3A8A;padding:28px 40px;text-align:center;">
-              <h1 style="color:#fff;margin:0;font-size:22px;">${STORE_NAME}</h1>
+              <h1 style="color:#fff;margin:0;font-size:22px;">${ctx.storeName}</h1>
               <p style="color:#93c5fd;margin:6px 0 0;font-size:13px;">Actualización de pedido</p>
             </td>
           </tr>
@@ -250,7 +271,7 @@ function buildOrderStatusHtml(data: OrderStatusData, storeUrl: string): string {
                 </span>
               </div>
               <div style="text-align:center;margin-top:24px;">
-                <a href="${storeUrl}/account/orders"
+                <a href="${ctx.storeUrl}/account/orders"
                   style="display:inline-block;background:#1E3A8A;color:#fff;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:14px;font-weight:bold;">
                   Ver mis pedidos
                 </a>
@@ -260,7 +281,7 @@ function buildOrderStatusHtml(data: OrderStatusData, storeUrl: string): string {
           <tr>
             <td style="background:#f8fafc;padding:20px 40px;text-align:center;border-top:1px solid #e2e8f0;">
               <p style="margin:0;font-size:12px;color:#aaa;">
-                © ${new Date().getFullYear()} ${STORE_NAME}. Todos los derechos reservados.
+                © ${new Date().getFullYear()} ${ctx.storeName}. Todos los derechos reservados.
               </p>
             </td>
           </tr>
@@ -280,11 +301,12 @@ export async function sendOrderStatusUpdate(data: OrderStatusData): Promise<void
   const resend = new Resend(process.env.RESEND_API_KEY);
   const label = ORDER_STATUS_LABEL[data.newStatus] ?? data.newStatus;
   try {
+    const ctx = await getEmailContext();
     await resend.emails.send({
-      from: FROM_EMAIL,
+      from: ctx.fromEmail,
       to: data.customerEmail,
-      subject: `📦 Pedido ${data.orderNumber}: ${label} — ${STORE_NAME}`,
-      html: buildOrderStatusHtml(data, await getBaseUrl()),
+      subject: `📦 Pedido ${data.orderNumber}: ${label} — ${ctx.storeName}`,
+      html: buildOrderStatusHtml(data, ctx),
     });
   } catch (err) {
     console.error("[email] Error enviando actualización de orden:", err);
@@ -324,10 +346,10 @@ export interface RepairStatusData {
   newStatus: string;
 }
 
-function buildRepairStatusHtml(data: RepairStatusData, storeUrl: string): string {
+function buildRepairStatusHtml(data: RepairStatusData, ctx: EmailContext): string {
   const label = REPAIR_STATUS_LABEL[data.newStatus] ?? data.newStatus;
   const icon = REPAIR_STATUS_ICON[data.newStatus] ?? "🔧";
-  const trackingUrl = `${storeUrl}/soporte-tecnico/seguimiento/${data.codigo}`;
+  const trackingUrl = `${ctx.storeUrl}/soporte-tecnico/seguimiento/${data.codigo}`;
   return `
 <!DOCTYPE html>
 <html lang="es">
@@ -339,7 +361,7 @@ function buildRepairStatusHtml(data: RepairStatusData, storeUrl: string): string
         <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);">
           <tr>
             <td style="background:#1E3A8A;padding:28px 40px;text-align:center;">
-              <h1 style="color:#fff;margin:0;font-size:22px;">${STORE_NAME}</h1>
+              <h1 style="color:#fff;margin:0;font-size:22px;">${ctx.storeName}</h1>
               <p style="color:#93c5fd;margin:6px 0 0;font-size:13px;">Actualización de reparación</p>
             </td>
           </tr>
@@ -373,7 +395,7 @@ function buildRepairStatusHtml(data: RepairStatusData, storeUrl: string): string
           <tr>
             <td style="background:#f8fafc;padding:20px 40px;text-align:center;border-top:1px solid #e2e8f0;">
               <p style="margin:0;font-size:12px;color:#aaa;">
-                © ${new Date().getFullYear()} ${STORE_NAME}. Todos los derechos reservados.
+                © ${new Date().getFullYear()} ${ctx.storeName}. Todos los derechos reservados.
               </p>
             </td>
           </tr>
@@ -393,11 +415,12 @@ export async function sendRepairStatusUpdate(data: RepairStatusData): Promise<vo
   const resend = new Resend(process.env.RESEND_API_KEY);
   const label = REPAIR_STATUS_LABEL[data.newStatus] ?? data.newStatus;
   try {
+    const ctx = await getEmailContext();
     await resend.emails.send({
-      from: FROM_EMAIL,
+      from: ctx.fromEmail,
       to: data.clienteEmail,
-      subject: `🔧 Reparación ${data.codigo}: ${label} — ${STORE_NAME}`,
-      html: buildRepairStatusHtml(data, await getBaseUrl()),
+      subject: `🔧 Reparación ${data.codigo}: ${label} — ${ctx.storeName}`,
+      html: buildRepairStatusHtml(data, ctx),
     });
   } catch (err) {
     console.error("[email] Error enviando actualización de reparación:", err);
@@ -415,11 +438,12 @@ export async function sendOrderConfirmation(data: OrderEmailData): Promise<void>
   const resend = new Resend(process.env.RESEND_API_KEY);
 
   try {
+    const ctx = await getEmailContext();
     await resend.emails.send({
-      from: FROM_EMAIL,
+      from: ctx.fromEmail,
       to: data.customerEmail,
-      subject: `✅ Pedido ${data.orderNumber} confirmado — ${STORE_NAME}`,
-      html: buildOrderConfirmationHtml(data, await getBaseUrl()),
+      subject: `✅ Pedido ${data.orderNumber} confirmado — ${ctx.storeName}`,
+      html: buildOrderConfirmationHtml(data, ctx),
     });
   } catch (err) {
     console.error("[email] Error enviando confirmación:", err);

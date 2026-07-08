@@ -10,6 +10,12 @@ export interface ISetting extends Document {
   instagramUrl: string;
   facebookUrl: string;
   whatsappNumber: string;
+  // Credenciales/identidad por tenant (fallback a env vars si están vacías)
+  mpAccessToken: string;
+  mpWebhookSecret: string;
+  fromEmail: string;
+  transferAlias: string;
+  transferCvu: string;
   carouselImages: string[];
   homeFeaturedMode: "products" | "categories";
   shippingEnabled: boolean;
@@ -32,6 +38,11 @@ const SettingSchema = new Schema(
     instagramUrl:          { type: String, default: "" },
     facebookUrl:           { type: String, default: "" },
     whatsappNumber:        { type: String, default: "" },
+    mpAccessToken:         { type: String, default: "" },
+    mpWebhookSecret:       { type: String, default: "" },
+    fromEmail:             { type: String, default: "" },
+    transferAlias:         { type: String, default: "" },
+    transferCvu:           { type: String, default: "" },
     carouselImages:        { type: [String], default: [] },
     homeFeaturedMode:      { type: String, enum: ["products", "categories"], default: "products" },
     shippingEnabled:       { type: Boolean, default: true },

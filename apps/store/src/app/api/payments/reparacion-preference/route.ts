@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Preference } from "mercadopago";
-import client from "@/lib/mercadopago";
+import { getMpClient } from "@/lib/mercadopago";
 import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
 import { getBaseUrl } from "@/lib/base-url";
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
 
     const equipoLabel = [rep.equipo.marca, rep.equipo.modelo].filter(Boolean).join(" ") || rep.equipo.tipo;
 
-    const preference = new Preference(client);
+    const preference = new Preference(await getMpClient());
     const response = await preference.create({
       body: {
         items: [

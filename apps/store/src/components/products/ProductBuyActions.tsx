@@ -5,6 +5,7 @@ import { ShoppingCart, Zap, MessageCircle } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { IProduct } from "@/models/Product";
 import { useCartStore } from "@/store/useCartStore";
+import { useWhatsAppNumber } from "@/hooks/use-whatsapp-number";
 import { cn } from "@/lib/utils";
 
 export default function ProductBuyActions({ product }: { product: IProduct }) {
@@ -39,7 +40,7 @@ export default function ProductBuyActions({ product }: { product: IProduct }) {
     router.push("/checkout");
   };
 
-  const waNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "";
+  const waNumber = useWhatsAppNumber();
   const productUrl = `${origin}${pathname}`;
   const waMessage = encodeURIComponent(
     `Hola! Me interesa este producto: ${product.name}\n${productUrl}`

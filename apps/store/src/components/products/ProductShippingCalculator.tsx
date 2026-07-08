@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Truck, Zap, Globe, Clock, MessageCircle, LogIn, MapPin } from "lucide-react";
 import { useShippingZone } from "@/hooks/useShippingZone";
+import { useWhatsAppNumber } from "@/hooks/use-whatsapp-number";
 
 interface Props {
   shippingTypes: string[];
@@ -10,14 +11,13 @@ interface Props {
   shippingEnabled?: boolean;
 }
 
-const WHATSAPP = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "5491150610043";
-
 function isBeforeNoon() {
   return new Date().getHours() < 12;
 }
 
 export default function ProductShippingCalculator({ shippingTypes, freeShipping = false, shippingEnabled = true }: Props) {
   const { zone, source, loading } = useShippingZone();
+  const WHATSAPP = useWhatsAppNumber();
 
   const hasFlex     = shippingTypes.includes("flex");
   const hasStandard = shippingTypes.includes("standard");

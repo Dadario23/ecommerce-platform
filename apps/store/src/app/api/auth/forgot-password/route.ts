@@ -5,6 +5,7 @@ import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
 import { getClientIp, hitRateLimit } from "@/lib/rate-limit";
 import { getBaseUrl } from "@/lib/base-url";
+import { getTenantSecrets } from "@/lib/tenant-secrets";
 
 const ForgotSchema = z.object({ email: z.string().email() });
 
@@ -92,8 +93,9 @@ export async function POST(request: NextRequest) {
     const { Resend } = await import("resend");
     const resend = new Resend(process.env.RESEND_API_KEY);
 
+    const { fromEmail } = await getTenantSecrets();
     await resend.emails.send({
-      from: process.env.RESEND_EMAIL_FROM || "onboarding@resend.dev",
+      from: fromEmail || process.env.RESEND_EMAIL_FROM || "onboarding@resend.dev",
       to: email,
       subject: "Recupera tu contraseña",
       html: `

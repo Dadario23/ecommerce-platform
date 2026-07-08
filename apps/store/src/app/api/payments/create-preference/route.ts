@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { Preference } from "mercadopago";
-import client from "@/lib/mercadopago";
+import { getMpClient } from "@/lib/mercadopago";
 import mongoose from "mongoose";
 import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
@@ -182,7 +182,7 @@ export async function POST(request: NextRequest) {
       throw err;
     }
 
-    const preference = new Preference(client);
+    const preference = new Preference(await getMpClient());
 
     // Con cupón aplicado, Mercado Pago cobra el total ya rebajado como un único
     // concepto (Checkout Pro no admite líneas de descuento con precio negativo).

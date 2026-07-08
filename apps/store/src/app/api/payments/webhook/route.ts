@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { IOrderItem } from "@/models/Order";
 import { Payment } from "mercadopago";
-import client from "@/lib/mercadopago";
+import { getMpClient } from "@/lib/mercadopago";
+import { getTenantSecrets } from "@/lib/tenant-secrets";
 import { sendOrderConfirmation } from "@/lib/email";
 import crypto from "crypto";
 import { getModels } from "@/lib/tenant-models";
 import { releaseStock } from "@/lib/stock";
 
-function verifyMercadoPagoSignature(request: NextRequest): boolean {
-  const secret = process.env.MP_WEBHOOK_SECRET;
+function verifyMercadoPagoSignature(request: NextRequest, secret: string): boolean {
   // Si no hay secret configurado en producción, rechazar
   if (!secret) {
     return process.env.NODE_ENV === "development";
@@ -40,7 +40,8 @@ export async function POST(request: NextRequest) {
   try {
     const rawBody = await request.text();
 
-    if (!verifyMercadoPagoSignature(request)) {
+    const { mpWebhookSecret } = await getTenantSecrets();
+    if (!verifyMercadoPagoSignature(request, mpWebhookSecret)) {
       return NextResponse.json({ error: "Firma inválida" }, { status: 401 });
     }
 
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
     const { type, data } = body;
 
     if (type === "payment") {
-      const payment = new Payment(client);
+      const payment = new Payment(await getMpClient());
       const paymentData = await payment.get({ id: data.id });
 
       const externalRef   = paymentData.external_reference ?? "";

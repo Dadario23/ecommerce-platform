@@ -1,10 +1,8 @@
 import { notFound } from "next/navigation";
 import { getModels } from "@/lib/tenant-models";
 import { getBaseUrl } from "@/lib/base-url";
+import { getTenantSecrets } from "@/lib/tenant-secrets";
 import Image from "next/image";
-
-const ALIAS = process.env.MP_ALIAS ?? "";
-const CVU   = process.env.MP_CVU   ?? "";
 
 interface Props {
   params: Promise<{ orderId: string }>;
@@ -33,6 +31,7 @@ export default async function PayPage({ params }: Props) {
   // Solo mostrar esta página para órdenes de contraentrega + transferencia
   if (order.payment.method !== "transfer") return notFound();
 
+  const { transferAlias: ALIAS, transferCvu: CVU } = await getTenantSecrets();
   const orderId_ = String(order._id);
   const payUrl   = `${await getBaseUrl()}/pay/${orderId_}`;
   const qrUrl    = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(payUrl)}&bgcolor=ffffff&color=1E3A8A&qzone=1`;

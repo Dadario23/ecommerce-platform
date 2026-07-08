@@ -75,6 +75,7 @@ export default async function RootLayout({
     <html
       lang="es"
       data-store-name={clientConfig.storeName}
+      data-whatsapp={clientConfig.contact.whatsapp}
       data-module-repairs={clientConfig.modules.repairs ? "1" : "0"}
       data-card-style={theme.cardStyle}
       style={{

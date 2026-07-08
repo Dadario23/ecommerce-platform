@@ -22,6 +22,7 @@ import type {
   ShippingZone,
 } from "../types";
 import CheckoutAddressForm from "./CheckoutAddressForm";
+import { useWhatsAppNumber } from "@/hooks/use-whatsapp-number";
 
 interface CheckoutStepDeliveryProps {
   shippingEnabled: boolean;
@@ -58,6 +59,7 @@ export default function CheckoutStepDelivery({
   detectedZone,
   onContinue,
 }: CheckoutStepDeliveryProps) {
+  const whatsappNumber = useWhatsAppNumber();
   return (
     <div className="space-y-4">
       <h1 className="text-xl font-bold text-gray-900">
@@ -284,7 +286,7 @@ export default function CheckoutStepDelivery({
                     cubierta por nuestro servicio de envío propio.
                   </p>
                   <a
-                    href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "5491150610043"}`}
+                    href={`https://wa.me/${whatsappNumber}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 w-full py-3 text-sm font-semibold text-white bg-green-500 hover:bg-green-600 rounded-xl transition-colors"
