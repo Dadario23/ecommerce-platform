@@ -1,346 +1,165 @@
 # PRD.md — ecommerce-platform
 
-> Product requirements for LLMs and stakeholders. Defines WHAT we are building
-> and WHY. Implementation details belong in ARCHITECTURE.md; UI standards in
-> DESIGN_SYSTEM.md.
->
-> **Related docs:**
-> - Technical implementation → [ARCHITECTURE.md](./ARCHITECTURE.md)
-> - UI/design standards → [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md)
-> - Global conventions → [../CLAUDE.md](../CLAUDE.md)
+> Qué hace el producto y por qué. El cómo técnico vive en
+> [ARCHITECTURE.md](./ARCHITECTURE.md); los estándares de UI en
+> [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md); las reglas de trabajo en
+> [CLAUDE.md](./CLAUDE.md).
 
 ---
 
-## Product Vision
+## Visión
 
-**ecommerce-platform** is a **multi-tenant SaaS platform** for Argentine retail
-businesses. The operator (platform owner) deploys and manages independent
-e-commerce storefronts for up to 40+ clients, each running on their own domain
-with their own database, branding, and feature configuration.
+Plataforma SaaS **multi-tenant** de e-commerce para comercios argentinos. El
+operador (dueño de la plataforma) da de alta tiendas independientes — cada una
+con su dominio, su base de datos, su branding y sus módulos — sobre **un único
+deployment**. Objetivo: 40+ clientes sin infraestructura nueva por cliente.
 
-The platform provides clients with a complete end-to-end commerce experience:
-product discovery, checkout, payment processing (Mercado Pago), and order
-management. The operator manages all clients from a central `admin-hub`,
-monitoring health, membership status, and key metrics across every tenant.
-
-The platform is designed to be long-lived and commercially operated. New clients
-are onboarded by copying the `_template` app — no new infrastructure, no new
-codebase.
+El negocio es de largo plazo: el operador vive de esto. Robustez, aislamiento
+entre tenants y cero fugas de seguridad valen más que features nuevas.
 
 ---
 
-## Platform Roles
+## Roles
 
-| Role | Who | Access |
-|------|-----|--------|
-| Platform operator | You (the owner) | `admin-hub` — full cross-tenant visibility |
-| Tenant admin | Client's staff | Per-tenant admin panel within their own app |
-| Customer | End user | Public storefront of a specific tenant |
-
----
-
-## admin-hub — Platform Operator Dashboard
-
-**This is the operator's control panel, not a per-client admin panel.**
-
-What it provides:
-- Aggregated metrics across all tenants (orders, revenue, activity)
-- Membership management — activate or suspend any tenant
-- Billing status visibility per client
-- Health monitoring for all active storefronts
-
-What it does NOT do:
-- Provide per-tenant product or order management (that lives inside each tenant app)
-- Allow client staff to log in (operator-only tool)
+| Rol | Quién | Acceso |
+|-----|-------|--------|
+| Operador de plataforma | El dueño | `admin-hub`: métricas cross-tenant, membresías, alta de clientes |
+| `admin` / `superadmin` | Staff del cliente | Panel admin de su propia tienda (productos, órdenes, cupones, settings) |
+| `receptionist` | Staff del cliente | Alta y gestión de reparaciones |
+| `technician` | Staff del cliente | Reparaciones asignadas a él |
+| `user` | Consumidor final | Storefront, su cuenta, sus compras |
 
 ---
 
-## Membership & Billing Model
+## Tenants actuales
 
-Each tenant has a `memberships` collection in their own MongoDB database.
-admin-hub reads and writes this collection via `useDb(slug)` — the tenant
-app itself never manages its own membership.
+| Tenant | Rubro | Dominio | Módulos extra |
+|--------|-------|---------|---------------|
+| `bitm-cel` | Tecnología + servicio técnico | bitm-cel.com.ar | repairs |
+| `kameleba` | Moda | kameleba.com.ar | — |
+| `compumobile` | Tecnología + servicio técnico | www.compumobile.com.ar | repairs, budgets |
 
-### Membership Document Shape
+Módulos activables por tenant (doc `Setting`): `repairs`, `budgets`,
+`shipping`, `coupons`. El alta de un cliente nuevo está documentada en
+CLAUDE.md ("Agregar un nuevo cliente").
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `status` | `"active"` \| `"suspended"` | Current access state |
-| `paidUntil` | Date | Last day of the paid billing period (end of month) |
-| `gracePeriodEnd` | Date | 15 days after `paidUntil` — suspension deadline |
-| `lastPaymentDate` | Date | When the last payment was registered |
-| `updatedAt` | Date | Last time admin-hub wrote to this document |
+---
 
-### Billing Cycle
+## Membresía y facturación
 
-When the operator activates a tenant via the admin-hub:
+El operador cobra a cada cliente por el servicio. La membresía vive en la DB
+del tenant (colección `memberships`), la **escribe solo admin-hub** y el store
+la lee para decidir si la tienda opera.
+
+### Estados efectivos
 
 ```
-Activation date:  any day of the month
-paidUntil:        last day of that same month
-gracePeriodEnd:   15th of the following month
+active ──(vence paidUntil)──▶ grace ──(vence gracePeriodEnd / día 15)──▶ suspended
+   ▲                                                                        │
+   └──────────────────── operador registra pago / reactiva ◀────────────────┘
 ```
 
-This gives clients a 15-day grace period after month end before suspension
-is enforced.
+- **active** — al día, o sin doc de membresía (default benevolente)
+- **grace** — vencido pero dentro de la gracia; la tienda opera normal
+- **suspended** — el storefront muestra "tienda fuera de servicio" (implementado
+  en el layout de store); un error de lectura nunca suspende
 
-### Status Transitions
+### Ciclo
 
-```
-(new tenant) ──► active ──► suspended ──► active
-                              ▲               │
-                              └───────────────┘
-                         operator toggles at any time
-```
+Activación en cualquier día del mes → `paidUntil` = fin de ese mes →
+`gracePeriodEnd` = día 15 del mes siguiente.
 
-- **activate** — sets `status: "active"`, recalculates `paidUntil` and
-  `gracePeriodEnd` from today, records `lastPaymentDate`
-- **suspend** — sets `status: "suspended"`, date fields unchanged
+### Limitaciones actuales (deliberadas)
 
-### Fallback Behaviour
-
-If a tenant has no `memberships` document, admin-hub treats them as
-`{ status: "active", paidUntil: null }`. New tenants are active by default
-until explicitly suspended.
-
-### Current Limitations
-
-- Suspension enforcement in tenant apps is not yet implemented — status is
-  stored but not checked at the storefront level
-- No automatic suspension trigger on `gracePeriodEnd` — operator suspends
-  manually
-- No payment gateway integration — operator records payments manually via
-  the activate action in admin-hub
-- Tenant registry is static (`PLATFORM_CLIENTS` env var) — dynamic onboarding
-  without redeployment requires a future `platform_clients` collection
+- El operador suspende/activa manualmente — sin trigger automático al vencer la gracia
+- Pagos registrados a mano en admin-hub — sin gateway para cobrar membresías
+- Registro de tenants estático por env vars
 
 ---
 
-## Tenant Applications
+## Features de la tienda (todos los tenants)
 
-### compumobile
+### Cuentas
+- Registro/login con email y contraseña, y Google OAuth
+- Reset de contraseña por email con token que expira; rate limiting en
+  login/registro/reset
+- Datos: nombre, email, direcciones múltiples (con default), favoritos,
+  historial de pedidos y notificaciones in-app
 
-**Domain:** Technology products and services (Buenos Aires area)
+### Catálogo
+- Producto: nombre, slug único, descripción, imágenes (Cloudinary), precio,
+  precio de comparación, marca, categoría, stock, condición, envío, activo
+- Búsqueda por texto, filtros por categoría/precio, orden y paginación
+- Sin stock: visible pero no comprable
+- Reviews con rating solo de compradores (verificadas contra sus órdenes)
 
-**Core purpose:** Sell technology products online AND manage repair/technical
-service orders within the same platform.
+### Carrito y checkout
+- Carrito persistente por usuario (DB) con estado cliente en Zustand
+- Cupones: porcentaje o monto fijo, mínimo de orden, límite de usos, expiración;
+  el descuento se recalcula siempre server-side
+- **Tres métodos de pago:** Mercado Pago (redirect), transferencia (alias/CVU
+  del tenant) y contraentrega
+- Stock: reserva atómica en checkout; MP reserva por 45 min (preferencia expira
+  a los 30); reservas abandonadas se liberan solas
+- Zonas de envío configurables por tenant (módulo `shipping`)
 
-**What makes it unique:**
-- Integrated technical service module for tracking repair jobs
-- Products span hardware, peripherals, accessories, and components
-- Customers can submit a repair request and track its progress online
-- Operators manage both sales orders and service orders from one admin panel
+### Órdenes
 
-**Target audience:** End consumers purchasing technology products or seeking
-technical service for devices.
+Estados: `pending → confirmed → processing → shipped → delivered`, más
+`cancelled`. El pago tiene su propio estado (`pending / completed / failed /
+refunded`).
 
----
+- El cliente cancela solo en `pending`/`confirmed`; cancelar devuelve stock y cupón
+- El admin cambia estados; des-cancelar re-reserva stock (falla si ya no hay)
+- Todo cambio de estado notifica por email + notificación in-app
+- Las órdenes no se borran: se cancelan
 
-### kameleba
+### Servicio técnico (módulo `repairs` — bitm-cel y compumobile)
 
-**Domain:** General merchandise / fashion e-commerce
+Estados: `recibido → diagnosticado → en_reparacion → esperando_repuestos →
+listo → entregado`, más `cancelado` y `sin_reparacion`.
 
-**Core purpose:** Pure product-focused storefront without the service module.
+- Alta por staff (`receptionist`+); presupuesto con aprobación del cliente
+- Seguimiento público por código, sin login
+- Catálogo de reparaciones con precios por equipo/marca/modelo (celular,
+  laptop, pc) para cotización
+- Cambios de estado notifican por email + in-app
 
-**What makes it unique:**
-- Fashion-oriented product model with size and colour variants
-- Lookbook and outfit grouping system (planned)
-- Virtual AI fitting room feature (roadmap)
-- Advanced filtering by size, colour, price range, and category
-
-**Target audience:** End consumers browsing and purchasing fashion and
-lifestyle products.
-
----
-
-### admin-hub (platform operator)
-
-- Protected by static bearer token — no per-user login
-- Dashboard: cross-tenant revenue, orders, membership status
-- Membership management: activate or suspend any tenant
-- Tenant registry driven by `PLATFORM_CLIENTS` environment variable
-
----
-
-## Shared Feature Requirements
-
-The following requirements apply to both storefronts unless explicitly noted.
-
-### 1. Authentication & Accounts
-
-- Customers register with email and password
-- Customers can log in via email/password
-- Password reset via email link (expires after 1 hour)
-- Password change available from account settings
-- Sessions persist across browser restarts
-- Account data: name, email, shipping addresses (multiple), order history
-
-### 2. Product Catalogue
-
-- Products have: name, description, images (multiple), price, category,
-  brand, SKU, stock quantity, and active/inactive status
-- Products can belong to one category; categories can nest up to 2 levels
-- Images hosted on Cloudinary; minimum 1 image required to activate a product
-- Out-of-stock products remain visible but cannot be purchased
-- Slug auto-generated from product name (unique, URL-safe)
-- Search by name and description
-
-### 3. Product Variants (kameleba primary, compumobile secondary)
-
-- Variants define combinations of attributes (size, colour, material)
-- Each variant has its own: SKU, price (optional override), stock, and images
-- Adding a product to cart requires selecting all required variant attributes
-- If only one variant exists, selection is skipped
-
-### 4. Cart
-
-- Cart persists for authenticated users (database-backed)
-- Cart is session-based for guests (local storage)
-- Guest cart merges with account cart on login
-- Maximum 99 units per line item
-- Cart displays: image thumbnail, name, variant, unit price, quantity
-  controls, line total, and remove action
-- Cart total displays before and after any applied discounts
-
-### 5. Checkout
-
-- Shipping address: select from saved addresses or enter a new one
-- New addresses can be saved to the account during checkout
-- Payment via Mercado Pago (redirect flow)
-- Order is created server-side before payment redirect
-- Order status updates via Mercado Pago webhook (not client redirect)
-- Confirmation email sent on successful payment
-
-### 6. Orders
-
-**Statuses:**
-
-| Status | Meaning |
-|--------|---------|
-| `pending_payment` | Created, awaiting payment confirmation |
-| `confirmed` | Payment received |
-| `processing` | Being prepared for dispatch |
-| `shipped` | Dispatched, tracking available |
-| `delivered` | Confirmed delivered |
-| `cancelled` | Cancelled (by customer or operator) |
-| `refunded` | Payment returned |
-
-- Customers can view all their orders with current status
-- Customers can cancel an order in `pending_payment` or `confirmed` status
-- Operators can update order status and add tracking information
-- Status changes trigger email notifications to the customer
-
-### 7. Search & Discovery
-
-- Full-text search on product name and description
-- Filter by: category, price range, brand, availability
-- Sort by: relevance, price ascending/descending, newest
-- Paginated results (default 20 products per page)
-- URL state reflects active filters and sort (shareable links)
-
-### 8. Admin Panel (admin-hub)
-
-- Protected behind `admin` role — inaccessible to customers
-- Dashboard: today's orders, revenue, low-stock alerts, recent activity
-- Products: CRUD with image upload, bulk archive/activate
-- Orders: list with filters by status/date, detail view, status update
-- Customers: list, profile view, order history
+### Presupuestos (módulo `budgets` — compumobile)
+- Solicitud pública de presupuesto; gestión y respuesta desde el panel admin
 
 ---
 
-## compumobile-Specific Requirements
+## Reglas de negocio
 
-### Technical Service Module
-
-Customers can submit a repair request for a device. The request captures:
-
-- Device type (category), brand, model
-- Problem description (free text)
-- Contact details (pre-filled if logged in)
-- Optional: photos of the device/issue
-
-**Service order statuses:**
-
-| Status | Meaning |
-|--------|---------|
-| `received` | Request submitted |
-| `diagnosing` | Technician evaluating |
-| `quote_sent` | Budget sent to customer |
-| `approved` | Customer approved the quote |
-| `in_repair` | Repair in progress |
-| `ready` | Repair complete, awaiting pickup |
-| `delivered` | Device returned to customer |
-| `rejected` | Customer rejected quote or cancelled |
-
-- Customers can track service order status with a reference number
-  (no login required)
-- Operators update status and add technician notes from admin-hub
-- Status change notifications sent via email
+- Precios en **pesos argentinos (ARS)**; formato `$ 1.234,50`
+- Copy en español rioplatense (voseo)
+- El descuento de cupón y los totales se calculan siempre en el server
+- `usedCount` de cupón se cuenta al confirmarse el pago (MP) o al crear la
+  orden (otros métodos); cancelar lo devuelve
+- Mercado Pago cobra un ítem único con el total cuando hay descuento
+  (Checkout Pro no admite ítems negativos)
+- Credenciales de MP, remitente de email y datos de transferencia son **por
+  tenant** (Setting), con fallback a las credenciales del operador
 
 ---
 
-## kameleba-Specific Requirements
+## Fuera de alcance (versión actual)
 
-### Variant System
-
-Full attribute-based variant model:
-
-- Define variant attributes per product (e.g. Size: S, M, L, XL; Colour: Red,
-  Blue)
-- Each combination generates a variant with independent stock and optional
-  price override
-- Display available attributes as swatches (colour) or buttons (size)
-- Unavailable variant combinations are visually indicated, not hidden
-
-### Outfit / Lookbook System (Planned)
-
-- Group multiple products into a named "look" or outfit
-- Each look has a cover image and optional editorial description
-- Products in a look can be added to cart individually or as a group
-- Admin creates and manages looks from admin-hub
-
-### Virtual AI Fitting Room (Roadmap)
-
-- Customer uploads a photo and selects a garment product
-- AI generates a preview of the customer wearing the garment
-- Preview is watermarked and non-downloadable
-- Requires explicit customer consent before photo upload
+- Multi-moneda y multi-idioma
+- Variantes de producto por atributos (talle/color) — planificado para kameleba
+- POS / integración con local físico
+- Suscripciones o pagos recurrentes
+- Apps móviles nativas (web responsive solamente)
+- Cobro automático de membresías a los clientes
 
 ---
 
-## Business Rules
+## Métricas de éxito
 
-- Prices are in **Argentine Pesos (ARS)**
-- Stock is decremented when an order reaches `confirmed` status
-- Stock is restored when an order reaches `cancelled` or `refunded` status
-- A product cannot be deleted if it has associated orders — only archived
-- Email must be unique per customer account
-- Admins cannot delete orders — only cancel or refund them
-- Mercado Pago is the exclusive payment method (no cash on delivery, no other
-  gateways — subject to future review)
-
----
-
-## Non-Goals (Current Scope)
-
-The following are explicitly out of scope for the current version:
-
-- Multi-currency support
-- Physical store (POS) integration
-- Supplier / B2B purchasing flows
-- Subscription or recurring payments
-- Product reviews and ratings (planned but not scheduled)
-- Multi-language support (Spanish only)
-- Native mobile apps (responsive web only)
-
----
-
-## Success Metrics
-
-| Metric | Target |
-|--------|--------|
-| Checkout conversion rate | > 3% of sessions |
-| Cart abandonment rate | < 70% |
-| Average page load (LCP) | < 2.5s on 4G mobile |
-| Admin order processing time | < 2 min per order |
-| Uptime | 99.9% monthly |
+| Métrica | Objetivo |
+|---------|----------|
+| Conversión de checkout | > 3% de sesiones |
+| LCP mobile 4G | < 2.5s |
+| Uptime | 99.9% mensual |
+| Onboarding de un cliente nuevo | < 1 día, sin deployment nuevo |

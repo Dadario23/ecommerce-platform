@@ -1,397 +1,133 @@
 # DESIGN_SYSTEM.md — ecommerce-platform
 
-> Design system documentation for LLMs. Defines tokens, component patterns,
-> accessibility standards, and UI conventions. All UI work must reference this
-> document before writing any styles or components.
+> Tokens, theming por tenant y patrones de UI. Leer antes de escribir estilos
+> o componentes.
 >
-> **Related docs:**
-> - Component architecture → [ARCHITECTURE.md](./ARCHITECTURE.md)
-> - Brand requirements → [PRD.md](./PRD.md)
-> - Global rules → [../CLAUDE.md](../CLAUDE.md)
+> **Docs relacionadas:**
+> - Arquitectura → [ARCHITECTURE.md](./ARCHITECTURE.md)
+> - Producto → [PRD.md](./PRD.md)
+> - Reglas de trabajo → [CLAUDE.md](./CLAUDE.md)
 
 ---
 
-## Core Principle: Token-First
+## Stack
 
-**Never hardcode a colour, font size, spacing value, or shadow.**
-Every visual decision must trace back to a design token. This makes theming,
-app-to-app consistency, and future rebrandin trivial.
+- **Tailwind CSS v4** — tokens como CSS custom properties en
+  `apps/store/src/app/globals.css` (`:root` en HSL + bloque `@theme inline`
+  que los expone a Tailwind). No hay `tailwind.config` de tokens.
+- **shadcn/ui** — componentes de propiedad local en
+  `apps/store/src/components/ui/` (button, dialog, sheet, card, badge,
+  skeleton, table, form, sonner, …). No existe `packages/ui`: admin-hub es una
+  herramienta interna con su propia UI mínima.
+- Extender con `className` + `cn()` — no envolver un componente shadcn solo
+  para cambiarle estilos.
+
+---
+
+## Regla central: token-first
+
+Nunca hardcodear color, tamaño ni sombra en un componente.
 
 ```
-Wrong:  className="text-[#1a1a1a] text-[14px] p-[16px]"
-Right:  className="text-foreground text-sm p-4"
+Mal:   className="text-[#1a1a1a] p-[16px]"
+Bien:  className="text-foreground p-4"
 ```
 
----
-
-## Technology Stack
-
-- **Tailwind CSS v4** — utility-first with CSS custom property tokens
-- **shadcn/ui** — headless component primitives, locally owned
-- **CSS custom properties** — the source of truth for all tokens
-
-Tailwind v4 reads tokens from CSS custom properties defined in the global
-stylesheet. Do not define token values in `tailwind.config` — define them in
-CSS and let Tailwind consume them.
+Tokens semánticos disponibles (los de shadcn): `background/foreground`,
+`card`, `popover`, `primary`, `secondary`, `muted`, `accent`, `destructive`,
+`border`, `input`, `ring` — siempre por **propósito**, no por color.
 
 ---
 
-## Design Tokens
+## Theming por tenant
 
-### Colour System
-
-Tokens use semantic naming — always refer to the token's **purpose**, not its
-colour value.
-
-#### Semantic Colour Tokens
-
-| Token | Purpose | Do not use for |
-|-------|---------|----------------|
-| `--background` | Page background | Component backgrounds |
-| `--foreground` | Primary text on background | Muted or secondary text |
-| `--card` | Card/surface background | Page background |
-| `--card-foreground` | Text on card surfaces | — |
-| `--popover` | Popover/dropdown background | — |
-| `--popover-foreground` | Text on popovers | — |
-| `--primary` | Brand actions, CTAs, links | Decorative elements |
-| `--primary-foreground` | Text on primary background | — |
-| `--secondary` | Secondary actions, badges | Primary actions |
-| `--secondary-foreground` | Text on secondary background | — |
-| `--muted` | Disabled states, subtle backgrounds | Active elements |
-| `--muted-foreground` | Placeholder text, captions | Body text |
-| `--accent` | Hover states, highlights | Brand identity |
-| `--accent-foreground` | Text on accent background | — |
-| `--destructive` | Delete, error, danger | Warning states |
-| `--destructive-foreground` | Text on destructive background | — |
-| `--border` | Borders, dividers | Backgrounds |
-| `--input` | Form input borders | — |
-| `--ring` | Focus rings | — |
-
-#### App-Level Colour Overrides
-
-Each app can define its own brand tokens as CSS custom properties without
-forking shared components:
+El branding de cada tenant es **estático y vive en el código**, en
+`apps/store/src/config/tenant-themes.ts` — una entrada `TenantTheme` por slug.
+No hay editor de temas en runtime: dar de alta o retocar un tema es un cambio
+de código hecho por el dev (decisión deliberada: menos superficie de error
+que un theme builder).
 
 ```pseudocode
-// apps/compumobile/src/styles/brand.css (pseudo)
-:root {
-  --primary: <compumobile brand primary>;
-  --primary-foreground: <contrast text>;
-}
-
-// apps/kameleba/src/styles/brand.css (pseudo)
-:root {
-  --primary: <kameleba brand primary>;
-  --primary-foreground: <contrast text>;
+TenantTheme {
+  storeName
+  colors: { primary, primaryHover, onPrimary, tint, accent, background? }
+  backgroundPattern?   // PNG translúcido repetido sobre el fondo
+  radius
+  font: "geist" | "manrope" | "editorial" | "urban"   // cargadas via next/font
+  logo: { src, invert? } | null    // null → wordmark con storeName
+  favicon | null
+  navStyle: "solid" | "light"      // barra en primary vs. blanca
+  cardStyle: "boxed" | "minimal"   // card con borde vs. limpia (variante CSS `minimal:`)
+  homeVariant: "tech" | "editorial"
+  benefits[] / promoItems[]        // íconos + copy de la franja de beneficios
 }
 ```
 
-The shared `packages/ui` components remain unchanged — only the token values
-differ per app.
+Reglas:
+
+- Un tema nuevo = una entrada nueva en `tenant-themes.ts`; nunca condicionar
+  por slug dentro de un componente
+- Los colores del tema deben cumplir contraste AA contra `onPrimary`/fondo
+- Las fuentes se cargan con `next/font` en el layout (`FONT_VARS`) — nunca
+  importar Google Fonts en un componente
 
 ---
 
-### Typography Scale
+## Patrones
 
-| Token class | Use case |
-|------------|---------|
-| `text-xs` | Captions, labels, legal |
-| `text-sm` | Secondary text, metadata, form hints |
-| `text-base` | Body text (default) |
-| `text-lg` | Lead paragraphs, card titles |
-| `text-xl` | Section headings (minor) |
-| `text-2xl` | Section headings (major) |
-| `text-3xl` | Page headings |
-| `text-4xl` + | Hero headings only |
+### Formularios
+React Hook Form + Zod con los primitivos `Form` de shadcn: `FormField →
+FormItem → FormLabel + FormControl + FormMessage`. El submit muestra estado
+pendiente ("Guardar" → "Guardando…") y queda deshabilitado durante el envío.
+El schema Zod del form es el mismo contrato que valida la API en el boundary.
 
-**Font weight conventions:**
+### Estados de listas y operaciones async
+Toda vista async maneja: loading (skeleton con la forma del contenido, no
+spinner de pantalla completa), éxito, error (mensaje accionable, nunca un
+código interno) y **vacío** (ícono del dominio + qué hacer a continuación +
+CTA si aplica).
 
-| Weight | Use |
-|--------|-----|
-| `font-normal` | Body text |
-| `font-medium` | UI labels, button text |
-| `font-semibold` | Card titles, section headers |
-| `font-bold` | Page titles, primary headings |
-
-Font families are defined as CSS custom properties (`--font-sans`,
-`--font-mono`) and loaded via `next/font`. Never import Google Fonts directly
-in components.
+### Tarjeta de producto
+Imagen 1:1 con `next/image`, nombre `line-clamp-2`, precio destacado, precio
+de comparación tachado si hay oferta, badge "Sin stock" con overlay muted. La
+variante visual la decide `cardStyle` del tema del tenant, no el componente.
 
 ---
 
-### Spacing
+## Responsive
 
-Follow Tailwind's default spacing scale. Do not use arbitrary values unless
-approved.
-
-| Pattern | Usage |
-|---------|-------|
-| `gap-2 / gap-4` | Tight component internal spacing |
-| `gap-6 / gap-8` | Component-level spacing |
-| `gap-12 / gap-16` | Section-level spacing |
-| `p-4 / p-6` | Card internal padding |
-| `px-4 / py-2` | Button padding |
-| `container mx-auto` | Page-level content centering |
+Mobile-first con los breakpoints default de Tailwind. Navegación colapsa a
+Sheet en mobile; grillas de producto 2 → 3 → 4 columnas; tablas admin con
+scroll horizontal; targets táctiles ≥ 44×44px.
 
 ---
 
-### Border Radius
+## Accesibilidad (WCAG 2.1 AA)
 
-```pseudocode
---radius: base radius value (defined per app)
-
-Derived tokens:
-  --radius-sm: calc(var(--radius) - 4px)
-  --radius-md: calc(var(--radius) - 2px)
-  --radius-lg: var(--radius)
-  --radius-xl: calc(var(--radius) + 4px)
-```
-
-Use `rounded-sm`, `rounded-md`, `rounded-lg`, `rounded-xl` — never hardcode
-pixel values.
+- Contraste: 4.5:1 texto normal, 3:1 texto grande y componentes UI —
+  verificarlo al definir colores de un tema nuevo
+- Todo interactivo alcanzable por teclado; focus ring visible siempre
+  (nunca `outline: none` sin reemplazo); modales atrapan el foco; Escape cierra
+- Nombre accesible en todo control (label, `aria-label`); errores linkeados
+  con `aria-describedby`; imágenes decorativas con `alt=""`
+- Animaciones con fallback `prefers-reduced-motion`
 
 ---
 
-## Component Standards
+## Idioma y formato (es-AR)
 
-### shadcn/ui Components
-
-shadcn/ui components live in `packages/ui/components/ui/`. They are locally
-owned — modify them when needed, but keep changes backwards-compatible.
-
-**Never install shadcn/ui components directly into an app** — always add to
-`packages/ui` first so all apps benefit.
-
-#### Accepted shadcn/ui Components
-
-| Component | Usage context |
-|-----------|--------------|
-| `Button` | All interactive actions |
-| `Input` | All text inputs |
-| `Select` | Dropdown selection |
-| `Dialog` | Modal overlays |
-| `Sheet` | Mobile drawers, side panels |
-| `Card` | Content containers |
-| `Badge` | Status indicators, labels |
-| `Skeleton` | Loading states |
-| `Toast / Sonner` | Feedback notifications |
-| `Table` | Admin data tables |
-| `Form` | React Hook Form wrapper |
-
-#### Extending Components
-
-Extend via the `className` prop and `cn()` utility — never wrap a shadcn
-component in another component just to change its styles.
-
-```pseudocode
-// Correct (pseudo)
-<Button className={cn("w-full", isLoading && "opacity-50")}>
-
-// Wrong (pseudo)
-<FullWidthButton>   ← unnecessary wrapper
-```
+- Voseo: "Ingresá tu email", "Volvé a intentarlo"
+- Moneda: `$ 1.234,50` (`toLocaleString("es-AR")`)
+- Fechas: `DD/MM/YYYY`
+- Evitar anglicismos cuando hay término natural en español
 
 ---
 
-### Product Card Pattern
+## No hacer
 
-The product card is the most repeated UI pattern. It must follow this structure:
-
-```pseudocode
-ProductCard {
-  // Image area
-  - Aspect ratio: 1:1 (square)
-  - next/image with fill layout
-  - Skeleton shown during load
-  - Hover: subtle scale or overlay
-
-  // Content area
-  - Product name: text-sm font-medium, 2 lines max (line-clamp-2)
-  - Price: text-base font-semibold text-primary
-  - Secondary info (brand, condition): text-xs text-muted-foreground
-  - CTA button: full width on mobile, auto on desktop
-
-  // States
-  - Out of stock: muted overlay + "Sin stock" badge
-  - On sale: original price struck through + sale badge
-  - Loading: Skeleton for all areas
-}
-```
-
----
-
-### Form Pattern
-
-All forms use React Hook Form + Zod. UI is built with shadcn/ui `Form`
-primitives.
-
-```pseudocode
-FORM STRUCTURE:
-  FormField wraps every input
-    └── FormItem
-          ├── FormLabel       (required indicator if field is required)
-          ├── FormControl
-          │     └── Input / Select / Textarea
-          ├── FormDescription (optional hint text)
-          └── FormMessage     (validation error — shown on blur + submit)
-
-SUBMIT BUTTON:
-  - Shows loading spinner while pending
-  - Disabled during submission
-  - Text changes: "Guardar" → "Guardando..." → back to "Guardar"
-```
-
----
-
-### Empty States
-
-Every list view must have an empty state. Empty states are not error messages
-— they are invitations to act.
-
-```pseudocode
-EMPTY STATE STRUCTURE:
-  - Icon relevant to the content type (not a generic "no data" icon)
-  - Heading: what is empty (e.g. "No hay productos")
-  - Body: what to do next (e.g. "Agregá tu primer producto para comenzar")
-  - CTA button if an action is available
-```
-
----
-
-### Loading States
-
-```pseudocode
-LOADING HIERARCHY:
-  1. Page-level: Next.js loading.tsx with full page skeleton
-  2. Section-level: Skeleton components matching content shape
-  3. Button-level: Spinner inside button, button stays sized
-  4. Inline: text-muted-foreground "Cargando..." label
-
-NEVER:
-  - Show a blank white screen during load
-  - Use a spinner that blocks the entire viewport
-  - Flash content before data is ready (prefer SSR / RSC)
-```
-
----
-
-### Error States
-
-```pseudocode
-ERROR DISPLAY RULES:
-  - Inline under the field that caused it (form errors)
-  - Inline banner at top of section (API errors on forms)
-  - Toast for non-blocking background operation failures
-  - Error boundary page for route-level failures
-
-ERROR MESSAGE RULES:
-  - Plain language: "El email ya está en uso" not "UNIQUE_CONSTRAINT_VIOLATION"
-  - Always actionable: tell the user what to do next
-  - Never expose stack traces, IDs, or internal codes to end users
-```
-
----
-
-## Responsive Design
-
-### Breakpoints (Tailwind defaults)
-
-| Prefix | Min width | Target |
-|--------|----------|--------|
-| (none) | 0px | Mobile first |
-| `sm:` | 640px | Large mobile / landscape |
-| `md:` | 768px | Tablet |
-| `lg:` | 1024px | Desktop |
-| `xl:` | 1280px | Wide desktop |
-
-### Mobile-First Rules
-
-- Write base styles for mobile, override at larger breakpoints
-- Navigation collapses to Sheet (drawer) on mobile
-- Product grids: 2 columns mobile → 3 tablet → 4 desktop
-- Admin tables: horizontally scrollable on mobile
-- Touch targets: minimum 44×44px for all interactive elements
-
----
-
-## Accessibility Standards
-
-Minimum target: **WCAG 2.1 AA** for all user-facing interfaces.
-
-### Colour Contrast
-
-| Text type | Minimum ratio |
-|-----------|-------------|
-| Normal text (< 18px) | 4.5:1 |
-| Large text (≥ 18px or 14px bold) | 3:1 |
-| UI components and graphics | 3:1 |
-
-Always verify contrast when overriding brand colour tokens.
-
-### Keyboard Navigation
-
-- All interactive elements reachable via Tab
-- Focus ring always visible — never `outline: none` without a replacement
-- Modals trap focus while open
-- Escape closes all overlays
-- Custom interactive components implement ARIA roles and keyboard handlers
-
-### Screen Reader Support
-
-```pseudocode
-REQUIRED for all interactive elements:
-  - Meaningful accessible name (label, aria-label, or aria-labelledby)
-  - State communicated via aria-* (aria-expanded, aria-selected, aria-disabled)
-  - Loading state: aria-busy="true" on the loading container
-  - Errors: aria-describedby linking input to its error message
-  - Images: descriptive alt text; decorative images use alt=""
-```
-
-### Reduced Motion
-
-Respect `prefers-reduced-motion`. All animations must have a static fallback:
-
-```pseudocode
-// CSS pattern (pseudo)
-@media (prefers-reduced-motion: no-preference) {
-  .animated-element {
-    transition: transform 200ms ease;
-  }
-}
-```
-
----
-
-## Icon Usage
-
-Use a single icon library consistently — do not mix libraries. Icons must:
-
-- Always have an accessible label (`aria-label` or visually hidden text)
-  when used without adjacent text
-- Be sized relative to surrounding text (1em width/height)
-- Use `stroke` not `fill` for line icons to ensure consistent weight
-
----
-
-## Internationalisation (i18n)
-
-All user-facing copy is in **Spanish (Argentina)**. Follow these conventions:
-
-- Currency: Argentine Peso — format as `$ 1.234,50` (period thousands, comma
-  decimal)
-- Dates: `DD/MM/YYYY` format
-- Voseo forms: use _vos_ conjugation ("Ingresá tu email", not "Ingresa...")
-- Avoid anglicisms when a natural Spanish term exists
-
----
-
-## Do Not
-
-- Hardcode any colour value (hex, rgb, hsl) in a component
-- Use arbitrary Tailwind values (`w-[347px]`) without a documented reason
-- Add new shadcn/ui components to an individual app — always go through
-  `packages/ui`
-- Disable focus styles
-- Use `cursor-pointer` on non-interactive elements
-- Ship animations without a `prefers-reduced-motion` fallback
-- Mix icon libraries in the same app
+- Hardcodear colores o usar valores arbitrarios (`w-[347px]`) sin razón documentada
+- Condicionar UI por slug de tenant — todo pasa por el tema o los módulos
+- Deshabilitar estilos de foco
+- `cursor-pointer` en elementos no interactivos
+- Mezclar librerías de íconos
+- Animar sin fallback de `prefers-reduced-motion`

@@ -21,11 +21,10 @@ ecommerce-platform/
 │   ├── admin-hub/    ← Panel del superadmin (solo el operador de la plataforma)
 │   └── _template/    ← no usar, referencia histórica
 ├── packages/
-│   ├── tenant/       ← resolveTenant() + connectTenantDB() — núcleo del multi-tenant
-│   ├── auth/         ← helpers de autenticación compartidos
-│   ├── database/     ← modelos y conexión compartida
-│   ├── email/        ← envío de emails (Resend)
-│   └── membership/   ← gestión de membresías
+│   └── tenant/       ← resolveTenant() + connectTenantDB() — núcleo del multi-tenant
+├── ARCHITECTURE.md   ← cómo está construido el sistema y por qué
+├── PRD.md            ← qué hace el producto (features, reglas de negocio)
+├── DESIGN_SYSTEM.md  ← tokens, theming por tenant, patrones de UI
 ├── CLAUDE.md
 ├── turbo.json
 └── package.json
@@ -92,6 +91,15 @@ Cada tenant puede tener módulos habilitados o deshabilitados. La configuración
 | `shipping`                  | true     | true     | true        |
 | `coupons`                   | true     | true     | true        |
 
+### Membresías
+
+La colección `memberships` de cada tenant la **escribe solo admin-hub** (activar,
+suspender, registrar pagos). El store solo la lee: `getEffectiveMembershipStatus()`
+en `lib/membership.ts` calcula el estado efectivo (sin doc = activo; vencido corre
+la gracia hasta `gracePeriodEnd` o el día 15; después, suspendido) y el layout
+muestra "tienda fuera de servicio" solo con estado `suspended`. Ante error de
+lectura la tienda sigue operando — nunca cortar un tenant por una falla nuestra.
+
 ---
 
 ## Variables de entorno — apps/store
@@ -153,7 +161,10 @@ npm run dev:admin
 3. Agregar `<slug>` a `PLATFORM_CLIENTS` en admin-hub
 4. Apuntar el dominio del cliente a Vercel
 5. Configurar los módulos del tenant en su documento `Setting` en la DB
-6. Cargar en el mismo `Setting` las credenciales del tenant: `mpAccessToken`, `mpWebhookSecret`, `fromEmail`, `transferAlias`, `transferCvu`, `whatsappNumber`
+6. Cargar en el mismo `Setting` las credenciales del tenant con
+   `node apps/admin-hub/scripts/seed-tenant-secrets.mjs <slug>` (interactivo:
+   `mpAccessToken`, `mpWebhookSecret`, `fromEmail`, `transferAlias`,
+   `transferCvu`, `whatsappNumber`; Enter conserva, `-` vacía → fallback env)
 
 No se crea una app nueva. No se hace un deployment nuevo.
 

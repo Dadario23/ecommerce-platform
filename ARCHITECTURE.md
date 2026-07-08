@@ -1,505 +1,181 @@
 # ARCHITECTURE.md — ecommerce-platform
 
-> Technical architecture guide for LLMs. Describes HOW the system is built and
-> WHY those decisions were made. Use pseudo code only — never maintain real
-> implementation samples here.
+> Cómo está construido el sistema y por qué. Pseudocódigo solamente — el código
+> real vive en el repo y esta doc no debe duplicarlo.
 >
-> **Related docs:**
-> - Product context → [PRD.md](./PRD.md)
-> - UI/component standards → [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md)
-> - Global rules → [../CLAUDE.md](../CLAUDE.md)
+> **Docs relacionadas:**
+> - Qué hace el producto → [PRD.md](./PRD.md)
+> - Tokens y patrones de UI → [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md)
+> - Reglas de trabajo → [CLAUDE.md](./CLAUDE.md)
 
 ---
 
-## Architectural Principles
+## Principios
 
-1. **Server-first** — fetch data on the server, stream to the client
-1. **Separation of concerns** — data, business logic, and UI are distinct layers
-1. **Shared by default** — anything reusable goes to `packages/`, never copied
-1. **Validate twice** — schema-level (Mongoose) and boundary-level (Zod)
-1. **Tenant isolation** — no tenant app ever reads or writes another tenant's DB
-1. **Fail loudly in development, gracefully in production**
+1. **Un solo deployment** — `apps/store` sirve a todos los tenants; escalar a 40+ clientes no crea apps ni deployments nuevos
+2. **DB por tenant en cluster compartido** — el slug del tenant ES el nombre de su base en Atlas
+3. **Server-first** — datos en Server Components; el cliente solo interactividad
+4. **Validar dos veces** — schema (Mongoose) y boundary (Zod)
+5. **Aislamiento de tenants** — el store nunca lee ni escribe la DB de otro tenant; solo admin-hub cruza tenants
+6. **Fallar hacia el servicio** — ante un error nuestro (lectura de membresía, config), la tienda sigue operando
 
 ---
 
-## Multi-Tenant Architecture
-
-The platform follows a **db-per-tenant on a shared cluster** model. Each client
-gets their own MongoDB database; all databases live on one Atlas cluster.
+## Multi-tenant
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│  admin-hub  (platform operator only)                         │
-│  Auth: static bearer token (ADMIN_HUB_SECRET)                │
-│  DB access: MONGODB_CLUSTER_URI → useDb(tenantSlug)          │
-│                                                              │
-│  Reads/writes into any tenant DB by switching database       │
-│  Manages: memberships, billing status, cross-tenant metrics  │
-└──────────────┬──────────────────────────┬────────────────────┘
-               │                          │
-     useDb("compumobile")       useDb("kameleba") ...
-               │                          │
-┌──────────────▼──────┐     ┌─────────────▼──────┐
-│  MongoDB Atlas      │     │  MongoDB Atlas      │
-│  DB: compumobile    │     │  DB: kameleba       │
-└──────────────▲──────┘     └─────────────▲──────┘
-               │                          │
-┌──────────────┴──────┐     ┌─────────────┴──────┐
-│  apps/compumobile   │     │  apps/kameleba      │
-│  Auth: NextAuth v4  │     │  Auth: NextAuth v4  │
-│  MONGODB_URI →      │     │  MONGODB_URI →      │
-│  own DB only        │     │  own DB only        │
-│  Vercel deployment  │     │  Vercel deployment  │
-│  own domain         │     │  own domain         │
-└─────────────────────┘     └────────────────────┘
+bitm-cel.com.ar ──┐
+kameleba.com.ar ──┤─▶ apps/store (Vercel, único deployment)
+www.compumobile.com.ar ─┘        │
+                                 ▼
+                     middleware (edge) → resolveTenant(host)
+                       · prod: TENANT_DOMAINS "dominio:slug,…" (match exacto de hostname)
+                       · dev:  TENANT_SLUG en .env.local
+                                 │  header x-tenant-slug
+                                 ▼
+                     connectTenantDB(slug)  →  mongoose.createConnection(cluster).useDb(slug)
+                       · una conexión cacheada por slug (sobrevive entre requests serverless)
 ```
 
-### Two Distinct Connection Patterns
+### Acceso a datos en store: `getModels()`
 
-These patterns must never be mixed.
-
-**Tenant app pattern** — single DB, cached connection:
+Los schemas se definen una sola vez en `apps/store/src/models/` y se **bindean**
+a la conexión del tenant activo en cada request:
 
 ```pseudocode
-// lib/mongodb.ts in every tenant app (pseudo)
-IF global.mongoose.connection exists AND state is connected:
-  RETURN cached connection
-ELSE:
-  connection = mongoose.connect(MONGODB_URI)  // points to this tenant's DB only
-  cache connection in global.mongoose
-  RETURN connection
+// lib/tenant-models.ts
+FUNCTION getModels():
+  conn = await connectTenantDB(slugDelRequest)
+  RETURN { Product: bind(conn, GlobalProduct), Order: ..., User: ..., … }
 ```
 
-**admin-hub pattern** — cluster connection, switch DB per tenant:
+Regla dura: **nunca** usar un modelo global directo ni `connectDB()` en store —
+escribe fuera de la DB del tenant. Los imports de `@/models/*` en rutas son solo
+para tipos (`import type`).
+
+### Patrón admin-hub (y solo admin-hub)
 
 ```pseudocode
-// lib/db.ts in admin-hub (pseudo)
 clusterConn = mongoose.createConnection(MONGODB_CLUSTER_URI)
-
-FUNCTION getTenantDb(tenantSlug):
-  RETURN clusterConn.useDb(tenantSlug, { useCache: true })
-
-// Usage in an API route:
-db = getTenantDb("compumobile")
-ProductModel = db.model("Product", ProductSchema)
-products = await ProductModel.find()
+db = clusterConn.useDb(slug)     // slug ∈ PLATFORM_CLIENTS
 ```
 
-### Tenant Registry
+- Auth: bearer estático `ADMIN_HUB_SECRET` comparado con `timingSafeEqual` en toda ruta API
+- Es la única app que escribe `memberships`
+- Los scripts de operador (`apps/admin-hub/scripts/`) usan este mismo patrón
 
-The list of active tenants is driven by the `PLATFORM_CLIENTS` environment
-variable in admin-hub (e.g. `"compumobile,kameleba,client-3"`). This is the
-source of truth for which databases admin-hub can access.
+### Configuración por tenant
 
-When onboarding a new client: add their slug to `PLATFORM_CLIENTS` and create
-their MongoDB database. No code changes required in admin-hub.
+Cada tenant tiene un doc `Setting` (singleton) en su DB:
+
+| Grupo | Campos | Se lee con |
+|-------|--------|-----------|
+| Identidad | storeName, storeEmail, whatsappNumber, redes | `getClientConfig()` |
+| Módulos | modules_repairs, modules_budgets, modules_shipping, modules_coupons | `getClientConfig()` |
+| Credenciales | mpAccessToken, mpWebhookSecret, fromEmail, transferAlias, transferCvu | `getTenantSecrets()` — fallback a env vars si están vacías |
+
+El theming NO vive en Setting: es estático por tenant en
+`config/tenant-themes.ts` (ver DESIGN_SYSTEM.md). La URL pública se deriva del
+host del request con `getBaseUrl()` (`lib/base-url.ts`) — nunca de una env var
+única, que rompería el multi-tenant en links de MP y emails.
+
+### Membresías
+
+- Colección `memberships` en la DB de cada tenant; **admin-hub escribe, store lee**
+- `evaluateMembership()`: sin doc = activo; `paidUntil` vencido corre gracia
+  hasta `gracePeriodEnd` (o día 15 si falta el campo); después, suspendido
+- `layout.tsx` corta el storefront solo con `suspended`; error de lectura = activo
 
 ---
 
-## Monorepo Structure
+## Autenticación y roles (store)
 
-The platform uses **Turborepo** to manage a workspace of independently
-deployable apps sharing a common packages layer.
-
-```
-┌────────────────────────────────────────────────────────────┐
-│                    ecommerce-platform                      │
-│                                                            │
-│  ┌───────────┐  ┌──────────┐  ┌──────────┐  ┌─────────┐  │
-│  │ admin-hub │  │compumob. │  │kameleba  │  │client-N │  │
-│  │ (platform)│  │(tenant)  │  │(tenant)  │  │(tenant) │  │
-│  └─────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬────┘  │
-│        │             │             │              │        │
-│  ┌─────▼─────────────▼─────────────▼──────────────▼────┐  │
-│  │                    packages/                        │  │
-│  │         ui  │  config  │  types  │  (future)       │  │
-│  └─────────────────────────────────────────────────────┘  │
-└────────────────────────────────────────────────────────────┘
-```
-
-### Package Dependency Rules
-
-- Apps can import from `packages/` — always allowed
-- Apps must never import from other apps — forbidden
-- `packages/` must never import from `apps/` — forbidden
-- Circular dependencies between packages — forbidden
+- NextAuth v4, estrategia JWT; credentials (email/password) + Google OAuth
+- Rate limiting respaldado en MongoDB (`lib/rate-limit.ts`): login por email;
+  register/forgot/reset por IP
+- Roles (`lib/roles.ts`): `user` → cuenta y compras; `receptionist` → alta de
+  reparaciones; `technician` → sus reparaciones asignadas; `admin`/`superadmin` → todo
+- Toda ruta `/api` valida sesión (o rol) antes de procesar; el rol se lee de la
+  sesión del server, jamás del payload
 
 ---
 
-## Application Architecture (per app)
+## Diseño de API
 
-Each storefront follows Next.js 15 App Router conventions with a clear
-separation between server and client concerns.
-
-### Request Lifecycle
-
-```
-Browser Request
-    │
-    ▼
-Next.js Middleware          ← Session check, redirects, locale
-    │
-    ▼
-Route Handler / Page        ← Server Component (default)
-    │
-    ├── Data fetching       ← Direct DB or internal API call
-    │
-    ├── Business logic      ← Server-side only
-    │
-    └── Render tree
-            │
-            ├── Server Components   ← Static + async data
-            └── Client Components   ← Interactivity only
+```pseudocode
+FUNCTION handler(request):
+  sesión/rol → 401/403 si no corresponde
+  body = ZodSchema.safeParse(...)   → 400 si falla
+  … lógica con getModels() …
+CATCH:
+  log server-side, responder mensaje genérico (nunca error.message al cliente)
 ```
 
-### 3-Layer State Model
-
-The platform uses three distinct state layers. Never mix their responsibilities.
-
-```
-┌─────────────────────────────────────────────────────┐
-│  Layer 1: Server State                              │
-│  Owner: React Server Components + API routes        │
-│  Contains: DB data, session, server-fetched content │
-│  Pattern: fetch → render → stream                   │
-└─────────────────────────────────────────────────────┘
-            │ props / serialised data
-            ▼
-┌─────────────────────────────────────────────────────┐
-│  Layer 2: Global Client State                       │
-│  Owner: Zustand stores                              │
-│  Contains: cart, UI preferences, ephemeral user     │
-│            state that must survive navigation       │
-│  Pattern: store → subscribe → render                │
-└─────────────────────────────────────────────────────┘
-            │ local state
-            ▼
-┌─────────────────────────────────────────────────────┐
-│  Layer 3: Local Component State                     │
-│  Owner: useState / useReducer                       │
-│  Contains: form state, toggle visibility, inputs    │
-│  Pattern: derive from props, never sync to global   │
-└─────────────────────────────────────────────────────┘
-```
-
-**Decision rule:** start at Layer 3. Promote to Layer 2 only when state needs
-to be shared across routes. Promote to Layer 1 only when state is derived from
-a database.
+- Schemas Zod inline por ruta; objetivo: tipos correctos + cerrar inyección de
+  operadores NoSQL (`{$ne:…}` en un findOne)
+- Modelos ricos admin-only (product PUT, presupuesto PATCH): en vez de enumerar
+  todo el schema, **guard de operadores** — rechazar body con claves `$…`
+- Nunca exponer `_id` crudo → mapear a `id` string
 
 ---
 
-## API Design
+## Checkout, stock y pagos
 
-### Route Organisation
+Tres métodos de pago comparten `lib/checkout.ts` (`createCheckoutOrder()` +
+schemas Zod): **Mercado Pago** (redirect), **transferencia** (alias/CVU del
+tenant) y **contraentrega**.
 
-```
-/app/api/
-├── auth/               # NextAuth.js handlers
-├── products/           # Product catalogue
-│   ├── route.ts        # GET (list), POST (create)
-│   └── [id]/
-│       └── route.ts    # GET, PUT, DELETE (single)
-├── orders/             # Order lifecycle
-├── cart/               # Cart persistence
-├── payments/
-│   └── webhook/        # Mercado Pago webhook (HMAC-verified)
-└── uploads/            # Cloudinary signed upload
-```
-
-### API Handler Pattern (pseudo code)
+### Reserva de stock (`lib/stock.ts`)
 
 ```pseudocode
-FUNCTION handleRequest(request):
-  session = await getServerSession()
-  IF session is null or unauthorised:
-    RETURN 401 or 403
-
-  body = await parseBody(request)
-  validated = zodSchema.safeParse(body)
-  IF validated fails:
-    RETURN 400 with validation errors
-
-  result = await serviceFunction(validated.data)
-  RETURN 200 with result
-
-CATCH any error:
-  log error server-side
-  RETURN 500 with generic message (never expose internals)
+reserveStock: por ítem, findOneAndUpdate({stock ≥ qty}, {$inc: -qty})  // atómico
+              si una línea falla → rollback de las anteriores
 ```
 
-### Response Shape Convention
+- Contraentrega/transferencia: descuenta al crear la orden
+- MP: reserva al crear la preferencia (`Order.stockReserved: true`);
+  preferencia expira a los 30 min < reserva 45 min (margen para pagos sobre la hora)
+- Reservas vencidas se liberan **lazy** al iniciar el próximo checkout
+  (`releaseExpiredReservations`) — sin cron
+- Cancelar (user o admin) → `restoreOnCancel`: devuelve stock y cupón según qué
+  se haya contabilizado; des-cancelar (admin) → `redeductOnUncancel`, espejo con
+  reserva atómica (409 si ya no hay stock)
 
-All API responses follow a consistent envelope:
+### Mercado Pago
 
-```pseudocode
-// Success
-{ data: <payload>, meta: { page, total } }
-
-// Error
-{ error: { code: string, message: string } }
-```
-
-Never return raw Mongoose documents — always map to plain objects and exclude
-`__v`, expose `id` not `_id`.
+- Credenciales **por tenant** vía `getTenantSecrets()`; `getMpClient()` por request
+- Con cupón, MP cobra un ítem único con el total (Checkout Pro no admite precios
+  negativos); el descuento se recalcula server-side, nunca se confía en el cliente
+- Webhook: firma HMAC-SHA256 con `timingSafeEqual` (hash de ambos lados para fijar
+  longitud) + **claim idempotente** con findOneAndUpdate sobre `payment.status`
+  — el mismo evento puede llegar N veces y se procesa una
+- `usedCount` del cupón se incrementa recién al aprobarse el pago
 
 ---
 
-## Data Layer
+## Email y media
 
-### MongoDB + Mongoose
-
-The platform connects to MongoDB Atlas via a singleton connection pattern to
-avoid connection exhaustion in serverless environments.
-
-```pseudocode
-// Connection singleton (pseudo)
-IF global.mongoose connection exists:
-  RETURN cached connection
-ELSE:
-  CREATE new connection
-  STORE in global cache
-  RETURN connection
-```
-
-### Model Conventions
-
-```pseudocode
-// Every model must define:
-SCHEMA ProductSchema {
-  // Required fields with types and validation
-  name: string, required, trimmed
-  slug: string, required, unique, auto-generated from name
-  price: number, required, min: 0
-  images: array of CloudinaryImage
-  category: ObjectId, ref: Category
-  active: boolean, default: true
-
-  // Audit fields — always present
-  createdAt: Date, auto
-  updatedAt: Date, auto
-}
-```
-
-### Shared Type Contracts
-
-Database models are defined in Mongoose (`apps/*/models/`) but their TypeScript
-shapes are defined in `packages/types`. This prevents apps from diverging on
-type definitions.
-
-```pseudocode
-// packages/types/product.ts (pseudo)
-TYPE Product = {
-  id: string          // mapped from _id
-  name: string
-  slug: string
-  price: number
-  variants: ProductVariant[]
-  images: CloudinaryImage[]
-  category: Category
-  active: boolean
-  createdAt: string   // ISO 8601
-  updatedAt: string
-}
-```
+- **Resend**, solo server-side; remitente por tenant (`fromEmail` del Setting,
+  fallback `FROM_EMAIL`); los builders de emails reciben `storeUrl` derivada del host
+- **Cloudinary**: upload vía `POST /api/upload` (admin-only, FormData); el server
+  valida tipo/tamaño/carpeta y sube por stream — el cliente nunca sube directo.
+  Transformaciones por URL en render (`quality auto`, `fetch_format auto`)
 
 ---
 
-## Authentication
+## Seguridad transversal
 
-The platform uses two completely different auth models. Never mix them.
-
-### Tenant Apps — NextAuth.js v4
-
-### NextAuth.js v4 Session Model
-
-```pseudocode
-SESSION {
-  user: {
-    id: string
-    email: string
-    role: "customer" | "admin"
-    name: string
-  }
-  expires: ISO date string
-}
-```
-
-### Middleware Protection Pattern
-
-```pseudocode
-// middleware.ts (pseudo)
-FOR each request:
-  IF path matches protected routes:
-    session = getToken(request)
-    IF no session:
-      REDIRECT to /login with callbackUrl
-    IF role check required AND role mismatch:
-      REDIRECT to /403
-  ELSE:
-    PASS through
-```
-
-### Role-Based Access (tenant apps)
-
-| Role | Access |
-|------|--------|
-| `customer` | Storefront, own orders, own profile |
-| `admin` | Everything + per-tenant admin routes |
-
-Admin routes are protected at both middleware and API handler level — never
-trust role from client payload alone.
-
-### admin-hub — Static Bearer Token
-
-admin-hub has no user accounts and no NextAuth. Access is gated by a single
-static secret checked on every API route.
-
-```pseudocode
-// Every admin-hub API route (pseudo)
-FUNCTION verifyOperator(request):
-  authHeader = request.headers.get("Authorization")
-  IF authHeader !== "Bearer " + ADMIN_HUB_SECRET:
-    RETURN 401
-
-// The dashboard page calls its own API server-side,
-// so ADMIN_HUB_SECRET never reaches the browser.
-```
-
-This is intentional — admin-hub is an internal operator tool, not a
-multi-user product. If multi-operator support is needed in the future,
-replace this with proper auth before that point.
+- Headers en `next.config.ts` de ambas apps (HSTS, nosniff, CSP acotada;
+  admin-hub además X-Robots-Tag noindex)
+- Errores: log server-side, mensaje genérico al cliente
+- Sin `console.log` en producción; nunca commitear env vars
 
 ---
 
-## Payments — Mercado Pago
+## Deuda técnica conocida
 
-### Flow Overview
-
-```pseudocode
-// Checkout flow (pseudo)
-1. Client submits order intent
-2. Server creates MP preference with order details
-3. Client redirects to MP checkout
-4. MP processes payment
-5. MP calls /api/payments/webhook
-6. Server verifies HMAC-SHA256 signature
-7. Server updates order status in DB
-8. Server sends confirmation email via Resend
-9. Client polls order status OR receives real-time update
-```
-
-### Webhook Security
-
-```pseudocode
-FUNCTION verifyWebhook(request):
-  signature = extractHeader("x-signature")
-  body = await request.text()
-  expected = HMAC-SHA256(MERCADOPAGO_SECRET, body)
-  IF timingSafeEqual(signature, expected) is false:
-    RETURN 401
-  PROCESS event
-```
-
-Idempotency is required — the same webhook event may arrive multiple times.
-Always check if the order status has already been updated before processing.
-
----
-
-## Media — Cloudinary
-
-All product images are hosted on Cloudinary. The storefront never handles
-binary file data directly.
-
-```pseudocode
-// Upload flow (pseudo)
-1. Client requests signed upload URL from /api/uploads
-2. Server generates signed params (timestamp + signature)
-3. Client uploads directly to Cloudinary
-4. Cloudinary returns public_id and secure_url
-5. Client sends public_id to API to persist on product
-```
-
-Transformations (resize, format, quality) are applied via Cloudinary URL params
-at render time, not stored. Always serve `webp` format and use `auto` quality.
-
----
-
-## Email — Resend
-
-Transactional emails are sent server-side only via Resend. Never call Resend
-from a Client Component.
-
-Trigger points:
-- Order confirmation → on successful payment webhook
-- Password reset → on reset request
-- Order status update → on admin status change
-
----
-
-## compumobile-Specific: Technical Service Module
-
-`compumobile` includes a repair/service management module that `kameleba` does
-not have. This module is isolated under:
-
-```
-apps/compumobile/src/app/(service)/
-apps/compumobile/src/models/ServiceOrder.ts
-apps/compumobile/src/app/api/service/
-```
-
-It must never be imported by `kameleba`. Service-specific types stay in
-`apps/compumobile/src/types/` and are not promoted to `packages/types`.
-
----
-
-## Error Handling Strategy
-
-### Server Side
-
-```pseudocode
-TRY:
-  execute operation
-CATCH known error types:
-  map to appropriate HTTP status + client-safe message
-CATCH unknown errors:
-  log full error with context (never to client)
-  return 500 with generic message
-FINALLY:
-  ensure DB connections are not leaked
-```
-
-### Client Side
-
-```pseudocode
-STATES to handle for every async operation:
-  - idle
-  - loading     → show skeleton or spinner
-  - success     → show data
-  - error       → show inline error with actionable message
-```
-
-Use React Error Boundaries at route segment level to prevent full-page crashes.
-
----
-
-## Performance Considerations
-
-- **Prefer Server Components** for data-heavy views — reduce client JS bundle
-- **Use `next/image`** for all images — automatic optimisation and lazy loading
-- **Paginate all list endpoints** — default page size: 20 items
-- **Avoid prop drilling** beyond 2 levels — use Zustand or RSC composition
-- **Database indexes** must exist for every field used in query filters or sorts
-
----
-
-## Testing Strategy
-
-| Layer | Tool | Scope |
-|-------|------|-------|
-| Unit | Vitest | Pure functions, utilities, Zod schemas |
-| Component | React Testing Library | UI behaviour, not implementation |
-| Integration | Vitest + MSW | API route handlers with mocked DB |
-| E2E | Playwright | Critical user journeys only |
-
-Test files co-locate with the source file they test. Never mock what you own —
-test the real implementation.
+- **Sin tests ni CI** — no hay runner instalado; el gate actual es `tsc --noEmit` manual
+- Registro de tenants estático (`TENANT_DOMAINS` / `PLATFORM_CLIENTS` env) —
+  con 40+ clientes conviene migrarlo a una colección de plataforma
+- Suspensión de membresía es manual (sin trigger automático al vencer la gracia)
+- `apps/_template` es referencia histórica — no refleja la arquitectura actual, no usar
