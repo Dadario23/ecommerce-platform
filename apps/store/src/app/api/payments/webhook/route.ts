@@ -4,6 +4,7 @@ import { Payment } from "mercadopago";
 import { getMpClient } from "@/lib/mercadopago";
 import { getTenantSecrets } from "@/lib/tenant-secrets";
 import { sendOrderConfirmation } from "@/lib/email";
+import { sendOpsAlert } from "@/lib/ops-alert";
 import crypto from "crypto";
 import { getModels } from "@/lib/tenant-models";
 import { releaseStock } from "@/lib/stock";
@@ -42,6 +43,14 @@ export async function POST(request: NextRequest) {
 
     const { mpWebhookSecret } = await getTenantSecrets();
     if (!verifyMercadoPagoSignature(request, mpWebhookSecret)) {
+      // Con headers de MP presentes no es un scanner: probable secret mal
+      // configurado tras un onboarding — todos los pagos quedarían sin confirmar
+      if (request.headers.get("x-signature") && request.headers.get("x-request-id")) {
+        await sendOpsAlert("Webhook MP con firma inválida", [
+          "Un webhook con formato de Mercado Pago no pasó la verificación HMAC.",
+          "Si se repite, revisar mpWebhookSecret en el Setting del tenant (o MP_WEBHOOK_SECRET).",
+        ]);
+      }
       return NextResponse.json({ error: "Firma inválida" }, { status: 401 });
     }
 
@@ -99,6 +108,11 @@ export async function POST(request: NextRequest) {
         if (!order) {
           const exists = await Order.exists({ _id: orderId });
           if (!exists) {
+            // Cobro aprobado sin orden asociada: plata del cliente en el aire
+            await sendOpsAlert("Pago MP aprobado sin orden", [
+              `Pago MP ${paymentData.id} aprobado con external_reference "${orderId}" que no existe.`,
+              "Revisar el pago en el panel de MP y contactar al cliente si corresponde.",
+            ]);
             return NextResponse.json(
               { error: "Orden no encontrada" },
               { status: 404 },
@@ -131,7 +145,12 @@ export async function POST(request: NextRequest) {
             total: order.total,
             paymentMethod: "mercadopago",
             shippingAddress: order.shippingAddress,
-          }).catch(() => {}),
+          }).catch(() =>
+            sendOpsAlert("Falló el email de confirmación de orden", [
+              `Orden ${order.orderNumber} (${order.customerEmail}): el pago se confirmó pero el email no salió.`,
+              "Revisar RESEND_API_KEY / fromEmail del tenant.",
+            ])
+          ),
         ]);
       } else if (paymentStatus === "rejected") {
         // Solo el primer rechazo matchea (no degrada una orden completada ni
@@ -156,6 +175,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error en webhook de pago:", error);
+    // MP reintenta ante 500, pero si el error persiste hay pagos aprobados
+    // sin orden confirmada: eso no puede morir solo en los logs
+    await sendOpsAlert("Error procesando webhook MP", [
+      `Error: ${error instanceof Error ? error.message : String(error)}`,
+      "MP va a reintentar; si esta alerta se repite, investigar ya (pagos sin confirmar).",
+    ]);
     return NextResponse.json(
       { error: "Error procesando el webhook" },
       { status: 500 },

@@ -119,6 +119,7 @@ lectura la tienda sigue operando — nunca cortar un tenant por una falla nuestr
 | `MP_ALIAS` / `MP_CVU`                                                    | Datos de transferencia (fallback)                             |
 | `NEXT_PUBLIC_URL`                                                        | URL pública de la app (fallback)                              |
 | `NEXT_PUBLIC_WHATSAPP_NUMBER`                                            | WhatsApp de contacto (fallback)                               |
+| `OPS_ALERT_EMAIL`                                                        | Email del operador para alertas de fallos en pagos (sin configurar = alertas apagadas) |
 
 > En producción `TENANT_SLUG` no se usa — el tenant se resuelve por `TENANT_DOMAINS` (ej: `bitm-cel.com.ar:bitm-cel,kameleba.com.ar:kameleba,www.compumobile.com.ar:compumobile`). La comparación de hostname es exacta: si un cliente entra con y sin `www`, ambos hostnames necesitan su entrada.
 
