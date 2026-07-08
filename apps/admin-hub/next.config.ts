@@ -12,8 +12,6 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@repo/database", "@repo/membership"],
-
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

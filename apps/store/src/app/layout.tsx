@@ -10,6 +10,7 @@ import { getPublicCategories } from "@/lib/getPublicCategories";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getClientConfig } from "@/config/client";
+import { getEffectiveMembershipStatus } from "@/lib/membership";
 import type { FontKey } from "@/config/tenant-themes";
 
 const geistSans = Geist({
@@ -62,14 +63,36 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [categories, session, clientConfig] = await Promise.all([
+  const [categories, session, clientConfig, membershipStatus] = await Promise.all([
     getPublicCategories(),
     getServerSession(authOptions),
     getClientConfig(),
+    getEffectiveMembershipStatus(),
   ]);
 
   const { theme } = clientConfig;
   const fonts = FONT_VARS[theme.font];
+
+  // Tenant con membresía suspendida: la tienda queda fuera de servicio
+  if (membershipStatus === "suspended") {
+    return (
+      <html lang="es">
+        <body className={`${geistSans.variable} antialiased`}>
+          <main className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
+            <div className="max-w-md text-center">
+              <h1 className="text-2xl font-bold text-gray-900 mb-3">
+                {clientConfig.storeName}
+              </h1>
+              <p className="text-gray-600">
+                La tienda está temporalmente fuera de servicio.
+                Volvé a intentarlo más tarde.
+              </p>
+            </div>
+          </main>
+        </body>
+      </html>
+    );
+  }
 
   return (
     <html

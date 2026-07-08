@@ -16,7 +16,7 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   eslint: { ignoreDuringBuilds: true },
-  transpilePackages: ["@repo/database", "@repo/auth", "@repo/email", "@repo/membership", "@repo/tenant"],
+  transpilePackages: ["@repo/tenant"],
 
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];

@@ -6,6 +6,7 @@ import type mongoose from "mongoose";
 import GlobalCart from "@/models/Cart";
 import GlobalCategory from "@/models/Category";
 import GlobalCoupon from "@/models/Coupon";
+import GlobalMembership from "@/models/Membership";
 import GlobalNotification from "@/models/Notification";
 import GlobalOrder from "@/models/Order";
 import GlobalPresupuesto from "@/models/Presupuesto";
@@ -40,6 +41,7 @@ export async function getModels() {
     Cart: bind(conn, GlobalCart),
     Category: bind(conn, GlobalCategory),
     Coupon: bind(conn, GlobalCoupon),
+    Membership: bind(conn, GlobalMembership),
     Notification: bind(conn, GlobalNotification),
     Order: bind(conn, GlobalOrder),
     Presupuesto: bind(conn, GlobalPresupuesto),
