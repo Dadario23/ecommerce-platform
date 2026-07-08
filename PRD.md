@@ -21,22 +21,22 @@ entre tenants y cero fugas de seguridad valen más que features nuevas.
 
 ## Roles
 
-| Rol | Quién | Acceso |
-|-----|-------|--------|
-| Operador de plataforma | El dueño | `admin-hub`: métricas cross-tenant, membresías, alta de clientes |
+| Rol                    | Quién             | Acceso                                                                  |
+| ---------------------- | ----------------- | ----------------------------------------------------------------------- |
+| Operador de plataforma | El dueño          | `admin-hub`: métricas cross-tenant, membresías, alta de clientes        |
 | `admin` / `superadmin` | Staff del cliente | Panel admin de su propia tienda (productos, órdenes, cupones, settings) |
-| `receptionist` | Staff del cliente | Alta y gestión de reparaciones |
-| `technician` | Staff del cliente | Reparaciones asignadas a él |
-| `user` | Consumidor final | Storefront, su cuenta, sus compras |
+| `receptionist`         | Staff del cliente | Alta y gestión de reparaciones                                          |
+| `technician`           | Staff del cliente | Reparaciones asignadas a él                                             |
+| `user`                 | Consumidor final  | Storefront, su cuenta, sus compras                                      |
 
 ---
 
 ## Tenants actuales
 
-| Tenant | Rubro | Dominio | Módulos extra |
-|--------|-------|---------|---------------|
-| `bitm-cel` | Tecnología + servicio técnico | bitm-cel.com.ar | repairs |
-| `kameleba` | Moda | kameleba.com.ar | — |
+| Tenant        | Rubro                         | Dominio                | Módulos extra    |
+| ------------- | ----------------------------- | ---------------------- | ---------------- |
+| `bitm-cel`    | Tecnología + servicio técnico | bitm-cel.com.ar        | repairs          |
+| `kameleba`    | Moda                          | kameleba.com.ar        | —                |
 | `compumobile` | Tecnología + servicio técnico | www.compumobile.com.ar | repairs, budgets |
 
 Módulos activables por tenant (doc `Setting`): `repairs`, `budgets`,
@@ -80,6 +80,7 @@ Activación en cualquier día del mes → `paidUntil` = fin de ese mes →
 ## Features de la tienda (todos los tenants)
 
 ### Cuentas
+
 - Registro/login con email y contraseña, y Google OAuth
 - Reset de contraseña por email con token que expira; rate limiting en
   login/registro/reset
@@ -87,6 +88,7 @@ Activación en cualquier día del mes → `paidUntil` = fin de ese mes →
   historial de pedidos y notificaciones in-app
 
 ### Catálogo
+
 - Producto: nombre, slug único, descripción, imágenes (Cloudinary), precio,
   precio de comparación, marca, categoría, stock, condición, envío, activo
 - Búsqueda por texto, filtros por categoría/precio, orden y paginación
@@ -94,6 +96,7 @@ Activación en cualquier día del mes → `paidUntil` = fin de ese mes →
 - Reviews con rating solo de compradores (verificadas contra sus órdenes)
 
 ### Carrito y checkout
+
 - Carrito persistente por usuario (DB) con estado cliente en Zustand
 - Cupones: porcentaje o monto fijo, mínimo de orden, límite de usos, expiración;
   el descuento se recalcula siempre server-side
@@ -126,6 +129,7 @@ listo → entregado`, más `cancelado` y `sin_reparacion`.
 - Cambios de estado notifican por email + in-app
 
 ### Presupuestos (módulo `budgets` — compumobile)
+
 - Solicitud pública de presupuesto; gestión y respuesta desde el panel admin
 
 ---
@@ -157,9 +161,9 @@ listo → entregado`, más `cancelado` y `sin_reparacion`.
 
 ## Métricas de éxito
 
-| Métrica | Objetivo |
-|---------|----------|
-| Conversión de checkout | > 3% de sesiones |
-| LCP mobile 4G | < 2.5s |
-| Uptime | 99.9% mensual |
+| Métrica                        | Objetivo                      |
+| ------------------------------ | ----------------------------- |
+| Conversión de checkout         | > 3% de sesiones              |
+| LCP mobile 4G                  | < 2.5s                        |
+| Uptime                         | 99.9% mensual                 |
 | Onboarding de un cliente nuevo | < 1 día, sin deployment nuevo |

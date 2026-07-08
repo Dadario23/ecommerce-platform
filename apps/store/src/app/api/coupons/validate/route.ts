@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
+import { computeCouponDiscount } from "@/lib/coupon-discount";
 
 const ValidateCouponSchema = z.object({
   code: z.string().trim().min(1),
@@ -14,7 +15,7 @@ export async function POST(request: NextRequest) {
   }
   const { code, orderTotal } = parsed.data;
 
-  const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
+  const { Coupon } = await getModels();
 
   const coupon = await Coupon.findOne({
     code: code.trim().toUpperCase(),
@@ -42,10 +43,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const discount =
-    coupon.type === "percentage"
-      ? Math.round((orderTotal * coupon.value) / 100)
-      : Math.min(coupon.value, orderTotal);
+  const discount = computeCouponDiscount(coupon, orderTotal);
 
   return NextResponse.json({
     valid: true,

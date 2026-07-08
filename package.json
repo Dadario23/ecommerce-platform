@@ -12,7 +12,8 @@
     "lint": "turbo lint",
     "dev:store": "turbo dev --filter=store",
     "dev:admin": "turbo dev --filter=admin-hub",
-    "build:store": "turbo build --filter=store"
+    "build:store": "turbo build --filter=store",
+    "test": "turbo test"
   },
   "devDependencies": {
     "next": "^15.5.0",

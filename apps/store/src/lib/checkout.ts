@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
+import { computeCouponDiscount } from "@/lib/coupon-discount";
 import { releaseExpiredReservations, releaseStock, reserveStock } from "@/lib/stock";
 import type { IOrder } from "@/models/Order";
 
@@ -133,10 +134,7 @@ export async function createCheckoutOrder(input: CheckoutInput): Promise<Checkou
     if (invalid) {
       return { ok: false, status: 422, error: "El cupón ya no es válido" };
     }
-    discount =
-      coupon.type === "percentage"
-        ? Math.round((subtotal * coupon.value) / 100)
-        : Math.min(coupon.value, subtotal);
+    discount = computeCouponDiscount(coupon, subtotal);
     couponCode = coupon.code;
   }
 

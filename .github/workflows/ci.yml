@@ -26,6 +26,11 @@ jobs:
         working-directory: apps/admin-hub
         run: npx tsc --noEmit
 
+      # mongodb-memory-server descarga mongod en el primer run del job
+      - name: Tests store
+        working-directory: apps/store
+        run: npx vitest run
+
       # _template queda fuera a propósito: es referencia histórica y no compila
       # contra la arquitectura actual.
       - name: Build
