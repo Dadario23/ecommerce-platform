@@ -1,15 +1,12 @@
 import type { MetadataRoute } from "next";
 import { getModels } from "@/lib/tenant-models";
 import { slugify } from "@/lib/slugify";
-
-const BASE_URL =
-  process.env.NEXT_PUBLIC_URL ||
-  process.env.NEXTAUTH_URL ||
-  "http://localhost:3000";
+import { getBaseUrl } from "@/lib/base-url";
 
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const BASE_URL = await getBaseUrl();
   const { Product, Category } = await getModels();
 
   const [products, categories] = await Promise.all([

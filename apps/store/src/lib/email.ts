@@ -1,8 +1,8 @@
 import { Resend } from "resend";
+import { getBaseUrl } from "@/lib/base-url";
 
 const FROM_EMAIL = process.env.FROM_EMAIL ?? "bitm-cel <no-reply@bitm-cel.com.ar>";
 const STORE_NAME = process.env.NEXT_PUBLIC_STORE_NAME ?? "bitm-cel";
-const STORE_URL = process.env.NEXT_PUBLIC_URL ?? "http://localhost:3000";
 
 interface OrderItem {
   name: string;
@@ -32,7 +32,7 @@ interface OrderEmailData {
   };
 }
 
-function buildOrderConfirmationHtml(data: OrderEmailData): string {
+function buildOrderConfirmationHtml(data: OrderEmailData, storeUrl: string): string {
   const isTransfer = data.paymentMethod === "transfer";
   const paymentLabel =
     data.paymentMethod === "mercadopago"
@@ -42,7 +42,7 @@ function buildOrderConfirmationHtml(data: OrderEmailData): string {
       : "Efectivo (contraentrega)";
 
   const payPageUrl = data.orderId
-    ? `${STORE_URL}/pay/${data.orderId}`
+    ? `${storeUrl}/pay/${data.orderId}`
     : null;
 
   const transferBlock = isTransfer ? `
@@ -162,7 +162,7 @@ function buildOrderConfirmationHtml(data: OrderEmailData): string {
 
               <!-- CTA -->
               <div style="text-align:center;margin-top:32px;">
-                <a href="${STORE_URL}/account/orders"
+                <a href="${storeUrl}/account/orders"
                   style="display:inline-block;background:#1E3A8A;color:#fff;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:14px;font-weight:bold;">
                   Ver mis pedidos
                 </a>
@@ -213,7 +213,7 @@ export interface OrderStatusData {
   newStatus: string;
 }
 
-function buildOrderStatusHtml(data: OrderStatusData): string {
+function buildOrderStatusHtml(data: OrderStatusData, storeUrl: string): string {
   const label = ORDER_STATUS_LABEL[data.newStatus] ?? data.newStatus;
   const icon = ORDER_STATUS_ICON[data.newStatus] ?? "📋";
   return `
@@ -250,7 +250,7 @@ function buildOrderStatusHtml(data: OrderStatusData): string {
                 </span>
               </div>
               <div style="text-align:center;margin-top:24px;">
-                <a href="${STORE_URL}/account/orders"
+                <a href="${storeUrl}/account/orders"
                   style="display:inline-block;background:#1E3A8A;color:#fff;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:14px;font-weight:bold;">
                   Ver mis pedidos
                 </a>
@@ -284,7 +284,7 @@ export async function sendOrderStatusUpdate(data: OrderStatusData): Promise<void
       from: FROM_EMAIL,
       to: data.customerEmail,
       subject: `📦 Pedido ${data.orderNumber}: ${label} — ${STORE_NAME}`,
-      html: buildOrderStatusHtml(data),
+      html: buildOrderStatusHtml(data, await getBaseUrl()),
     });
   } catch (err) {
     console.error("[email] Error enviando actualización de orden:", err);
@@ -324,10 +324,10 @@ export interface RepairStatusData {
   newStatus: string;
 }
 
-function buildRepairStatusHtml(data: RepairStatusData): string {
+function buildRepairStatusHtml(data: RepairStatusData, storeUrl: string): string {
   const label = REPAIR_STATUS_LABEL[data.newStatus] ?? data.newStatus;
   const icon = REPAIR_STATUS_ICON[data.newStatus] ?? "🔧";
-  const trackingUrl = `${STORE_URL}/soporte-tecnico/seguimiento/${data.codigo}`;
+  const trackingUrl = `${storeUrl}/soporte-tecnico/seguimiento/${data.codigo}`;
   return `
 <!DOCTYPE html>
 <html lang="es">
@@ -397,7 +397,7 @@ export async function sendRepairStatusUpdate(data: RepairStatusData): Promise<vo
       from: FROM_EMAIL,
       to: data.clienteEmail,
       subject: `🔧 Reparación ${data.codigo}: ${label} — ${STORE_NAME}`,
-      html: buildRepairStatusHtml(data),
+      html: buildRepairStatusHtml(data, await getBaseUrl()),
     });
   } catch (err) {
     console.error("[email] Error enviando actualización de reparación:", err);
@@ -419,7 +419,7 @@ export async function sendOrderConfirmation(data: OrderEmailData): Promise<void>
       from: FROM_EMAIL,
       to: data.customerEmail,
       subject: `✅ Pedido ${data.orderNumber} confirmado — ${STORE_NAME}`,
-      html: buildOrderConfirmationHtml(data),
+      html: buildOrderConfirmationHtml(data, await getBaseUrl()),
     });
   } catch (err) {
     console.error("[email] Error enviando confirmación:", err);

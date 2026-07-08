@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
 import { getModels } from "@/lib/tenant-models";
+import { getBaseUrl } from "@/lib/base-url";
 import Image from "next/image";
 
 const ALIAS = process.env.MP_ALIAS ?? "";
 const CVU   = process.env.MP_CVU   ?? "";
-const STORE_URL = process.env.NEXT_PUBLIC_URL ?? "http://localhost:3000";
 
 interface Props {
   params: Promise<{ orderId: string }>;
@@ -34,7 +34,7 @@ export default async function PayPage({ params }: Props) {
   if (order.payment.method !== "transfer") return notFound();
 
   const orderId_ = String(order._id);
-  const payUrl   = `${STORE_URL}/pay/${orderId_}`;
+  const payUrl   = `${await getBaseUrl()}/pay/${orderId_}`;
   const qrUrl    = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(payUrl)}&bgcolor=ffffff&color=1E3A8A&qzone=1`;
 
   return (

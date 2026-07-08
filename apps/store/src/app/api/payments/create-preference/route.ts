@@ -3,12 +3,10 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { Preference } from "mercadopago";
 import client from "@/lib/mercadopago";
-import Order from "@/models/Order";
-import User from "@/models/User";
-import Product from "@/models/Product";
 import mongoose from "mongoose";
 import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
+import { getBaseUrl } from "@/lib/base-url";
 
 const OrderItemSchema = z.object({
   id: z.string().min(1),
@@ -39,7 +37,7 @@ const PreferencePayloadSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
+    const { Coupon, Order, Product, User } = await getModels();
     const session = await getServerSession(authOptions);
 
     if (!session) {
@@ -178,10 +176,7 @@ export async function POST(request: NextRequest) {
             currency_id: "ARS",
           }));
 
-    const baseUrl =
-      process.env.NEXT_PUBLIC_URL ||
-      process.env.NEXTAUTH_URL ||
-      "http://localhost:3000";
+    const baseUrl = await getBaseUrl();
 
     const isProd = process.env.NODE_ENV === "production";
 

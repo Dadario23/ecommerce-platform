@@ -1,10 +1,10 @@
 // app/api/auth/forgot-password/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import User from "@/models/User";
 import crypto from "crypto";
 import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
 import { getClientIp, hitRateLimit } from "@/lib/rate-limit";
+import { getBaseUrl } from "@/lib/base-url";
 
 const ForgotSchema = z.object({ email: z.string().email() });
 
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     }
     const { email } = parsed.data;
 
-    const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
+    const { User } = await getModels();
 
     // Buscar usuario
     const user = await User.findOne({ email });
@@ -66,9 +66,7 @@ export async function POST(request: NextRequest) {
     await user.save();
 
     // Crear URL de reset
-    const resetUrl = `${
-      process.env.NEXTAUTH_URL
-    }/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
+    const resetUrl = `${await getBaseUrl()}/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
 
     // 🎯 MODO DESARROLLO: Mostrar en consola y devolver en response
     if (process.env.NODE_ENV === "development") {

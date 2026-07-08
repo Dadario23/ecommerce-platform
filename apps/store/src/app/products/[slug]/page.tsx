@@ -6,6 +6,7 @@ import ProductPageClient from "./ProductPageClient";
 import type { Metadata } from "next";
 import { getShippingEnabled } from "@/lib/getShippingEnabled";
 import { getClientConfig } from "@/config/client";
+import { getBaseUrl } from "@/lib/base-url";
 
 export const revalidate = 60;
 
@@ -43,15 +44,12 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   };
 }
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_URL ||
-  process.env.NEXTAUTH_URL ||
-  "http://localhost:3000";
-
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
   const product = await getProduct(slug);
   if (!product) return notFound();
+
+  const BASE_URL = await getBaseUrl();
 
   const categoryId =
     product.category && typeof product.category === "object"

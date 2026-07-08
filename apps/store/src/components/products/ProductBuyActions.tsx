@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ShoppingCart, Zap, MessageCircle } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { IProduct } from "@/models/Product";
@@ -13,6 +13,9 @@ export default function ProductBuyActions({ product }: { product: IProduct }) {
   const pathname = usePathname();
 
   const [added, setAdded] = useState(false);
+  // Origen del tenant activo — en el mount para no romper la hidratación
+  const [origin, setOrigin] = useState("");
+  useEffect(() => setOrigin(window.location.origin), []);
   const isOutOfStock = (product.stock ?? 0) <= 0;
 
   const cartPayload = {
@@ -37,7 +40,7 @@ export default function ProductBuyActions({ product }: { product: IProduct }) {
   };
 
   const waNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "";
-  const productUrl = `${process.env.NEXT_PUBLIC_URL ?? ""}${pathname}`;
+  const productUrl = `${origin}${pathname}`;
   const waMessage = encodeURIComponent(
     `Hola! Me interesa este producto: ${product.name}\n${productUrl}`
   );

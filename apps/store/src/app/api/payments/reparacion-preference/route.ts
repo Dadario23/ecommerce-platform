@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Preference } from "mercadopago";
 import client from "@/lib/mercadopago";
-import Reparacion from "@/models/Reparacion";
 import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
+import { getBaseUrl } from "@/lib/base-url";
 
 const PAYABLE_ESTADOS = ["diagnosticado", "en_reparacion", "esperando_repuestos", "listo"];
 
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     }
     const { codigo } = parsed.data;
 
-    const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
+    const { Reparacion } = await getModels();
 
     const rep = await Reparacion.findOne({ codigo: codigo.toUpperCase() }).lean<{
       _id: { toString(): string };
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Esta reparación ya fue pagada" }, { status: 400 });
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
+    const baseUrl = await getBaseUrl();
     const isProd  = process.env.NODE_ENV === "production";
     const returnUrl = `${baseUrl}/soporte-tecnico/seguimiento/${rep.codigo}`;
 
