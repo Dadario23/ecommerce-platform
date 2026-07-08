@@ -5,6 +5,7 @@ import client from "@/lib/mercadopago";
 import { sendOrderConfirmation } from "@/lib/email";
 import crypto from "crypto";
 import { getModels } from "@/lib/tenant-models";
+import { releaseStock } from "@/lib/stock";
 
 function verifyMercadoPagoSignature(request: NextRequest): boolean {
   const secret = process.env.MP_WEBHOOK_SECRET;
@@ -106,11 +107,15 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({ success: true });
         }
 
-        // Descontar stock, contabilizar cupón y enviar email al confirmar el pago
+        // Contabilizar cupón y enviar email al confirmar el pago. El stock
+        // solo se descuenta si la orden no lo reservó al crear la preferencia
+        // (órdenes anteriores a la reserva de stock).
         await Promise.all([
-          ...order.items.map((item: IOrderItem) =>
-            Product.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } })
-          ),
+          ...(order.stockReserved
+            ? []
+            : order.items.map((item: IOrderItem) =>
+                Product.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } })
+              )),
           ...(order.couponCode
             ? [Coupon.findOneAndUpdate({ code: order.couponCode }, { $inc: { usedCount: 1 } })]
             : []),
@@ -128,11 +133,16 @@ export async function POST(request: NextRequest) {
           }).catch(() => {}),
         ]);
       } else if (paymentStatus === "rejected") {
-        // No degradar una orden ya completada por un reintento fuera de orden
+        // Solo el primer rechazo matchea (no degrada una orden completada ni
+        // repite la liberación de stock en reintentos). findOneAndUpdate
+        // devuelve el doc previo: stockReserved indica si había reserva.
         const order = await Order.findOneAndUpdate(
-          { _id: orderId, "payment.status": { $ne: "completed" } },
-          { $set: { "payment.status": "failed", status: "cancelled" } },
+          { _id: orderId, "payment.status": { $nin: ["completed", "failed"] } },
+          { $set: { "payment.status": "failed", status: "cancelled", stockReserved: false } },
         );
+        if (order?.stockReserved) {
+          await releaseStock(Product, order.items);
+        }
         if (!order && !(await Order.exists({ _id: orderId }))) {
           return NextResponse.json(
             { error: "Orden no encontrada" },

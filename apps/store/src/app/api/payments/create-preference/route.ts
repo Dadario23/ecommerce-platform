@@ -7,6 +7,12 @@ import mongoose from "mongoose";
 import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
 import { getBaseUrl } from "@/lib/base-url";
+import {
+  MP_PREFERENCE_TTL_MS,
+  releaseExpiredReservations,
+  releaseStock,
+  reserveStock,
+} from "@/lib/stock";
 
 const OrderItemSchema = z.object({
   id: z.string().min(1),
@@ -50,6 +56,9 @@ export async function POST(request: NextRequest) {
     }
     const orderData = parsed.data;
     const items = orderData.items;
+
+    // Liberar reservas de checkouts MP abandonados antes de validar stock
+    await releaseExpiredReservations(Order, Product);
 
     // Validar stock antes de crear la preferencia
     const productIds = items.map((item) => new mongoose.Types.ObjectId(item.id));
@@ -132,6 +141,19 @@ export async function POST(request: NextRequest) {
 
     const total = Math.max(subtotal - discount, 0);
 
+    // Reservar stock mientras dura el checkout de MP. Se libera si el pago
+    // se rechaza (webhook) o si la reserva vence (releaseExpiredReservations).
+    const reservation = await reserveStock(Product, authoritativeItems);
+    if (!reservation.ok) {
+      return NextResponse.json(
+        {
+          error: "Problemas de stock",
+          details: [`"${reservation.failed.name}" no tiene stock suficiente`],
+        },
+        { status: 409 }
+      );
+    }
+
     const order = new Order({
       userId: user._id,
       customerEmail: session.user.email,
@@ -150,9 +172,15 @@ export async function POST(request: NextRequest) {
       status: "pending",
       shippingMethod: orderData.shippingMethod,
       notes: orderData.notes,
+      stockReserved: true,
     });
 
-    await order.save();
+    try {
+      await order.save();
+    } catch (err) {
+      await releaseStock(Product, authoritativeItems);
+      throw err;
+    }
 
     const preference = new Preference(client);
 
@@ -183,19 +211,37 @@ export async function POST(request: NextRequest) {
 
     const isProd = process.env.NODE_ENV === "production";
 
-    const response = await preference.create({
-      body: {
-        items: mpItems,
-        external_reference: order._id.toString(),
-        back_urls: {
-          success: `${baseUrl}/order-success?orderId=${order._id}`,
-          failure: `${baseUrl}/checkout?error=pago_fallido`,
-          pending: `${baseUrl}/order-success?orderId=${order._id}`,
+    let response;
+    try {
+      response = await preference.create({
+        body: {
+          items: mpItems,
+          external_reference: order._id.toString(),
+          back_urls: {
+            success: `${baseUrl}/order-success?orderId=${order._id}`,
+            failure: `${baseUrl}/checkout?error=pago_fallido`,
+            pending: `${baseUrl}/order-success?orderId=${order._id}`,
+          },
+          ...(isProd && { auto_return: "approved" }),
+          notification_url: `${baseUrl}/api/payments/webhook`,
+          // La preferencia expira antes de que venza la reserva de stock:
+          // pasado ese punto ya no se puede pagar una orden liberada
+          expires: true,
+          expiration_date_to: new Date(Date.now() + MP_PREFERENCE_TTL_MS)
+            .toISOString()
+            .replace("Z", "+00:00"),
         },
-        ...(isProd && { auto_return: "approved" }),
-        notification_url: `${baseUrl}/api/payments/webhook`,
-      },
-    });
+      });
+    } catch (err) {
+      // Sin preferencia no hay pago posible: liberar la reserva y cerrar la orden
+      await Promise.all([
+        releaseStock(Product, authoritativeItems),
+        Order.findByIdAndUpdate(order._id, {
+          $set: { status: "cancelled", "payment.status": "failed", stockReserved: false },
+        }),
+      ]);
+      throw err;
+    }
 
     return NextResponse.json({
       preferenceId: response.id,

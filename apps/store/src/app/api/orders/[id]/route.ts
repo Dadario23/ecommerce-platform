@@ -1,9 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import type { IOrderItem } from "@/models/Order";
+import type { Model } from "mongoose";
+import type { IOrder } from "@/models/Order";
+import type { IProduct } from "@/models/Product";
+import type { ICoupon } from "@/models/Coupon";
 import { authOptions } from "@/lib/auth";
 import { notifyOrderStatusChange } from "@/lib/notify";
 import { getModels } from "@/lib/tenant-models";
+import { releaseStock } from "@/lib/stock";
+
+// Devuelve stock y uso de cupón según qué se haya contabilizado:
+// contraentrega descuenta al crear la orden; MP reserva stock al crear la
+// preferencia (stockReserved) y cuenta el cupón recién al completarse el pago.
+// stockReserved undefined = orden previa a la reserva → criterio anterior.
+async function restoreOnCancel(
+  order: IOrder,
+  Product: Model<IProduct>,
+  Coupon: Model<ICoupon>
+) {
+  const stockWasDeducted =
+    order.stockReserved === true ||
+    (order.stockReserved === undefined &&
+      (order.payment.method !== "mercadopago" ||
+        order.payment.status === "completed"));
+
+  const couponWasCounted =
+    Boolean(order.couponCode) &&
+    (order.payment.method !== "mercadopago" ||
+      order.payment.status === "completed");
+
+  await Promise.all([
+    ...(stockWasDeducted ? [releaseStock(Product, order.items)] : []),
+    ...(couponWasCounted
+      ? [Coupon.findOneAndUpdate({ code: order.couponCode }, { $inc: { usedCount: -1 } })]
+      : []),
+  ]);
+  order.stockReserved = false;
+}
 
 export async function GET(
   _request: NextRequest,
@@ -64,6 +97,9 @@ export async function PATCH(
         return NextResponse.json({ error: "Estado inválido" }, { status: 400 });
       }
       const prevStatus = order.status;
+      if (body.status === "cancelled" && prevStatus !== "cancelled") {
+        await restoreOnCancel(order, Product, Coupon);
+      }
       order.status = body.status;
       await order.save();
       if (prevStatus !== body.status) {
@@ -86,22 +122,7 @@ export async function PATCH(
         );
       }
 
-      // Restaurar stock y uso de cupón si ya fueron contabilizados
-      // (contraentrega: al crear la orden; MP: al aprobarse el pago)
-      const stockWasDeducted =
-        order.payment.method !== "mercadopago" ||
-        order.payment.status === "completed";
-
-      if (stockWasDeducted) {
-        await Promise.all([
-          ...order.items.map((item: IOrderItem) =>
-            Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } })
-          ),
-          ...(order.couponCode
-            ? [Coupon.findOneAndUpdate({ code: order.couponCode }, { $inc: { usedCount: -1 } })]
-            : []),
-        ]);
-      }
+      await restoreOnCancel(order, Product, Coupon);
 
       order.status = "cancelled";
       await order.save();

@@ -5,6 +5,7 @@ import { sendOrderConfirmation } from "@/lib/email";
 import mongoose from "mongoose";
 import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
+import { releaseExpiredReservations, releaseStock, reserveStock } from "@/lib/stock";
 
 const OrderItemSchema = z.object({
   id: z.string().min(1),
@@ -49,6 +50,9 @@ export async function POST(request: NextRequest) {
     }
     const orderData = parsed.data;
     const items = orderData.items;
+
+    // Liberar reservas de checkouts MP abandonados antes de validar stock
+    await releaseExpiredReservations(Order, Product);
 
     // Validar stock antes de crear la orden
     const productIds = items.map((item) => new mongoose.Types.ObjectId(item.id));
@@ -131,37 +135,17 @@ export async function POST(request: NextRequest) {
 
     const total = Math.max(subtotal - discount, 0);
 
-    // Reservar stock de forma atómica ANTES de crear la orden. La condición
-    // stock >= quantity evita que dos órdenes concurrentes pasen la validación
-    // de arriba con las mismas unidades (la lectura inicial es solo informativa).
-    const reserved: typeof authoritativeItems = [];
-    const rollbackStock = () =>
-      Promise.all(
-        reserved.map((item) =>
-          Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } })
-        )
-      );
-
-    for (const item of authoritativeItems) {
-      const claimed = await Product.findOneAndUpdate(
+    // Reservar stock de forma atómica ANTES de crear la orden — la lectura
+    // inicial es solo informativa; la garantía real está en la reserva.
+    const reservation = await reserveStock(Product, authoritativeItems);
+    if (!reservation.ok) {
+      return NextResponse.json(
         {
-          _id: item.productId,
-          isActive: { $ne: false },
-          stock: { $gte: item.quantity },
+          error: "Problemas de stock",
+          details: [`"${reservation.failed.name}" no tiene stock suficiente`],
         },
-        { $inc: { stock: -item.quantity } }
+        { status: 409 }
       );
-      if (!claimed) {
-        await rollbackStock();
-        return NextResponse.json(
-          {
-            error: "Problemas de stock",
-            details: [`"${item.name}" no tiene stock suficiente`],
-          },
-          { status: 409 }
-        );
-      }
-      reserved.push(item);
     }
 
     const order = new Order({
@@ -182,12 +166,13 @@ export async function POST(request: NextRequest) {
       status: "pending",
       shippingMethod: orderData.shippingMethod,
       notes: orderData.notes,
+      stockReserved: true,
     });
 
     try {
       await order.save();
     } catch (err) {
-      await rollbackStock();
+      await releaseStock(Product, authoritativeItems);
       throw err;
     }
 

@@ -61,6 +61,9 @@ export interface IOrder extends Document {
   trackingNumber?: string;
   notes?: string;
   mpPaymentLink?: string;
+  // true mientras el stock esté descontado por esta orden.
+  // undefined = orden anterior a la reserva de stock (criterio legacy).
+  stockReserved?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -150,6 +153,8 @@ const OrderSchema = new Schema(
     trackingNumber:  { type: String },
     notes:           { type: String },
     mpPaymentLink:   { type: String },
+    // Sin default: las órdenes previas deben hidratar undefined
+    stockReserved:   { type: Boolean },
   },
   { timestamps: true }
 );
