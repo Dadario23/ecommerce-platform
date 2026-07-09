@@ -10,8 +10,8 @@
   },
   "dependencies": {
     "next": "^15.5.0",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
     "next-auth": "^4.24.11",
     "mongoose": "^8.17.1",
     "lucide-react": "^0.539.0"
