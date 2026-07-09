@@ -169,6 +169,8 @@ npm run dev:admin
 
 No se crea una app nueva. No se hace un deployment nuevo.
 
+Paso a paso completo (requisitos, orden, gotchas y verificación): ver `CLIENT-ONBOARDING.md`.
+
 ---
 
 ## Reglas de código
