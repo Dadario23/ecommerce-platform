@@ -38,4 +38,60 @@ email de **Deployment Failed**. Con el CI en verde un deploy no debería
 fallar, pero el build de Vercel tiene sus propios modos de falla (env vars,
 límites).
 
-## Restore de backup (pendiente — se documenta con el simulacro del paso 4)
+## Backups y restore
+
+El cluster de Atlas es **M0 (gratis): Atlas no hace ningún backup**. El único
+backup es el workflow `.github/workflows/backup.yml`: todos los días a las
+03:00 (hora argentina) hace `mongodump` de cada DB del cluster y lo sube como
+artifact del repo con 90 días de retención. Lista las DBs dinámicamente, así
+que un tenant nuevo queda cubierto sin tocar nada.
+
+- **RPO: hasta 24 h de pérdida** (un dump por día). Si en algún momento eso no
+  alcanza, subir la frecuencia del cron o pasar el cluster a Flex/M10, que
+  tienen backups propios de Atlas.
+- Requiere el secret `MONGODB_CLUSTER_URI` en GitHub (repo → Settings →
+  Secrets and variables → Actions) y que Atlas Network Access permita
+  `0.0.0.0/0` (ya requerido por Vercel).
+- GitHub avisa por email si el workflow falla (verificar en
+  github.com/settings/notifications → Actions → "Failed workflows only").
+- Ojo: GitHub **desactiva los crons tras 60 días sin actividad** en el repo;
+  avisa por email antes. Un push cualquiera lo reactiva.
+
+### Restore (simulacro hecho el 2026-07-09: dump 7 s, restore 5 s, 16/16 colecciones OK)
+
+Herramientas: [mongodb-database-tools](https://www.mongodb.com/try/download/database-tools)
+para `mongodump`/`mongorestore`; `mongosh` vía `npx -y mongosh`.
+
+1. Descargar el backup: repo → Actions → workflow "Backup" → run del día →
+   artifact `mongodb-backup-<fecha>`. Adentro hay un `<slug>.archive.gz` por tenant.
+2. **Inspeccionar primero en una DB temporal** (no pisa nada):
+
+   ```bash
+   mongorestore --uri "$MONGODB_CLUSTER_URI" --archive=<slug>.archive.gz --gzip \
+     --nsFrom='<slug>.*' --nsTo='restore-drill.*'
+   ```
+
+   Verificar conteos contra la DB viva:
+
+   ```bash
+   npx -y mongosh "$MONGODB_CLUSTER_URI" --quiet --eval '
+   const src = db.getSiblingDB("<slug>"), dst = db.getSiblingDB("restore-drill");
+   for (const c of src.getCollectionNames().sort())
+     print(c, src.getCollection(c).countDocuments(), dst.getCollection(c).countDocuments());'
+   ```
+
+3. Restaurar el tenant de verdad (pisa la DB con el contenido del backup;
+   `--drop` borra cada colección antes de recrearla — lo escrito después del
+   dump se pierde):
+
+   ```bash
+   mongorestore --uri "$MONGODB_CLUSTER_URI" --archive=<slug>.archive.gz --gzip --drop
+   ```
+
+4. Limpiar la DB temporal:
+
+   ```bash
+   npx -y mongosh "$MONGODB_CLUSTER_URI" --quiet --eval 'db.getSiblingDB("restore-drill").dropDatabase()'
+   ```
+
+Cada tenant es una DB separada: restaurar uno no toca a los demás.

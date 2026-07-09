@@ -1,0 +1,45 @@
+name: Backup
+
+# El cluster es M0 (gratis): Atlas no hace backups. Este workflow es el único
+# backup de la plataforma. Procedimiento de restore: RUNBOOK.md.
+
+on:
+  schedule:
+    - cron: "0 6 * * *" # 03:00 Argentina, diario
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Instalar mongodb-database-tools
+        run: |
+          curl -sfSLO https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2404-x86_64-100.12.0.tgz
+          tar xzf mongodb-database-tools-ubuntu2404-x86_64-100.12.0.tgz
+          echo "$PWD/mongodb-database-tools-ubuntu2404-x86_64-100.12.0/bin" >> "$GITHUB_PATH"
+
+      # Lista las DBs del cluster en vez de hardcodear slugs: un tenant nuevo
+      # queda cubierto sin tocar este archivo. "test" es basura de dev, no un tenant.
+      - name: Dump de todas las DBs de tenants
+        env:
+          URI: ${{ secrets.MONGODB_CLUSTER_URI }}
+        run: |
+          dbs=$(npx -y mongosh "$URI" --quiet --eval 'print(db.adminCommand("listDatabases").databases.map(d => d.name).filter(n => !["admin","local","config","test"].includes(n)).join("\n"))')
+          [ -n "$dbs" ] || { echo "::error::no se pudieron listar las DBs"; exit 1; }
+          mkdir -p dump
+          for db in $dbs; do
+            mongodump --uri "$URI" --db "$db" --archive="dump/$db.archive.gz" --gzip --quiet
+            [ -s "dump/$db.archive.gz" ] || { echo "::error::dump vacío: $db"; exit 1; }
+          done
+          ls -la dump
+
+      - name: Fecha para el nombre del artifact
+        id: fecha
+        run: echo "hoy=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mongodb-backup-${{ steps.fecha.outputs.hoy }}
+          path: dump/
+          retention-days: 90
+          if-no-files-found: error
