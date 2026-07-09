@@ -19,24 +19,31 @@ apagadas (no-op silencioso).
 | Falló el email de confirmación | El pago se confirmó pero el cliente no recibió el email | Revisar `RESEND_API_KEY` / `fromEmail` del tenant; reenviar manualmente si hace falta |
 | Error procesando webhook MP | Excepción en el webhook. MP reintenta con backoff, pero si se repite hay pagos aprobados sin confirmar | Ver logs de Vercel del deployment activo; los reintentos de MP son idempotentes, se puede corregir y esperar el próximo |
 
-## Monitoreo de uptime (pendiente de configurar — manual, ~15 min)
+## Monitoreo de uptime (configurado 2026-07-09)
 
 `GET /api/payments/webhook` responde `{"status":"webhook activo"}` sin auth:
 sirve de health check de app + DB routing por dominio.
 
-1. Crear cuenta gratis en https://uptimerobot.com
-2. Un monitor HTTP por tenant, intervalo 5 min:
-   - `https://bitm-cel.com.ar/api/payments/webhook`
-   - `https://kameleba.com.ar/api/payments/webhook`
-   - `https://www.compumobile.com.ar/api/payments/webhook`
-3. Alert contact: el mismo email de `OPS_ALERT_EMAIL`
+Cuenta UptimeRobot gratis (email de `OPS_ALERT_EMAIL`), un monitor HTTP por
+tenant, intervalo 5 min, alertas al mismo email:
 
-## Notificaciones de deploy (pendiente — manual, ~5 min)
+| Monitor | URL | Estado |
+|---------|-----|--------|
+| compumobile webhook | `https://www.compumobile.com.ar/api/payments/webhook` | activo |
+| bitm-cel webhook | `https://bitm-cel.com.ar/api/payments/webhook` | **pausado** — dominio sin comprar |
+| kameleba webhook | `https://kameleba.com.ar/api/payments/webhook` | **pausado** — dominio sin comprar |
 
-En Vercel → proyecto store → Settings → Notifications: activar aviso por
-email de **Deployment Failed**. Con el CI en verde un deploy no debería
-fallar, pero el build de Vercel tiene sus propios modos de falla (env vars,
-límites).
+Al comprar un dominio y hacer el cutover, reanudar su monitor desde el
+dashboard de UptimeRobot (o `POST /v3/monitors/<id>/start` de la API v3 con
+Bearer = Main API key). Para un tenant nuevo, crear el monitor con la misma
+receta. Ojo: la API v2 rechaza escrituras en el plan gratis (`access_denied`);
+usar la v3 (`api.uptimerobot.com/v3`, JSON + Bearer).
+
+## Notificaciones de deploy (configurado 2026-07-09)
+
+Vercel envía email de **Deployment Failed** (Account Settings →
+Notifications). Con el CI en verde un deploy no debería fallar, pero el
+build de Vercel tiene sus propios modos de falla (env vars, límites).
 
 ## Backups y restore
 
