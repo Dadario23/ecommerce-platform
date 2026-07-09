@@ -1,0 +1,26 @@
+version: 2
+updates:
+  # npm workspaces: una sola entrada en la raíz cubre apps/* y packages/*
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/Argentina/Buenos_Aires
+    # minor+patch juntos en un PR semanal; los majors salen como PRs aparte
+    groups:
+      minor-y-patch:
+        update-types:
+          - minor
+          - patch
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/Argentina/Buenos_Aires
+    open-pull-requests-limit: 3
