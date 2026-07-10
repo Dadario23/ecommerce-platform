@@ -38,23 +38,24 @@ Commitear y pushear (el deploy automático todavía no sirve el dominio, no pasa
 
 - La DB `<slug>` se crea sola con la primera escritura — **no** hace falta
   crearla a mano en Atlas.
-- Sembrar el documento `Setting` (colección `settings`) con los módulos
-  contratados: campos planos `modules_repairs`, `modules_budgets`,
-  `modules_shipping`, `modules_coupons`, `modules_analytics` + campos de
-  tienda (ver schema en `apps/store/src/models/Setting.ts`).
-- Después del alta, los módulos se gestionan desde el admin-hub
-  (`localhost:3100` → detalle del cliente → toggles).
+- Crear el `Setting` inicial desde el admin-hub: `localhost:3100/clients/new`
+  (el wizard lista los slugs de `PLATFORM_CLIENTS` que aún no tienen Setting
+  y siembra storeName + módulos + credenciales opcionales con los defaults
+  del schema). Requiere haber hecho el paso 1 y reiniciado el admin-hub.
+- Después del alta, los módulos se gestionan desde el detalle del cliente
+  (`/clients/<slug>` → toggles).
 
 ## Paso 3 — Credenciales del tenant
+
+Desde el admin-hub: detalle del cliente (`/clients/<slug>`) → card
+"Credenciales". Campo vacío conserva el valor actual, `-` lo vacía (→ usa el
+fallback de env vars globales). Los secrets se muestran enmascarados.
+
+Alternativa CLI equivalente:
 
 ```bash
 node apps/admin-hub/scripts/seed-tenant-secrets.mjs <slug>
 ```
-
-Interactivo — carga en el `Setting` del tenant: `mpAccessToken`,
-`mpWebhookSecret`, `fromEmail`, `transferAlias`, `transferCvu`,
-`whatsappNumber`. Enter conserva el valor actual, `-` lo vacía (→ usa el
-fallback de env vars globales).
 
 ## Paso 4 — `TENANT_DOMAINS` en Vercel
 

@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import mongoose from "mongoose";
 import crypto from "crypto";
 import { CLIENT_DISPLAY_NAMES } from "@/config/clients";
+import { REGISTERED_CLIENTS, getTenantDb } from "@/lib/tenants";
+import { activateMembership, suspendMembership } from "@/lib/memberships";
 
 // Comparación en tiempo constante: hashea ambos lados a 32 bytes fijos para no
 // filtrar ni la longitud ni el contenido del secreto por timing.
@@ -14,17 +15,8 @@ function isAuthorized(req: Request): boolean {
   return crypto.timingSafeEqual(a, b);
 }
 
-const REGISTERED_CLIENTS = (process.env.PLATFORM_CLIENTS ?? "bitm-cel").split(",").map((s) => s.trim());
-const CLUSTER_URI = process.env.MONGODB_CLUSTER_URI!;
-
-async function getClusterConnection() {
-  if (mongoose.connection.readyState === 1) return mongoose.connection;
-  await mongoose.connect(CLUSTER_URI);
-  return mongoose.connection;
-}
-
-async function getClientStats(conn: mongoose.Connection, dbName: string) {
-  const db = conn.useDb(dbName, { useCache: true });
+async function getClientStats(dbName: string) {
+  const db = await getTenantDb(dbName);
 
   const [membership, setting, productCount, orderCount, lastOrder] = await Promise.all([
     db.collection("memberships").findOne({}, { sort: { createdAt: -1 } }),
@@ -51,8 +43,13 @@ async function getClientStats(conn: mongoose.Connection, dbName: string) {
     slug: dbName,
     storeName: CLIENT_DISPLAY_NAMES[dbName] ?? (setting?.storeName as string | undefined) ?? dbName,
     membership: membership
-      ? { status: membership.status as string, paidUntil: membership.paidUntil ?? null, lastPaymentDate: membership.lastPaymentDate ?? null }
-      : { status: "active", paidUntil: null, lastPaymentDate: null },
+      ? {
+          status: membership.status as string,
+          paidUntil: membership.paidUntil ?? null,
+          lastPaymentDate: membership.lastPaymentDate ?? null,
+          monthlyPrice: (membership.monthlyPrice as number | undefined) ?? null,
+        }
+      : { status: "active", paidUntil: null, lastPaymentDate: null, monthlyPrice: null },
     modules: activeModules,
     productCount,
     orderCount,
@@ -66,8 +63,7 @@ export async function GET(req: Request) {
   }
 
   try {
-    const conn = await getClusterConnection();
-    const stats = await Promise.all(REGISTERED_CLIENTS.map((db) => getClientStats(conn, db)));
+    const stats = await Promise.all(REGISTERED_CLIENTS.map((db) => getClientStats(db)));
     return NextResponse.json({ clients: stats });
   } catch (err) {
     console.error("[admin-hub] Error obteniendo stats:", err);
@@ -85,27 +81,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Cliente no registrado" }, { status: 400 });
   }
 
-  const conn = await getClusterConnection();
-  const db = conn.useDb(clientDb, { useCache: true });
-  const now = new Date();
+  const db = await getTenantDb(clientDb);
 
   if (action === "activate") {
-    const paidUntil = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    const gracePeriodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 15);
-    await db.collection("memberships").updateOne(
-      {},
-      { $set: { status: "active", paidUntil, gracePeriodEnd, lastPaymentDate: now, updatedAt: now } },
-      { upsert: true }
-    );
+    await activateMembership(db);
     return NextResponse.json({ ok: true, message: `${clientDb} activado` });
   }
 
   if (action === "suspend") {
-    await db.collection("memberships").updateOne(
-      {},
-      { $set: { status: "suspended", updatedAt: now } },
-      { upsert: true }
-    );
+    await suspendMembership(db);
     return NextResponse.json({ ok: true, message: `${clientDb} suspendido` });
   }
 

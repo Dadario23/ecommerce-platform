@@ -11,6 +11,7 @@ export interface IMembership extends Document {
   gracePeriodEnd?: Date;
   lastPaymentDate?: Date | null;
   lastNotifiedAt?: Date | null;
+  monthlyPrice?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -22,6 +23,7 @@ const MembershipSchema = new Schema(
     gracePeriodEnd: { type: Date },
     lastPaymentDate: { type: Date, default: null },
     lastNotifiedAt: { type: Date, default: null },
+    monthlyPrice: { type: Number },
   },
   { timestamps: true }
 );

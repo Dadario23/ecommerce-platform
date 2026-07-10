@@ -129,11 +129,14 @@ lectura la tienda sigue operando — nunca cortar un tenant por una falla nuestr
 
 ## Variables de entorno — admin-hub
 
-| Variable              | Propósito                                        |
-| --------------------- | ------------------------------------------------ |
-| `MONGODB_CLUSTER_URI` | URI del cluster — accede a todas las DBs         |
-| `ADMIN_HUB_SECRET`    | Bearer token para autenticar todas las rutas API |
-| `PLATFORM_CLIENTS`    | Lista de slugs separados por coma                |
+| Variable               | Propósito                                        |
+| ---------------------- | ------------------------------------------------ |
+| `MONGODB_CLUSTER_URI`  | URI del cluster — accede a todas las DBs         |
+| `ADMIN_HUB_SECRET`     | Bearer token para autenticar todas las rutas API |
+| `PLATFORM_CLIENTS`     | Lista de slugs separados por coma                |
+| `UPTIMEROBOT_API_KEY`  | Panel de salud: uptime por tenant (sin configurar = "Sin configurar") |
+| `GITHUB_TOKEN`         | Panel de salud: opcional — solo si el repo pasa a privado (PAT Actions:read) |
+| `GITHUB_REPO`          | Panel de salud: opcional, default `Dadario23/ecommerce-platform` |
 
 ---
 
@@ -161,11 +164,12 @@ npm run dev:admin
 2. Agregar `<slug>` a `TENANT_DOMAINS` en las env vars de Vercel (`dominio.com:<slug>`)
 3. Agregar `<slug>` a `PLATFORM_CLIENTS` en admin-hub
 4. Apuntar el dominio del cliente a Vercel
-5. Configurar los módulos del tenant en su documento `Setting` en la DB
-6. Cargar en el mismo `Setting` las credenciales del tenant con
-   `node apps/admin-hub/scripts/seed-tenant-secrets.mjs <slug>` (interactivo:
-   `mpAccessToken`, `mpWebhookSecret`, `fromEmail`, `transferAlias`,
-   `transferCvu`, `whatsappNumber`; Enter conserva, `-` vacía → fallback env)
+5. Crear el `Setting` inicial (módulos + credenciales) desde el admin-hub:
+   `localhost:3100/clients/new` (requiere el slug ya en `PLATFORM_CLIENTS`)
+6. Credenciales después del alta: detalle del cliente en el admin-hub
+   (`/clients/<slug>`, campos `mpAccessToken`, `mpWebhookSecret`, `fromEmail`,
+   `transferAlias`, `transferCvu`, `whatsappNumber`; vacío conserva, `-` vacía
+   → fallback env). Alternativa CLI: `node apps/admin-hub/scripts/seed-tenant-secrets.mjs <slug>`
 
 No se crea una app nueva. No se hace un deployment nuevo.
 
