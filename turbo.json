@@ -1,5 +1,30 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalEnv": [
+    "ADMIN_HUB_SECRET",
+    "CLOUDINARY_API_KEY",
+    "CLOUDINARY_API_SECRET",
+    "CLOUDINARY_CLOUD_NAME",
+    "FROM_EMAIL",
+    "GITHUB_REPO",
+    "GITHUB_TOKEN",
+    "GOOGLE_CLIENT_ID",
+    "GOOGLE_CLIENT_SECRET",
+    "MONGODB_CLUSTER_URI",
+    "MP_ACCESS_TOKEN",
+    "MP_ALIAS",
+    "MP_CVU",
+    "MP_WEBHOOK_SECRET",
+    "NEXTAUTH_SECRET",
+    "NEXTAUTH_URL",
+    "OPS_ALERT_EMAIL",
+    "PLATFORM_CLIENTS",
+    "RESEND_API_KEY",
+    "RESEND_EMAIL_FROM",
+    "TENANT_DOMAINS",
+    "TENANT_SLUG",
+    "UPTIMEROBOT_API_KEY"
+  ],
   "tasks": {
     "build": {
       "dependsOn": [
