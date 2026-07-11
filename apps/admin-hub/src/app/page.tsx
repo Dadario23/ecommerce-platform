@@ -37,13 +37,17 @@ const BACKUP_COLORS: Record<BackupStatus["state"], string> = {
 
 async function fetchClients(): Promise<ClientStats[]> {
   const baseUrl = process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3100";
-  const res = await fetch(`${baseUrl}/api/clients`, {
-    headers: { authorization: `Bearer ${process.env.ADMIN_HUB_SECRET}` },
-    cache: "no-store",
-  });
-  if (!res.ok) return [];
-  const data = await res.json();
-  return data.clients ?? [];
+  try {
+    const res = await fetch(`${baseUrl}/api/clients`, {
+      headers: { authorization: `Bearer ${process.env.ADMIN_HUB_SECRET}` },
+      cache: "no-store",
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.clients ?? [];
+  } catch {
+    return [];
+  }
 }
 
 function formatDate(iso: string | null) {
