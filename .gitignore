@@ -21,3 +21,4 @@ Thumbs.db
 coverage/
 .vercel
 .env*
+!.env.example
