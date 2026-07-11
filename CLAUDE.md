@@ -132,7 +132,8 @@ lectura la tienda sigue operando — nunca cortar un tenant por una falla nuestr
 | Variable               | Propósito                                        |
 | ---------------------- | ------------------------------------------------ |
 | `MONGODB_CLUSTER_URI`  | URI del cluster — accede a todas las DBs         |
-| `ADMIN_HUB_SECRET`     | Bearer token para autenticar todas las rutas API |
+| `ADMIN_HUB_SECRET`     | Bearer token de las rutas API y password del Basic auth de las páginas en producción |
+| `NEXT_PUBLIC_ADMIN_URL`| URL pública del admin-hub (self-fetch del dashboard; se inlinea en build) |
 | `PLATFORM_CLIENTS`     | Lista de slugs separados por coma                |
 | `UPTIMEROBOT_API_KEY`  | Panel de salud: uptime por tenant (sin configurar = "Sin configurar") |
 | `GITHUB_TOKEN`         | Panel de salud: opcional — solo si el repo pasa a privado (PAT Actions:read) |
@@ -211,6 +212,7 @@ Paso a paso completo (requisitos, orden, gotchas y verificación): ver `CLIENT-O
 
 - Rutas `/api` en store: validar sesión NextAuth antes de procesar
 - Rutas `/api` en admin-hub: validar bearer token `ADMIN_HUB_SECRET`
+- Páginas de admin-hub en producción: Basic auth en `src/middleware.ts` (password = `ADMIN_HUB_SECRET`; en dev no se exige)
 - Webhooks: verificar firma HMAC-SHA256
 - Nunca commitear variables de entorno
 
