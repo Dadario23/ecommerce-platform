@@ -2,6 +2,10 @@
 
 Instrucciones para Claude Code. Leé este archivo completo antes de tocar cualquier código.
 
+> **Primera sesión con este repo:** leé también `HANDOFF.md` — el criterio de
+> trabajo, las trampas conocidas y el porqué de las decisiones, dejado por el
+> modelo anterior. Este archivo dice *qué* hacer; ese dice *cómo pensar*.
+
 ---
 
 ## Qué es este proyecto
