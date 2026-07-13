@@ -18,7 +18,7 @@
   "devDependencies": {
     "next": "^15.5.0",
     "turbo": "^2.10.4",
-    "typescript": "^5"
+    "typescript": "^7"
   },
   "overrides": {
     "next": {
