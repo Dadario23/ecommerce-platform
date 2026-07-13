@@ -5,10 +5,11 @@ import { authOptions } from "@/lib/auth";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
+import { passwordSchema, PASSWORD_POLICY_MESSAGE } from "@/lib/password-policy";
 
 const ChangePasswordSchema = z.object({
   currentPassword: z.string().min(1),
-  newPassword: z.string().min(6),
+  newPassword: passwordSchema,
 });
 
 export async function PATCH(request: NextRequest) {
@@ -23,7 +24,7 @@ export async function PATCH(request: NextRequest) {
     const parsed = ChangePasswordSchema.safeParse(await request.json());
     if (!parsed.success) {
       return NextResponse.json(
-        { error: "La nueva contraseña debe tener al menos 6 caracteres" },
+        { error: PASSWORD_POLICY_MESSAGE },
         { status: 400 }
       );
     }

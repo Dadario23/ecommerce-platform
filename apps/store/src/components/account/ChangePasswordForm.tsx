@@ -5,6 +5,8 @@ import { useSession } from "next-auth/react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Lock, CheckCircle, AlertCircle, Info } from "lucide-react";
+import { isPasswordValid, PASSWORD_POLICY_MESSAGE } from "@/lib/password-policy";
+import PasswordChecklist from "@/components/auth/PasswordChecklist";
 
 function PasswordField({
   id,
@@ -83,8 +85,8 @@ export default function ChangePasswordForm() {
     setError("");
     setSuccess(false);
 
-    if (next.length < 6) {
-      setError("La nueva contraseña debe tener al menos 6 caracteres");
+    if (!isPasswordValid(next)) {
+      setError(PASSWORD_POLICY_MESSAGE);
       return;
     }
     if (next !== confirm) {
@@ -149,13 +151,15 @@ export default function ChangePasswordForm() {
           value={current}
           onChange={setCurrent}
         />
-        <PasswordField
-          id="new"
-          label="Nueva contraseña"
-          value={next}
-          onChange={setNext}
-          hint="Mínimo 6 caracteres"
-        />
+        <div>
+          <PasswordField
+            id="new"
+            label="Nueva contraseña"
+            value={next}
+            onChange={setNext}
+          />
+          <PasswordChecklist password={next} />
+        </div>
         <PasswordField
           id="confirm"
           label="Confirmar nueva contraseña"

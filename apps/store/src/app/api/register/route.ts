@@ -3,11 +3,12 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
 import { getClientIp, hitRateLimit } from "@/lib/rate-limit";
+import { passwordSchema, PASSWORD_POLICY_MESSAGE } from "@/lib/password-policy";
 
 const RegisterSchema = z.object({
   name: z.string().trim().min(1).max(120),
   email: z.string().email(),
-  password: z.string().min(6).max(200),
+  password: passwordSchema,
 });
 
 export async function POST(req: Request) {
@@ -23,7 +24,11 @@ export async function POST(req: Request) {
 
     const parsed = RegisterSchema.safeParse(await req.json());
     if (!parsed.success) {
-      return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
+      const passwordIssue = parsed.error.issues.some((i) => i.path[0] === "password");
+      return NextResponse.json(
+        { error: passwordIssue ? PASSWORD_POLICY_MESSAGE : "Datos inválidos" },
+        { status: 400 }
+      );
     }
     const { name, email, password } = parsed.data;
 
@@ -37,7 +42,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 12);
 
     const newUser = await User.create({
       name,

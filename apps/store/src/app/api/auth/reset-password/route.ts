@@ -5,11 +5,12 @@ import crypto from "crypto";
 import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
 import { getClientIp, hitRateLimit } from "@/lib/rate-limit";
+import { passwordSchema, PASSWORD_POLICY_MESSAGE } from "@/lib/password-policy";
 
 const ResetSchema = z.object({
   token: z.string().min(1),
   email: z.string().email(),
-  newPassword: z.string().min(6),
+  newPassword: passwordSchema,
 });
 
 export async function POST(request: NextRequest) {
@@ -26,7 +27,7 @@ export async function POST(request: NextRequest) {
     const parsed = ResetSchema.safeParse(await request.json());
     if (!parsed.success) {
       return NextResponse.json(
-        { error: "Datos inválidos. La contraseña debe tener al menos 6 caracteres." },
+        { error: PASSWORD_POLICY_MESSAGE },
         { status: 400 }
       );
     }

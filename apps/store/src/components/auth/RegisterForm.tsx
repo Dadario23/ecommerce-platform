@@ -7,12 +7,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Eye, EyeOff, Loader2, CheckCircle } from "lucide-react";
+import { passwordSchema } from "@/lib/password-policy";
+import PasswordChecklist from "@/components/auth/PasswordChecklist";
 
 const registerSchema = z
   .object({
     name: z.string().min(2, "El nombre es demasiado corto"),
     email: z.string().email("Correo inválido"),
-    password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
+    password: passwordSchema,
     confirmPassword: z.string(),
     newsletter: z.boolean().optional(),
   })
@@ -31,8 +33,10 @@ export default function RegisterForm() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormData>({ resolver: zodResolver(registerSchema) });
+  const passwordValue = watch("password") ?? "";
 
   const [errorMsg, setErrorMsg] = useState("");
   const [success, setSuccess] = useState(false);
@@ -118,7 +122,7 @@ export default function RegisterForm() {
         <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
-            placeholder="Mínimo 6 caracteres"
+            placeholder="Mínimo 8 caracteres"
             {...register("password")}
             className={`${INPUT} pr-10`}
           />
@@ -130,9 +134,7 @@ export default function RegisterForm() {
             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
         </div>
-        {errors.password && (
-          <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>
-        )}
+        <PasswordChecklist password={passwordValue} />
       </div>
 
       {/* Confirm password */}

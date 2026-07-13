@@ -9,6 +9,8 @@ import {
   Loader2, Eye, EyeOff, Key, CheckCircle, AlertCircle, ArrowLeft,
 } from "lucide-react";
 import { useStoreName } from "@/hooks/use-store-name";
+import { isPasswordValid, PASSWORD_POLICY_MESSAGE } from "@/lib/password-policy";
+import PasswordChecklist from "@/components/auth/PasswordChecklist";
 
 const INPUT =
   "w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 placeholder:text-gray-300 transition-colors";
@@ -59,7 +61,7 @@ export default function ResetPasswordClient() {
     e.preventDefault();
     setError("");
     if (!password || !confirm) { setError("Completá todos los campos"); return; }
-    if (password.length < 6) { setError("La contraseña debe tener al menos 6 caracteres"); return; }
+    if (!isPasswordValid(password)) { setError(PASSWORD_POLICY_MESSAGE); return; }
     if (password !== confirm) { setError("Las contraseñas no coinciden"); return; }
 
     setLoading(true);
@@ -101,7 +103,8 @@ export default function ResetPasswordClient() {
           Creá tu nueva contraseña
         </h2>
         <p className="text-blue-200 text-sm leading-relaxed">
-          Elegí una contraseña segura de al menos 6 caracteres.
+          Elegí una contraseña segura: al menos 8 caracteres, con mayúscula,
+          minúscula y número.
         </p>
       </div>
       <p className="text-blue-400 text-xs relative">
@@ -205,7 +208,7 @@ export default function ResetPasswordClient() {
                         type={showPassword ? "text" : "password"}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Mínimo 6 caracteres"
+                        placeholder="Mínimo 8 caracteres"
                         className={`${INPUT} pr-10`}
                       />
                       <button
@@ -216,6 +219,7 @@ export default function ResetPasswordClient() {
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
+                    <PasswordChecklist password={password} />
                   </div>
 
                   <div>
