@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Loader2, Check, Phone } from "lucide-react";
+import DeleteAccountSection from "@/components/account/DeleteAccountSection";
 
 const inputCls =
   "w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-(--tenant-primary) placeholder:text-gray-400";
@@ -11,6 +12,7 @@ export default function ProfilePage() {
   const { data: session, update } = useSession();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [hasPassword, setHasPassword] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [ok, setOk] = useState(false);
@@ -22,6 +24,7 @@ export default function ProfilePage() {
       .then((d) => {
         setName(d.name ?? "");
         setPhone(d.phone ?? "");
+        setHasPassword(Boolean(d.hasPassword));
       })
       .finally(() => setLoading(false));
   }, []);
@@ -138,6 +141,8 @@ export default function ProfilePage() {
           )}
         </button>
       </form>
+
+      <DeleteAccountSection hasPassword={hasPassword} />
     </div>
   );
 }

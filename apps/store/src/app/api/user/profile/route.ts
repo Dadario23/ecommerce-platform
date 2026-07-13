@@ -8,10 +8,15 @@ export async function GET() {
   if (!session?.user?.email) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
-  const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
-  const user = await User.findOne({ email: session.user.email }).select("name email phone");
+  const { User } = await getModels();
+  const user = await User.findOne({ email: session.user.email }).select("name email phone password");
   if (!user) return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 });
-  return NextResponse.json({ name: user.name ?? "", email: user.email, phone: user.phone ?? "" });
+  return NextResponse.json({
+    name: user.name ?? "",
+    email: user.email,
+    phone: user.phone ?? "",
+    hasPassword: Boolean(user.password),
+  });
 }
 
 export async function PATCH(req: Request) {
