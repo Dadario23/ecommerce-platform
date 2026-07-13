@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  Loader2, Eye, EyeOff, Key, CheckCircle, AlertCircle, ArrowLeft,
+  Loader2, Eye, EyeOff, Key, CheckCircle, AlertCircle, ArrowLeft, Check, X,
 } from "lucide-react";
 import { useStoreName } from "@/hooks/use-store-name";
 import { isPasswordValid, PASSWORD_POLICY_MESSAGE } from "@/lib/password-policy";
@@ -30,6 +30,10 @@ export default function ResetPasswordClient() {
   const [success, setSuccess] = useState(false);
   const [tokenValid, setTokenValid] = useState<boolean | null>(null);
   const [tokenError, setTokenError] = useState("");
+
+  const confirmStarted = confirm.length > 0;
+  const passwordsMatch = confirmStarted && confirm === password;
+  const passwordsMismatch = confirmStarted && confirm !== password;
 
   useEffect(() => {
     if (!token || !email) {
@@ -232,8 +236,14 @@ export default function ResetPasswordClient() {
                         value={confirm}
                         onChange={(e) => setConfirm(e.target.value)}
                         placeholder="Repetí tu contraseña"
-                        className={`${INPUT} pr-10`}
+                        className={`${INPUT} pr-16`}
                       />
+                      {passwordsMatch && (
+                        <Check className="absolute right-10 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
+                      )}
+                      {passwordsMismatch && (
+                        <X className="absolute right-10 top-1/2 -translate-y-1/2 w-4 h-4 text-red-500" />
+                      )}
                       <button
                         type="button"
                         onClick={() => setShowConfirm((v) => !v)}
@@ -242,6 +252,12 @@ export default function ResetPasswordClient() {
                         {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
+                    {passwordsMismatch && (
+                      <p className="text-xs text-red-500 mt-1">Las contraseñas no coinciden</p>
+                    )}
+                    {passwordsMatch && (
+                      <p className="text-xs text-emerald-600 mt-1">Las contraseñas coinciden</p>
+                    )}
                   </div>
 
                   {error && (

@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Lock, CheckCircle, AlertCircle, Info } from "lucide-react";
+import { Eye, EyeOff, Lock, CheckCircle, AlertCircle, Info, Loader2 } from "lucide-react";
 import { isPasswordValid, PASSWORD_POLICY_MESSAGE } from "@/lib/password-policy";
 import PasswordChecklist from "@/components/auth/PasswordChecklist";
 
@@ -50,17 +49,29 @@ function PasswordField({
 }
 
 export default function ChangePasswordForm() {
-  const { data: session } = useSession();
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [hasPassword, setHasPassword] = useState<boolean | null>(null);
 
-  const isGoogleUser = session?.user?.image?.includes("googleusercontent");
+  useEffect(() => {
+    fetch("/api/user/profile")
+      .then((r) => r.json())
+      .then((d) => setHasPassword(Boolean(d.hasPassword)));
+  }, []);
 
-  if (isGoogleUser) {
+  if (hasPassword === null) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+      </div>
+    );
+  }
+
+  if (!hasPassword) {
     return (
       <div className="space-y-4">
         <h2 className="text-lg font-bold text-gray-900">Cambiar contraseña</h2>
