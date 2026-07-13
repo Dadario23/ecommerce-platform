@@ -4,6 +4,7 @@ import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
 import { getClientIp, hitRateLimit } from "@/lib/rate-limit";
 import { passwordSchema, PASSWORD_POLICY_MESSAGE } from "@/lib/password-policy";
+import { sendWelcomeEmail } from "@/lib/email";
 
 const RegisterSchema = z.object({
   name: z.string().trim().min(1).max(120),
@@ -32,7 +33,7 @@ export async function POST(req: Request) {
     }
     const { name, email, password } = parsed.data;
 
-    const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
+    const { User } = await getModels();
 
     const userExists = await User.findOne({ email });
     if (userExists) {
@@ -50,6 +51,9 @@ export async function POST(req: Request) {
       password: hashedPassword,
       role: "user",
     });
+
+    // Email de bienvenida (no bloquea la respuesta si falla)
+    sendWelcomeEmail({ name, email }).catch(() => {});
 
     return NextResponse.json(
       {

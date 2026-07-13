@@ -16,6 +16,9 @@ type EmailContext = {
   fromEmail: string;
   transferAlias: string;
   transferCvu: string;
+  primaryColor: string;
+  onPrimaryColor: string;
+  tint: string;
 };
 
 // Identidad del tenant activo al momento del envío — los emails siempre
@@ -32,7 +35,64 @@ async function getEmailContext(): Promise<EmailContext> {
     fromEmail: secrets.fromEmail,
     transferAlias: secrets.transferAlias,
     transferCvu: secrets.transferCvu,
+    primaryColor: config.theme.colors.primary,
+    onPrimaryColor: config.theme.colors.onPrimary,
+    tint: config.theme.colors.tint,
   };
+}
+
+// ── Shell visual compartido ──────────────────────────────────────────────────
+// Header/footer con la marca del tenant activo, reutilizado por todos los
+// tipos de email para que se vean como un mismo sistema.
+
+function emailShell(opts: { ctx: EmailContext; eyebrow: string; bodyHtml: string; preheader?: string }): string {
+  const { ctx, eyebrow, bodyHtml, preheader } = opts;
+  return `
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charSet="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:Arial,Helvetica,sans-serif;">
+  ${preheader ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;">${preheader}</div>` : ""}
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;padding:40px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.06);">
+          <tr>
+            <td style="background:${ctx.primaryColor};padding:36px 40px;text-align:center;">
+              <h1 style="color:${ctx.onPrimaryColor};margin:0;font-size:22px;letter-spacing:-.2px;">${ctx.storeName}</h1>
+              <p style="color:${ctx.onPrimaryColor};margin:6px 0 0;font-size:13px;opacity:.8;">${eyebrow}</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:36px 40px;">
+              ${bodyHtml}
+            </td>
+          </tr>
+          <tr>
+            <td style="background:#f8fafc;padding:22px 40px;text-align:center;border-top:1px solid #eef2f7;">
+              <p style="margin:0;font-size:12px;color:#94a3b8;">
+                © ${new Date().getFullYear()} ${ctx.storeName}. Todos los derechos reservados.
+              </p>
+              <p style="margin:6px 0 0;font-size:11px;color:#cbd5e1;">
+                Este es un mensaje automático, no es necesario responder.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
+function ctaButton(text: string, url: string, ctx: EmailContext): string {
+  return `
+    <div style="text-align:center;margin-top:28px;">
+      <a href="${url}" style="display:inline-block;background:${ctx.primaryColor};color:${ctx.onPrimaryColor};text-decoration:none;padding:13px 32px;border-radius:8px;font-size:14px;font-weight:bold;">
+        ${text}
+      </a>
+    </div>`;
 }
 
 interface OrderEmailData {
@@ -67,7 +127,7 @@ function buildOrderConfirmationHtml(data: OrderEmailData, ctx: EmailContext): st
     : null;
 
   const transferBlock = isTransfer ? `
-    <div style="margin-top:20px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:20px;">
+    <div style="margin-top:24px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:20px;">
       <h3 style="font-size:13px;color:#166534;margin:0 0 12px;text-transform:uppercase;letter-spacing:.5px;">
         Datos para transferir al repartidor
       </h3>
@@ -76,13 +136,13 @@ function buildOrderConfirmationHtml(data: OrderEmailData, ctx: EmailContext): st
       </p>
       <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:12px;">
         <tr>
-          <td style="padding:8px 12px;background:#fff;border-radius:6px 6px 0 0;border:1px solid #d1fae5;border-bottom:none;">
+          <td style="padding:10px 14px;background:#fff;border-radius:8px 8px 0 0;border:1px solid #d1fae5;border-bottom:none;">
             <p style="margin:0;font-size:11px;color:#888;text-transform:uppercase;">Alias</p>
             <p style="margin:4px 0 0;font-size:16px;font-weight:bold;color:#166534;font-family:monospace;">${ctx.transferAlias}</p>
           </td>
         </tr>
         <tr>
-          <td style="padding:8px 12px;background:#fff;border-radius:0 0 6px 6px;border:1px solid #d1fae5;">
+          <td style="padding:10px 14px;background:#fff;border-radius:0 0 8px 8px;border:1px solid #d1fae5;">
             <p style="margin:0;font-size:11px;color:#888;text-transform:uppercase;">CVU</p>
             <p style="margin:4px 0 0;font-size:13px;color:#374151;font-family:monospace;">${ctx.transferCvu}</p>
           </td>
@@ -91,7 +151,7 @@ function buildOrderConfirmationHtml(data: OrderEmailData, ctx: EmailContext): st
       ${payPageUrl ? `
       <div style="text-align:center;margin-top:16px;">
         <a href="${payPageUrl}"
-          style="display:inline-block;background:#166534;color:#fff;text-decoration:none;padding:10px 20px;border-radius:6px;font-size:13px;font-weight:bold;">
+          style="display:inline-block;background:#166534;color:#fff;text-decoration:none;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:bold;">
           Ver página de pago con QR
         </a>
       </div>` : ""}
@@ -118,92 +178,56 @@ function buildOrderConfirmationHtml(data: OrderEmailData, ctx: EmailContext): st
 
   const addr = data.shippingAddress;
 
-  return `
-<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:32px 0;">
-    <tr>
-      <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);">
-          <!-- Header -->
-          <tr>
-            <td style="background:#1E3A8A;padding:28px 40px;text-align:center;">
-              <h1 style="color:#fff;margin:0;font-size:22px;">${ctx.storeName}</h1>
-              <p style="color:#93c5fd;margin:6px 0 0;font-size:13px;">Confirmación de pedido</p>
-            </td>
-          </tr>
-          <!-- Body -->
-          <tr>
-            <td style="padding:32px 40px;">
-              <p style="font-size:16px;color:#333;margin:0 0 8px;">
-                Hola${data.customerName ? `, ${data.customerName.split(" ")[0]}` : ""}!
-              </p>
-              <p style="font-size:14px;color:#555;margin:0 0 24px;">
-                Recibimos tu pedido y lo estamos procesando. Te avisaremos cuando sea despachado.
-              </p>
+  const bodyHtml = `
+    <p style="font-size:16px;color:#1e293b;margin:0 0 8px;">
+      Hola${data.customerName ? `, ${data.customerName.split(" ")[0]}` : ""}! 🎉
+    </p>
+    <p style="font-size:14px;color:#475569;line-height:1.6;margin:0 0 24px;">
+      Recibimos tu pedido y lo estamos procesando. Te avisaremos cuando sea despachado.
+    </p>
 
-              <!-- Order number -->
-              <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:16px;margin-bottom:24px;text-align:center;">
-                <p style="margin:0;font-size:12px;color:#888;text-transform:uppercase;letter-spacing:.5px;">Número de pedido</p>
-                <p style="margin:6px 0 0;font-size:20px;font-weight:bold;color:#1E3A8A;">${data.orderNumber}</p>
-              </div>
+    <div style="background:${ctx.tint};border-radius:12px;padding:16px;margin-bottom:24px;text-align:center;">
+      <p style="margin:0;font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:.5px;">Número de pedido</p>
+      <p style="margin:6px 0 0;font-size:20px;font-weight:bold;color:${ctx.primaryColor};">${data.orderNumber}</p>
+    </div>
 
-              <!-- Items -->
-              <h3 style="font-size:14px;color:#333;margin:0 0 12px;text-transform:uppercase;letter-spacing:.5px;">Detalle del pedido</h3>
-              <table width="100%" cellpadding="0" cellspacing="0">
-                ${itemsHtml}
-                <tr>
-                  <td style="padding:12px 0 0;font-weight:bold;font-size:15px;color:#333;">Total</td>
-                  <td style="padding:12px 0 0;text-align:right;font-weight:bold;font-size:15px;color:#1E3A8A;">
-                    $${data.total.toLocaleString("es-AR")}
-                  </td>
-                </tr>
-              </table>
+    <h3 style="font-size:14px;color:#1e293b;margin:0 0 12px;text-transform:uppercase;letter-spacing:.5px;">Detalle del pedido</h3>
+    <table width="100%" cellpadding="0" cellspacing="0">
+      ${itemsHtml}
+      <tr>
+        <td style="padding:12px 0 0;font-weight:bold;font-size:15px;color:#1e293b;">Total</td>
+        <td style="padding:12px 0 0;text-align:right;font-weight:bold;font-size:15px;color:${ctx.primaryColor};">
+          $${data.total.toLocaleString("es-AR")}
+        </td>
+      </tr>
+    </table>
 
-              <!-- Shipping -->
-              <div style="margin-top:24px;padding-top:20px;border-top:1px solid #f0f0f0;">
-                <h3 style="font-size:14px;color:#333;margin:0 0 8px;text-transform:uppercase;letter-spacing:.5px;">Envío a</h3>
-                <p style="margin:0;font-size:14px;color:#555;line-height:1.6;">
-                  ${addr.firstName} ${addr.lastName}<br>
-                  ${addr.street}<br>
-                  ${addr.city}, ${addr.state} ${addr.zipCode}
-                </p>
-              </div>
+    <div style="margin-top:24px;padding-top:20px;border-top:1px solid #f1f5f9;">
+      <h3 style="font-size:14px;color:#1e293b;margin:0 0 8px;text-transform:uppercase;letter-spacing:.5px;">Envío a</h3>
+      <p style="margin:0;font-size:14px;color:#475569;line-height:1.6;">
+        ${addr.firstName} ${addr.lastName}<br>
+        ${addr.street}<br>
+        ${addr.city}, ${addr.state} ${addr.zipCode}
+      </p>
+    </div>
 
-              <!-- Payment -->
-              <div style="margin-top:16px;">
-                <p style="margin:0;font-size:13px;color:#888;">
-                  Método de pago: <strong style="color:#555;">${paymentLabel}</strong>
-                </p>
-              </div>
+    <div style="margin-top:16px;">
+      <p style="margin:0;font-size:13px;color:#94a3b8;">
+        Método de pago: <strong style="color:#475569;">${paymentLabel}</strong>
+      </p>
+    </div>
 
-              ${transferBlock}
+    ${transferBlock}
 
-              <!-- CTA -->
-              <div style="text-align:center;margin-top:32px;">
-                <a href="${ctx.storeUrl}/account/orders"
-                  style="display:inline-block;background:#1E3A8A;color:#fff;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:14px;font-weight:bold;">
-                  Ver mis pedidos
-                </a>
-              </div>
-            </td>
-          </tr>
-          <!-- Footer -->
-          <tr>
-            <td style="background:#f8fafc;padding:20px 40px;text-align:center;border-top:1px solid #e2e8f0;">
-              <p style="margin:0;font-size:12px;color:#aaa;">
-                © ${new Date().getFullYear()} ${ctx.storeName}. Todos los derechos reservados.
-              </p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
+    ${ctaButton("Ver mis pedidos", `${ctx.storeUrl}/account/orders`, ctx)}
+  `;
+
+  return emailShell({
+    ctx,
+    eyebrow: "Confirmación de pedido",
+    preheader: `Pedido ${data.orderNumber} confirmado — total $${data.total.toLocaleString("es-AR")}`,
+    bodyHtml,
+  });
 }
 
 // ── Order status update ──────────────────────────────────────────────────────
@@ -237,60 +261,33 @@ export interface OrderStatusData {
 function buildOrderStatusHtml(data: OrderStatusData, ctx: EmailContext): string {
   const label = ORDER_STATUS_LABEL[data.newStatus] ?? data.newStatus;
   const icon = ORDER_STATUS_ICON[data.newStatus] ?? "📋";
-  return `
-<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:32px 0;">
-    <tr>
-      <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);">
-          <tr>
-            <td style="background:#1E3A8A;padding:28px 40px;text-align:center;">
-              <h1 style="color:#fff;margin:0;font-size:22px;">${ctx.storeName}</h1>
-              <p style="color:#93c5fd;margin:6px 0 0;font-size:13px;">Actualización de pedido</p>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:32px 40px;">
-              <p style="font-size:16px;color:#333;margin:0 0 8px;">
-                Hola${data.customerName ? `, ${data.customerName.split(" ")[0]}` : ""}!
-              </p>
-              <p style="font-size:14px;color:#555;margin:0 0 24px;">
-                Hubo una actualización en tu pedido.
-              </p>
-              <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:16px;margin-bottom:24px;text-align:center;">
-                <p style="margin:0;font-size:12px;color:#888;text-transform:uppercase;letter-spacing:.5px;">Número de pedido</p>
-                <p style="margin:6px 0 0;font-size:20px;font-weight:bold;color:#1E3A8A;">${data.orderNumber}</p>
-              </div>
-              <div style="text-align:center;margin-bottom:28px;">
-                <p style="margin:0 0 8px;font-size:13px;color:#888;text-transform:uppercase;letter-spacing:.5px;">Nuevo estado</p>
-                <span style="display:inline-block;background:#EFF6FF;color:#1E3A8A;border:1px solid #BFDBFE;border-radius:9999px;padding:8px 20px;font-size:16px;font-weight:bold;">
-                  ${icon} ${label}
-                </span>
-              </div>
-              <div style="text-align:center;margin-top:24px;">
-                <a href="${ctx.storeUrl}/account/orders"
-                  style="display:inline-block;background:#1E3A8A;color:#fff;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:14px;font-weight:bold;">
-                  Ver mis pedidos
-                </a>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td style="background:#f8fafc;padding:20px 40px;text-align:center;border-top:1px solid #e2e8f0;">
-              <p style="margin:0;font-size:12px;color:#aaa;">
-                © ${new Date().getFullYear()} ${ctx.storeName}. Todos los derechos reservados.
-              </p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
+
+  const bodyHtml = `
+    <p style="font-size:16px;color:#1e293b;margin:0 0 8px;">
+      Hola${data.customerName ? `, ${data.customerName.split(" ")[0]}` : ""}!
+    </p>
+    <p style="font-size:14px;color:#475569;line-height:1.6;margin:0 0 24px;">
+      Hubo una actualización en tu pedido.
+    </p>
+    <div style="background:${ctx.tint};border-radius:12px;padding:16px;margin-bottom:24px;text-align:center;">
+      <p style="margin:0;font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:.5px;">Número de pedido</p>
+      <p style="margin:6px 0 0;font-size:20px;font-weight:bold;color:${ctx.primaryColor};">${data.orderNumber}</p>
+    </div>
+    <div style="text-align:center;margin-bottom:8px;">
+      <p style="margin:0 0 8px;font-size:13px;color:#64748b;text-transform:uppercase;letter-spacing:.5px;">Nuevo estado</p>
+      <span style="display:inline-block;background:${ctx.tint};color:${ctx.primaryColor};border-radius:9999px;padding:8px 20px;font-size:16px;font-weight:bold;">
+        ${icon} ${label}
+      </span>
+    </div>
+    ${ctaButton("Ver mis pedidos", `${ctx.storeUrl}/account/orders`, ctx)}
+  `;
+
+  return emailShell({
+    ctx,
+    eyebrow: "Actualización de pedido",
+    preheader: `Pedido ${data.orderNumber}: ${label}`,
+    bodyHtml,
+  });
 }
 
 export async function sendOrderStatusUpdate(data: OrderStatusData): Promise<void> {
@@ -350,61 +347,34 @@ function buildRepairStatusHtml(data: RepairStatusData, ctx: EmailContext): strin
   const label = REPAIR_STATUS_LABEL[data.newStatus] ?? data.newStatus;
   const icon = REPAIR_STATUS_ICON[data.newStatus] ?? "🔧";
   const trackingUrl = `${ctx.storeUrl}/soporte-tecnico/seguimiento/${data.codigo}`;
-  return `
-<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:32px 0;">
-    <tr>
-      <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);">
-          <tr>
-            <td style="background:#1E3A8A;padding:28px 40px;text-align:center;">
-              <h1 style="color:#fff;margin:0;font-size:22px;">${ctx.storeName}</h1>
-              <p style="color:#93c5fd;margin:6px 0 0;font-size:13px;">Actualización de reparación</p>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:32px 40px;">
-              <p style="font-size:16px;color:#333;margin:0 0 8px;">
-                Hola, ${data.clienteNombre.split(" ")[0]}!
-              </p>
-              <p style="font-size:14px;color:#555;margin:0 0 24px;">
-                Tu equipo tiene una actualización de estado.
-              </p>
-              <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:16px;margin-bottom:20px;">
-                <p style="margin:0;font-size:12px;color:#888;text-transform:uppercase;letter-spacing:.5px;">Número de reparación</p>
-                <p style="margin:6px 0 8px;font-size:20px;font-weight:bold;color:#1E3A8A;">${data.codigo}</p>
-                <p style="margin:0;font-size:13px;color:#555;">${data.equipoMarca} ${data.equipoModelo}</p>
-              </div>
-              <div style="text-align:center;margin-bottom:28px;">
-                <p style="margin:0 0 8px;font-size:13px;color:#888;text-transform:uppercase;letter-spacing:.5px;">Nuevo estado</p>
-                <span style="display:inline-block;background:#EFF6FF;color:#1E3A8A;border:1px solid #BFDBFE;border-radius:9999px;padding:8px 20px;font-size:16px;font-weight:bold;">
-                  ${icon} ${label}
-                </span>
-              </div>
-              <div style="text-align:center;margin-top:24px;">
-                <a href="${trackingUrl}"
-                  style="display:inline-block;background:#1E3A8A;color:#fff;text-decoration:none;padding:12px 28px;border-radius:6px;font-size:14px;font-weight:bold;">
-                  Ver estado de mi reparación
-                </a>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td style="background:#f8fafc;padding:20px 40px;text-align:center;border-top:1px solid #e2e8f0;">
-              <p style="margin:0;font-size:12px;color:#aaa;">
-                © ${new Date().getFullYear()} ${ctx.storeName}. Todos los derechos reservados.
-              </p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
+
+  const bodyHtml = `
+    <p style="font-size:16px;color:#1e293b;margin:0 0 8px;">
+      Hola, ${data.clienteNombre.split(" ")[0]}!
+    </p>
+    <p style="font-size:14px;color:#475569;line-height:1.6;margin:0 0 24px;">
+      Tu equipo tiene una actualización de estado.
+    </p>
+    <div style="background:${ctx.tint};border-radius:12px;padding:16px;margin-bottom:20px;">
+      <p style="margin:0;font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:.5px;">Número de reparación</p>
+      <p style="margin:6px 0 8px;font-size:20px;font-weight:bold;color:${ctx.primaryColor};">${data.codigo}</p>
+      <p style="margin:0;font-size:13px;color:#475569;">${data.equipoMarca} ${data.equipoModelo}</p>
+    </div>
+    <div style="text-align:center;margin-bottom:8px;">
+      <p style="margin:0 0 8px;font-size:13px;color:#64748b;text-transform:uppercase;letter-spacing:.5px;">Nuevo estado</p>
+      <span style="display:inline-block;background:${ctx.tint};color:${ctx.primaryColor};border-radius:9999px;padding:8px 20px;font-size:16px;font-weight:bold;">
+        ${icon} ${label}
+      </span>
+    </div>
+    ${ctaButton("Ver estado de mi reparación", trackingUrl, ctx)}
+  `;
+
+  return emailShell({
+    ctx,
+    eyebrow: "Actualización de reparación",
+    preheader: `Reparación ${data.codigo}: ${label}`,
+    bodyHtml,
+  });
 }
 
 export async function sendRepairStatusUpdate(data: RepairStatusData): Promise<void> {
@@ -448,4 +418,95 @@ export async function sendOrderConfirmation(data: OrderEmailData): Promise<void>
   } catch (err) {
     console.error("[email] Error enviando confirmación:", err);
   }
+}
+
+// ── Welcome email ────────────────────────────────────────────────────────────
+
+function buildWelcomeHtml(name: string, ctx: EmailContext): string {
+  const firstName = name.split(" ")[0];
+  const bodyHtml = `
+    <p style="font-size:16px;color:#1e293b;margin:0 0 8px;">
+      ¡Hola${firstName ? `, ${firstName}` : ""}! 👋
+    </p>
+    <p style="font-size:14px;color:#475569;line-height:1.6;margin:0 0 24px;">
+      Gracias por crear tu cuenta en ${ctx.storeName}. Ya podés explorar productos,
+      guardar tus favoritos y hacer seguimiento de tus compras desde un solo lugar.
+    </p>
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:${ctx.tint};border-radius:12px;">
+      <tr>
+        <td style="padding:18px 20px;">
+          <p style="margin:0 0 10px;font-size:13px;color:#334155;">📦 &nbsp;Seguí el estado de tus pedidos</p>
+          <p style="margin:0 0 10px;font-size:13px;color:#334155;">🛒 &nbsp;Guardá productos en tus favoritos</p>
+          <p style="margin:0;font-size:13px;color:#334155;">📍 &nbsp;Guardá tus direcciones de envío</p>
+        </td>
+      </tr>
+    </table>
+    ${ctaButton("Ir a la tienda", ctx.storeUrl, ctx)}
+  `;
+
+  return emailShell({
+    ctx,
+    eyebrow: "¡Bienvenido/a!",
+    preheader: `Tu cuenta en ${ctx.storeName} ya está lista`,
+    bodyHtml,
+  });
+}
+
+export async function sendWelcomeEmail(data: { name: string; email: string }): Promise<void> {
+  if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY.startsWith("re_xxx")) {
+    console.warn("[email] RESEND_API_KEY no configurado, se omite el envío.");
+    return;
+  }
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  try {
+    const ctx = await getEmailContext();
+    await resend.emails.send({
+      from: ctx.fromEmail,
+      to: data.email,
+      subject: `¡Bienvenido/a a ${ctx.storeName}! 👋`,
+      html: buildWelcomeHtml(data.name, ctx),
+    });
+  } catch (err) {
+    console.error("[email] Error enviando bienvenida:", err);
+  }
+}
+
+// ── Password reset ───────────────────────────────────────────────────────────
+
+function buildPasswordResetHtml(resetUrl: string, ctx: EmailContext): string {
+  const bodyHtml = `
+    <p style="font-size:16px;color:#1e293b;margin:0 0 8px;">
+      Recuperación de contraseña
+    </p>
+    <p style="font-size:14px;color:#475569;line-height:1.6;margin:0 0 24px;">
+      Recibimos una solicitud para restablecer tu contraseña en ${ctx.storeName}.
+      Hacé clic en el botón para elegir una nueva.
+    </p>
+    ${ctaButton("Restablecer contraseña", resetUrl, ctx)}
+    <p style="font-size:12px;color:#94a3b8;margin:24px 0 0;text-align:center;">
+      Este enlace expira en 1 hora. Si no solicitaste este cambio, podés ignorar este mensaje.
+    </p>
+  `;
+
+  return emailShell({
+    ctx,
+    eyebrow: "Recuperación de contraseña",
+    preheader: "Restablecé tu contraseña — el enlace expira en 1 hora",
+    bodyHtml,
+  });
+}
+
+export async function sendPasswordResetEmail(email: string, resetUrl: string): Promise<void> {
+  if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY.startsWith("re_xxx")) {
+    console.warn("[email] RESEND_API_KEY no configurado, se omite el envío.");
+    return;
+  }
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const ctx = await getEmailContext();
+  await resend.emails.send({
+    from: ctx.fromEmail,
+    to: email,
+    subject: `Recuperá tu contraseña — ${ctx.storeName}`,
+    html: buildPasswordResetHtml(resetUrl, ctx),
+  });
 }

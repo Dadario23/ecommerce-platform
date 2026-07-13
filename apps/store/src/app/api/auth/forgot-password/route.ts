@@ -5,7 +5,7 @@ import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
 import { getClientIp, hitRateLimit } from "@/lib/rate-limit";
 import { getBaseUrl } from "@/lib/base-url";
-import { getTenantSecrets } from "@/lib/tenant-secrets";
+import { sendPasswordResetEmail } from "@/lib/email";
 
 const ForgotSchema = z.object({ email: z.string().email() });
 
@@ -89,25 +89,8 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // 🎯 MODO PRODUCCIÓN: Código original con Resend (se ejecutará solo en producción)
-    const { Resend } = await import("resend");
-    const resend = new Resend(process.env.RESEND_API_KEY);
-
-    const { fromEmail } = await getTenantSecrets();
-    await resend.emails.send({
-      from: fromEmail || process.env.RESEND_EMAIL_FROM || "onboarding@resend.dev",
-      to: email,
-      subject: "Recupera tu contraseña",
-      html: `
-        <h2>Recuperación de contraseña</h2>
-        <p>Haz click en el siguiente enlace para restablecer tu contraseña:</p>
-        <a href="${resetUrl}" style="background:#0070f3;color:white;padding:12px 24px;text-decoration:none;border-radius:4px;display:inline-block;">
-          Restablecer contraseña
-        </a>
-        <p>Este enlace expira en 1 hora.</p>
-        <p>Si no solicitaste este cambio, ignora este email.</p>
-      `,
-    });
+    // 🎯 MODO PRODUCCIÓN
+    await sendPasswordResetEmail(email, resetUrl);
 
     return NextResponse.json({
       message: "Si el email existe, recibirás un enlace de recuperación",

@@ -5,6 +5,7 @@ import { z } from "zod";
 import { verifyPassword } from "@/lib/auth-helpers";
 import { getModels } from "@/lib/tenant-models";
 import { peekRateLimit, hitRateLimit, resetRateLimit } from "@/lib/rate-limit";
+import { sendWelcomeEmail } from "@/lib/email";
 
 const LOGIN_LIMIT = 8;
 const LOGIN_WINDOW_MS = 15 * 60 * 1000;
@@ -84,6 +85,8 @@ export const authOptions: AuthOptions = {
             image: user.image,
             role: "user",
           });
+          // Email de bienvenida (no bloquea el login si falla)
+          sendWelcomeEmail({ name: user.name ?? "", email: user.email ?? "" }).catch(() => {});
         } else {
           await User.updateOne(
             { email: user.email },
