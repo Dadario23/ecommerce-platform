@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Eye, EyeOff, Loader2, CheckCircle } from "lucide-react";
+import { Eye, EyeOff, Loader2, CheckCircle, Check, X } from "lucide-react";
 import { passwordSchema } from "@/lib/password-policy";
 import PasswordChecklist from "@/components/auth/PasswordChecklist";
 
@@ -37,6 +37,10 @@ export default function RegisterForm() {
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormData>({ resolver: zodResolver(registerSchema) });
   const passwordValue = watch("password") ?? "";
+  const confirmValue = watch("confirmPassword") ?? "";
+  const confirmStarted = confirmValue.length > 0;
+  const passwordsMatch = confirmStarted && confirmValue === passwordValue;
+  const passwordsMismatch = confirmStarted && confirmValue !== passwordValue;
 
   const [errorMsg, setErrorMsg] = useState("");
   const [success, setSuccess] = useState(false);
@@ -147,8 +151,14 @@ export default function RegisterForm() {
             type={showConfirm ? "text" : "password"}
             placeholder="Repetí tu contraseña"
             {...register("confirmPassword")}
-            className={`${INPUT} pr-10`}
+            className={`${INPUT} pr-16`}
           />
+          {passwordsMatch && (
+            <Check className="absolute right-10 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
+          )}
+          {passwordsMismatch && (
+            <X className="absolute right-10 top-1/2 -translate-y-1/2 w-4 h-4 text-red-500" />
+          )}
           <button
             type="button"
             onClick={() => setShowConfirm((v) => !v)}
@@ -157,7 +167,13 @@ export default function RegisterForm() {
             {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
         </div>
-        {errors.confirmPassword && (
+        {passwordsMismatch && (
+          <p className="text-xs text-red-500 mt-1">Las contraseñas no coinciden</p>
+        )}
+        {passwordsMatch && (
+          <p className="text-xs text-emerald-600 mt-1">Las contraseñas coinciden</p>
+        )}
+        {!confirmStarted && errors.confirmPassword && (
           <p className="text-xs text-red-500 mt-1">{errors.confirmPassword.message}</p>
         )}
       </div>
