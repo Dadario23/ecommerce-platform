@@ -19,9 +19,11 @@ import {
   ChevronRight,
   Plus,
   ShieldCheck,
+  Store,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import NotificationBell from "@/components/NotificationBell";
+import { isAdmin } from "@/lib/roles";
 
 const ALL_NAV_ITEMS = [
   { href: "/soporte-tecnico/admin",              label: "Overview",      icon: LayoutDashboard, exact: true,  roles: ["admin","superadmin","receptionist","technician"] },
@@ -137,6 +139,19 @@ function Sidebar({ collapsed, onToggle, role }: { collapsed: boolean; onToggle: 
             <Wrench className="w-4 h-4 shrink-0" />
             {!collapsed && <span className="whitespace-nowrap">Ver soporte</span>}
           </Link>
+          {isAdmin(role) && (
+            <Link
+              href="/dashboard"
+              title={collapsed ? "Ir al dashboard de tienda" : undefined}
+              className={cn(
+                "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-colors",
+                collapsed && "justify-center px-2",
+              )}
+            >
+              <Store className="w-4 h-4 shrink-0" />
+              {!collapsed && <span className="whitespace-nowrap">Ir al dashboard de tienda</span>}
+            </Link>
+          )}
         </div>
       </nav>
 

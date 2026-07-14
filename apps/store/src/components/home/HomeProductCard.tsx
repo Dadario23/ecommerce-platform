@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import { INSTALLMENTS } from "@/config/installments";
+import { cloudinaryBlurDataUrl } from "@/lib/image-blur";
 
 interface HomeProductCardProps {
   id: string;
@@ -29,6 +30,8 @@ export default function HomeProductCard({
     ? Math.round(((compareAtPrice - price) / compareAtPrice) * 100)
     : 0;
   const installment = Math.ceil(price / INSTALLMENTS.max);
+  const blurUrl = cloudinaryBlurDataUrl(image || "");
+  const hoverBlurUrl = hoverImage ? cloudinaryBlurDataUrl(hoverImage) : undefined;
 
   return (
     <Link
@@ -49,6 +52,8 @@ export default function HomeProductCard({
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
           className="object-contain p-3 group-hover:scale-105 transition-transform duration-300 minimal:object-cover minimal:p-0"
+          placeholder={blurUrl ? "blur" : "empty"}
+          blurDataURL={blurUrl}
         />
         {hoverImage && (
           <Image
@@ -57,6 +62,8 @@ export default function HomeProductCard({
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
             className="hidden minimal:block object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            placeholder={hoverBlurUrl ? "blur" : "empty"}
+            blurDataURL={hoverBlurUrl}
           />
         )}
       </div>

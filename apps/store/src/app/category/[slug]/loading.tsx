@@ -1,6 +1,10 @@
 import ProductGridSkeleton from "@/components/category/ProductGridSkeleton";
+import { getClientConfig } from "@/config/client";
 
-export default function Loading() {
+export default async function Loading() {
+  const { theme } = await getClientConfig();
+  const listView = theme.cardStyle !== "minimal";
+
   return (
     <main className="pt-20 md:pt-32 px-4 max-w-7xl mx-auto">
       <div className="flex gap-6">
@@ -17,7 +21,7 @@ export default function Loading() {
         {/* Skeleton del grid de productos */}
         <section className="flex-1">
           <div className="h-8 bg-gray-200 rounded w-1/3 mb-6 animate-pulse"></div>
-          <ProductGridSkeleton items={9} />
+          <ProductGridSkeleton items={9} listView={listView} />
         </section>
       </div>
     </main>

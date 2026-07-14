@@ -52,7 +52,7 @@ export default function MisReparacionesPage() {
   }
 
   return (
-    <main className="pt-20 pb-20 bg-gray-50 min-h-screen">
+    <main className="pt-20 md:pt-32 pb-20 bg-gray-50 min-h-screen">
       <div className="max-w-lg mx-auto px-4 space-y-5 pt-6">
 
         {/* Header */}

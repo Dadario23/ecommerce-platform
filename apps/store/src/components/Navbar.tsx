@@ -19,6 +19,7 @@ import {
   Wrench,
   UserCircle,
   Heart,
+  Store,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -37,12 +38,18 @@ import { useCartStore } from "@/store/useCartStore";
 import { useFavoritesSync } from "@/hooks/useFavoritesSync";
 import Image from "next/image";
 import type { TenantTheme } from "@/config/tenant-themes";
+import { isAdmin, isStaff } from "@/lib/roles";
 
 interface Category {
   _id: string;
   name: string;
   slug?: string;
 }
+
+const SOPORTE_LINKS = [
+  { href: "/soporte-tecnico", label: "Inicio", exact: true },
+  { href: "/soporte-tecnico/seguimiento", label: "Mis reparaciones", exact: false },
+];
 
 function getSlug(cat: Category) {
   return (
@@ -74,6 +81,7 @@ export default function Navbar({
   const router = useRouter();
   const pathname = usePathname();
   const { data: session } = useSession();
+  const inSoporte = pathname.startsWith("/soporte-tecnico");
 
   const { isLoading } = useCartWithSession();
   const itemsCount = useCartStore((state) =>
@@ -207,17 +215,27 @@ export default function Navbar({
                       </Link>
                     </DropdownMenuItem>
 
-                    {session.user?.role === "admin" && (
+                    {(isStaff(session.user?.role) && showRepairs) || isAdmin(session.user?.role) ? (
                       <>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                          <Link href="/dashboard" className="flex items-center gap-2">
-                            <LayoutDashboard className="w-4 h-4 text-(--tenant-primary)" />
-                            <span className="text-(--tenant-primary) font-medium">Dashboard</span>
-                          </Link>
-                        </DropdownMenuItem>
+                        {isStaff(session.user?.role) && showRepairs && (
+                          <DropdownMenuItem asChild>
+                            <Link href="/soporte-tecnico/admin" className="flex items-center gap-2">
+                              <Wrench className="w-4 h-4 text-(--tenant-primary)" />
+                              <span className="text-(--tenant-primary) font-medium">Admin soporte</span>
+                            </Link>
+                          </DropdownMenuItem>
+                        )}
+                        {isAdmin(session.user?.role) && (
+                          <DropdownMenuItem asChild>
+                            <Link href="/dashboard" className="flex items-center gap-2">
+                              <LayoutDashboard className="w-4 h-4 text-(--tenant-primary)" />
+                              <span className="text-(--tenant-primary) font-medium">Dashboard</span>
+                            </Link>
+                          </DropdownMenuItem>
+                        )}
                       </>
-                    )}
+                    ) : null}
 
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
@@ -277,29 +295,60 @@ export default function Navbar({
         <nav className="hidden md:block bg-white border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4">
             <div className={`flex items-center overflow-x-auto scrollbar-none ${light ? "gap-2 justify-center" : "gap-1"}`}>
-              {initialCategories.map((cat) => (
-                <button
-                  key={cat._id}
-                  onClick={() => goToCategory(cat)}
-                  className={
-                    light
-                      ? "px-3.5 py-3 whitespace-nowrap text-xs font-bold uppercase tracking-wider text-gray-900 hover:text-(--tenant-accent) transition-colors shrink-0"
-                      : "px-3.5 py-2.5 whitespace-nowrap text-sm text-gray-600 hover:text-(--tenant-primary) hover:bg-(--tenant-tint) font-medium transition-colors rounded-md shrink-0"
-                  }
-                >
-                  {cat.name}
-                </button>
-              ))}
-              {showRepairs && (
+              {inSoporte ? (
                 <>
-                  <div className="w-px h-4 bg-gray-200 mx-1 shrink-0" />
                   <Link
-                    href="/soporte-tecnico"
-                    className="flex items-center gap-1.5 px-3.5 py-2.5 whitespace-nowrap text-sm text-(--tenant-primary) hover:bg-(--tenant-tint) font-semibold transition-colors rounded-md shrink-0"
+                    href="/"
+                    className="flex items-center gap-1.5 px-3.5 py-2.5 whitespace-nowrap text-sm text-gray-600 hover:text-(--tenant-primary) hover:bg-(--tenant-tint) font-medium transition-colors rounded-md shrink-0"
                   >
-                    <Wrench className="w-3.5 h-3.5" />
-                    Soporte Técnico
+                    <Store className="w-3.5 h-3.5" />
+                    Tienda
                   </Link>
+                  <div className="w-px h-4 bg-gray-200 mx-1 shrink-0" />
+                  {SOPORTE_LINKS.map(({ href, label, exact }) => {
+                    const active = exact ? pathname === href : pathname.startsWith(href);
+                    return (
+                      <Link
+                        key={href}
+                        href={href}
+                        className={`px-3.5 py-2.5 whitespace-nowrap text-sm font-medium transition-colors rounded-md shrink-0 ${
+                          active
+                            ? "text-(--tenant-primary) bg-(--tenant-tint)"
+                            : "text-gray-600 hover:text-(--tenant-primary) hover:bg-(--tenant-tint)"
+                        }`}
+                      >
+                        {label}
+                      </Link>
+                    );
+                  })}
+                </>
+              ) : (
+                <>
+                  {initialCategories.map((cat) => (
+                    <button
+                      key={cat._id}
+                      onClick={() => goToCategory(cat)}
+                      className={
+                        light
+                          ? "px-3.5 py-3 whitespace-nowrap text-xs font-bold uppercase tracking-wider text-gray-900 hover:text-(--tenant-accent) transition-colors shrink-0"
+                          : "px-3.5 py-2.5 whitespace-nowrap text-sm text-gray-600 hover:text-(--tenant-primary) hover:bg-(--tenant-tint) font-medium transition-colors rounded-md shrink-0"
+                      }
+                    >
+                      {cat.name}
+                    </button>
+                  ))}
+                  {showRepairs && (
+                    <>
+                      <div className="w-px h-4 bg-gray-200 mx-1 shrink-0" />
+                      <Link
+                        href="/soporte-tecnico"
+                        className="flex items-center gap-1.5 px-3.5 py-2.5 whitespace-nowrap text-sm text-(--tenant-primary) hover:bg-(--tenant-tint) font-semibold transition-colors rounded-md shrink-0"
+                      >
+                        <Wrench className="w-3.5 h-3.5" />
+                        Soporte Técnico
+                      </Link>
+                    </>
+                  )}
                 </>
               )}
             </div>
@@ -360,31 +409,73 @@ export default function Navbar({
             {/* Categories list */}
             <div className="flex-1 overflow-y-auto">
               <p className="px-4 pt-4 pb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
-                Categorías
+                {inSoporte ? "Soporte técnico" : "Categorías"}
               </p>
               <ul className="divide-y divide-gray-100">
-                {initialCategories.map((cat) => (
-                  <li key={cat._id}>
-                    <button
-                      onClick={() => goToCategory(cat)}
-                      className="w-full flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:bg-(--tenant-tint) hover:text-(--tenant-primary) transition-colors text-left"
-                    >
-                      {cat.name}
-                      <ChevronRight className="w-4 h-4 text-gray-300 shrink-0" />
-                    </button>
-                  </li>
-                ))}
-                {showRepairs && (
-                  <li>
-                    <Link
-                      href="/soporte-tecnico"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 text-sm text-(--tenant-primary) font-semibold hover:bg-(--tenant-tint)"
-                    >
-                      <Wrench className="w-4 h-4" />
-                      Soporte Técnico
-                    </Link>
-                  </li>
+                {inSoporte ? (
+                  <>
+                    <li>
+                      <Link
+                        href="/"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:bg-(--tenant-tint) hover:text-(--tenant-primary) transition-colors text-left"
+                      >
+                        <span className="flex items-center gap-3">
+                          <Store className="w-4 h-4 text-gray-400" />
+                          Tienda
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-gray-300 shrink-0" />
+                      </Link>
+                    </li>
+                    {SOPORTE_LINKS.map(({ href, label, exact }) => {
+                      const active = exact ? pathname === href : pathname.startsWith(href);
+                      return (
+                        <li key={href}>
+                          <Link
+                            href={href}
+                            onClick={() => setMobileMenuOpen(false)}
+                            className={`flex items-center justify-between px-4 py-3 text-sm transition-colors text-left ${
+                              active
+                                ? "bg-(--tenant-tint) text-(--tenant-primary) font-semibold"
+                                : "text-gray-700 hover:bg-(--tenant-tint) hover:text-(--tenant-primary)"
+                            }`}
+                          >
+                            <span className="flex items-center gap-3">
+                              <Wrench className="w-4 h-4 text-gray-400" />
+                              {label}
+                            </span>
+                            <ChevronRight className="w-4 h-4 text-gray-300 shrink-0" />
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </>
+                ) : (
+                  <>
+                    {initialCategories.map((cat) => (
+                      <li key={cat._id}>
+                        <button
+                          onClick={() => goToCategory(cat)}
+                          className="w-full flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:bg-(--tenant-tint) hover:text-(--tenant-primary) transition-colors text-left"
+                        >
+                          {cat.name}
+                          <ChevronRight className="w-4 h-4 text-gray-300 shrink-0" />
+                        </button>
+                      </li>
+                    ))}
+                    {showRepairs && (
+                      <li>
+                        <Link
+                          href="/soporte-tecnico"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="flex items-center gap-3 px-4 py-3 text-sm text-(--tenant-primary) font-semibold hover:bg-(--tenant-tint)"
+                        >
+                          <Wrench className="w-4 h-4" />
+                          Soporte Técnico
+                        </Link>
+                      </li>
+                    )}
+                  </>
                 )}
               </ul>
 
@@ -425,7 +516,19 @@ export default function Navbar({
                         Mis favoritos
                       </Link>
                     </li>
-                    {session.user?.role === "admin" && (
+                    {isStaff(session.user?.role) && showRepairs && (
+                      <li>
+                        <Link
+                          href="/soporte-tecnico/admin"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="flex items-center gap-3 px-4 py-3 text-sm text-(--tenant-primary) font-medium hover:bg-(--tenant-tint)"
+                        >
+                          <Wrench className="w-4 h-4" />
+                          Admin soporte
+                        </Link>
+                      </li>
+                    )}
+                    {isAdmin(session.user?.role) && (
                       <li>
                         <Link
                           href="/dashboard"

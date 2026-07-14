@@ -4,6 +4,7 @@ import ShippingBadge from "@/components/products/ShippingBadge";
 import { ShippingZoneResult } from "@/hooks/useShippingZone";
 import FavoriteButton from "@/components/ui/FavoriteButton";
 import { INSTALLMENTS } from "@/config/installments";
+import { cloudinaryBlurDataUrl } from "@/lib/image-blur";
 
 interface Product {
   _id: string;
@@ -28,6 +29,8 @@ interface Props {
 
 export default function CategoryProductCard({ product, listView = false, shippingZone, shippingEnabled = true }: Props) {
   const image       = product.images?.[0] ?? "";
+  const blurUrl     = cloudinaryBlurDataUrl(image);
+  const hoverBlurUrl = product.images?.[1] ? cloudinaryBlurDataUrl(product.images[1]) : undefined;
   const priceDiff   = product.compareAtPrice ? product.compareAtPrice - product.price : 0;
   const hasDiscount = !!(product.compareAtPrice && product.compareAtPrice > product.price && priceDiff >= 500);
   const discountPct = hasDiscount ? Math.round((priceDiff / product.compareAtPrice!) * 100) : 0;
@@ -62,6 +65,8 @@ export default function CategoryProductCard({ product, listView = false, shippin
             fill
             sizes="(max-width: 640px) 144px, 176px"
             className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+            placeholder={blurUrl ? "blur" : "empty"}
+            blurDataURL={blurUrl}
           />
         </div>
 
@@ -146,6 +151,8 @@ export default function CategoryProductCard({ product, listView = false, shippin
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           className="object-contain p-3 group-hover:scale-105 transition-transform duration-300 minimal:object-cover minimal:p-0"
+          placeholder={blurUrl ? "blur" : "empty"}
+          blurDataURL={blurUrl}
         />
         {product.images?.[1] && (
           <Image
@@ -154,6 +161,8 @@ export default function CategoryProductCard({ product, listView = false, shippin
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="hidden minimal:block object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            placeholder={hoverBlurUrl ? "blur" : "empty"}
+            blurDataURL={hoverBlurUrl}
           />
         )}
       </div>

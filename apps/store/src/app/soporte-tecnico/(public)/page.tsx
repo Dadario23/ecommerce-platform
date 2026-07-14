@@ -43,7 +43,7 @@ export default async function SoporteTecnicoPage() {
     <main className="pb-20 bg-gray-50 min-h-screen">
 
       {/* ── HERO ── */}
-      <section className="bg-(--tenant-primary) text-white pt-20 pb-12 md:pt-24 md:pb-16 px-4">
+      <section className="bg-(--tenant-primary) text-white pt-20 pb-12 md:pt-32 md:pb-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-(--tenant-on-primary)/80 text-xs font-semibold uppercase tracking-widest mb-3">
             Soporte Técnico

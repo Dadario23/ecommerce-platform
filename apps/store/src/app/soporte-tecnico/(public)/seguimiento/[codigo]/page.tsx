@@ -125,7 +125,7 @@ export default function SeguimientoDetailPage() {
   // ── Loading ────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <main className="pt-20 pb-20 bg-gray-50 min-h-screen">
+      <main className="pt-20 md:pt-32 pb-20 bg-gray-50 min-h-screen">
         <div className="max-w-lg mx-auto px-4 flex flex-col items-center justify-center py-20 gap-3">
           <Loader2 className="w-8 h-8 animate-spin text-(--tenant-primary)" />
           <p className="text-sm text-gray-500">Cargando seguimiento…</p>
@@ -137,7 +137,7 @@ export default function SeguimientoDetailPage() {
   // ── Not found ──────────────────────────────────────────────────────────
   if (notFound || !rep) {
     return (
-      <main className="pt-20 pb-20 bg-gray-50 min-h-screen">
+      <main className="pt-20 md:pt-32 pb-20 bg-gray-50 min-h-screen">
         <div className="max-w-lg mx-auto px-4 space-y-5">
           <Link
             href="/soporte-tecnico/seguimiento"

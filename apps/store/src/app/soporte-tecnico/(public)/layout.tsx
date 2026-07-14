@@ -1,4 +1,3 @@
-import SoporteNavbar from "@/components/SoporteNavbar";
 import ChatBotWidget from "../ChatBotWidget";
 
 export default function SoporteTecnicoLayout({
@@ -8,7 +7,6 @@ export default function SoporteTecnicoLayout({
 }) {
   return (
     <>
-      <SoporteNavbar />
       {children}
       <ChatBotWidget />
     </>

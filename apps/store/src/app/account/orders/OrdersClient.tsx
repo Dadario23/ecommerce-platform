@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
+import { safeImageSrc } from "@/lib/safe-image-src";
 import {
   Clock, Truck, CheckCircle, XCircle, Package,
   ArrowRight, ChevronRight, ShoppingBag,
@@ -90,7 +91,7 @@ function OrderCard({ order }: { order: Order }) {
         <div className="relative w-[72px] h-[72px] shrink-0 rounded-xl overflow-hidden border border-gray-100 bg-gray-50">
           {firstItem?.image ? (
             <Image
-              src={firstItem.image}
+              src={safeImageSrc(firstItem.image, "/placeholder.png")}
               alt={firstItem.name}
               fill
               sizes="72px"
@@ -141,7 +142,7 @@ function OrderCard({ order }: { order: Order }) {
   );
 }
 
-function OrderSkeleton() {
+export function OrderSkeleton() {
   return (
     <div className="animate-pulse border border-gray-100 rounded-2xl overflow-hidden bg-white">
       <div className="p-4 flex items-start gap-4">

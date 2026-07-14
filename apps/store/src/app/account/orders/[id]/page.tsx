@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { safeImageSrc } from "@/lib/safe-image-src";
 import {
   ArrowLeft, Clock, Package, Truck, CheckCircle, XCircle,
   Home, CreditCard, MapPin, CalendarDays, Ban, AlertTriangle,
@@ -310,7 +311,7 @@ export default function OrderDetailPage() {
             <li key={i} className="flex items-center gap-4 px-4 py-3">
               <div className="relative w-14 h-14 shrink-0 rounded-lg overflow-hidden border border-gray-100 bg-gray-50">
                 <Image
-                  src={item.image || "/placeholder.png"}
+                  src={safeImageSrc(item.image, "/placeholder.png")}
                   alt={item.name}
                   fill
                   sizes="56px"

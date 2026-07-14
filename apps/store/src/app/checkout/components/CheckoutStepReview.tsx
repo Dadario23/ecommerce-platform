@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Spinner from "@/components/ui/Spinner";
+import { safeImageSrc } from "@/lib/safe-image-src";
 import { Truck, CreditCard, Lock, ShieldCheck, ChevronLeft } from "lucide-react";
 import type { AddressData, CartItem, DeliveryMethod, PaymentMethod, ShippingType, ShippingZone } from "../types";
 import { addBusinessDays, formatDateLong } from "../helpers";
@@ -68,7 +69,7 @@ export default function CheckoutStepReview({
             <li key={item.id} className="flex items-center gap-3 py-3">
               <div className="relative w-14 h-14 shrink-0 rounded-xl overflow-hidden border border-gray-100 bg-gray-50">
                 <Image
-                  src={item.image || "/placeholder-category.jpg"}
+                  src={safeImageSrc(item.image, "/placeholder-category.jpg")}
                   alt={item.name}
                   fill
                   sizes="56px"

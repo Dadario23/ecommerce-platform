@@ -30,7 +30,7 @@ export default function LayoutWrapper({
 
   const hideNavbar =
     pathname.startsWith("/dashboard") ||
-    pathname.startsWith("/soporte-tecnico");
+    pathname.startsWith("/soporte-tecnico/admin");
 
   return (
     <>

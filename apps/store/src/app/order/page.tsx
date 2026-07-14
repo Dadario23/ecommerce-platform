@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { safeImageSrc } from "@/lib/safe-image-src";
 import { useCartStore } from "@/store/useCartStore";
 import { useSession } from "next-auth/react";
 import Spinner from "@/components/ui/Spinner";
@@ -81,7 +82,7 @@ export default function OrderPage() {
               <li key={item.id} className="flex gap-4 p-4">
                 <div className="relative w-20 h-20 shrink-0 rounded-xl overflow-hidden border border-gray-100 bg-gray-50">
                   <Image
-                    src={item.image || "/placeholder.png"}
+                    src={safeImageSrc(item.image, "/placeholder.png")}
                     alt={item.name}
                     fill
                     sizes="80px"

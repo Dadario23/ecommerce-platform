@@ -17,6 +17,7 @@ import AuthModal from "@/components/auth/AuthModal";
 import Image from "next/image";
 import Link from "next/link";
 import { INSTALLMENTS } from "@/config/installments";
+import { cloudinaryBlurDataUrl } from "@/lib/image-blur";
 
 export default function CartDrawer() {
   const router = useRouter();
@@ -122,6 +123,8 @@ export default function CartDrawer() {
                         fill
                         sizes="72px"
                         className="object-contain p-1.5"
+                        placeholder={cloudinaryBlurDataUrl(item.image) ? "blur" : "empty"}
+                        blurDataURL={cloudinaryBlurDataUrl(item.image)}
                       />
                     </Link>
 

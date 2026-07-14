@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, ZoomIn, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { cloudinaryBlurDataUrl } from "@/lib/image-blur";
 
 interface ImageGalleryProps {
   images: string[];
@@ -24,6 +25,7 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
 
   const prev = () => setSelected((i) => (i - 1 + images.length) % images.length);
   const next = () => setSelected((i) => (i + 1) % images.length);
+  const currentBlurUrl = cloudinaryBlurDataUrl(images[selected]);
 
   return (
     <>
@@ -41,6 +43,8 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
             sizes="(max-width: 768px) 100vw, 50vw"
             className="object-contain p-4 transition-transform duration-300 group-hover:scale-105"
             priority
+            placeholder={currentBlurUrl ? "blur" : "empty"}
+            blurDataURL={currentBlurUrl}
           />
 
           {/* Nav arrows */}
@@ -94,6 +98,8 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
                   fill
                   sizes="80px"
                   className="object-contain p-1"
+                  placeholder={cloudinaryBlurDataUrl(img) ? "blur" : "empty"}
+                  blurDataURL={cloudinaryBlurDataUrl(img)}
                 />
               </button>
             ))}
@@ -141,6 +147,8 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
               fill
               sizes="90vw"
               className="object-contain"
+              placeholder={currentBlurUrl ? "blur" : "empty"}
+              blurDataURL={currentBlurUrl}
             />
           </div>
         </div>

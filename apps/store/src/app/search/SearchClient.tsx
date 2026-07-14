@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Home, ChevronRight, SlidersHorizontal, X, ChevronDown, Search } from "lucide-react";
 import FiltersSidebar, { ActiveFilters } from "@/components/category/FiltersSidebar";
 import CategoryProductCard from "@/components/category/CategoryProductCard";
+import ProductCardSkeleton from "@/components/category/ProductCardSkeleton";
 import {
   Pagination,
   PaginationContent,
@@ -42,20 +43,6 @@ const SORT_LABELS: Record<SortOption, string> = {
 
 const ITEMS_PER_PAGE = 12;
 
-function ProductSkeleton() {
-  return (
-    <div className="bg-white rounded-xl border border-gray-100 overflow-hidden animate-pulse">
-      <div className="aspect-square bg-gray-100" />
-      <div className="p-3 space-y-2">
-        <div className="h-2.5 bg-gray-100 rounded w-1/3" />
-        <div className="h-3 bg-gray-100 rounded w-full" />
-        <div className="h-3 bg-gray-100 rounded w-3/4" />
-        <div className="h-4 bg-gray-100 rounded w-1/2 mt-2" />
-      </div>
-    </div>
-  );
-}
-
 interface Props {
   shippingEnabled?: boolean;
   gridCards?: boolean;
@@ -68,7 +55,7 @@ export default function SearchClient({ shippingEnabled = true, gridCards = false
 
   const [products, setProducts] = useState<Product[]>([]);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(!!query.trim());
   const [sort, setSort] = useState<SortOption>("relevant");
   const [sortOpen, setSortOpen] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -256,9 +243,9 @@ export default function SearchClient({ shippingEnabled = true, gridCards = false
           {/* Results */}
           <section className="flex-1 min-w-0">
             {loading ? (
-              <div className="flex flex-col gap-3">
+              <div className={gridCards ? "grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8" : "flex flex-col gap-3"}>
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <ProductSkeleton key={i} />
+                  <ProductCardSkeleton key={i} listView={!gridCards} />
                 ))}
               </div>
             ) : paginatedProducts.length > 0 ? (
