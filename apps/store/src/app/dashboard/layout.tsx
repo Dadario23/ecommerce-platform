@@ -1,11 +1,11 @@
 import { getClientConfig } from "@/config/client";
-import DashboardShell from "./DashboardShell";
+import AdminShell from "@/components/admin/AdminShell";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { modules, theme, storeName } = await getClientConfig();
   return (
-    <DashboardShell repairsEnabled={modules.repairs} logo={theme.logo} storeName={storeName}>
+    <AdminShell repairsEnabled={modules.repairs} logo={theme.logo} storeName={storeName}>
       {children}
-    </DashboardShell>
+    </AdminShell>
   );
 }

@@ -3,27 +3,28 @@
 import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
-import Sidebar from "@/components/dashboard/Sidebar";
-import type { TenantTheme } from "@/config/tenant-themes";
-import { Menu, X, Store, LogOut } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
+import { Menu, X, Store, LogOut } from "lucide-react";
+import { cn } from "@/lib/utils";
+import AdminSidebar from "./AdminSidebar";
+import NotificationBell from "@/components/NotificationBell";
+import type { TenantTheme } from "@/config/tenant-themes";
+import { TIENDA_PAGE_TITLES, SOPORTE_ITEMS, isNavItemActive } from "./admin-nav";
 
-const PAGE_TITLES: Record<string, string> = {
-  "/dashboard": "Dashboard",
-  "/dashboard/orders": "Órdenes",
-  "/dashboard/products": "Productos",
-  "/dashboard/products/new": "Nuevo producto",
-  "/dashboard/categories": "Categorías",
-  "/dashboard/categories/new": "Nueva categoría",
-  "/dashboard/coupons": "Cupones",
-  "/dashboard/customers": "Clientes",
-  "/dashboard/analytics": "Analytics",
-  "/dashboard/carousel": "Carousel",
-  "/dashboard/shipping": "Tarifas de envío",
-  "/dashboard/settings": "Configuración",
-};
+function tiendaPageTitle(pathname: string): string {
+  return (
+    Object.entries(TIENDA_PAGE_TITLES).find(
+      ([key]) => key === pathname || pathname.startsWith(key + "/"),
+    )?.[1] ?? "Dashboard"
+  );
+}
 
-export default function DashboardShell({
+function soportePageTitle(pathname: string): string {
+  return SOPORTE_ITEMS.find((item) => isNavItemActive(item, pathname))?.label ?? "Admin";
+}
+
+export default function AdminShell({
   children,
   repairsEnabled,
   logo,
@@ -39,10 +40,8 @@ export default function DashboardShell({
   const { data: session } = useSession();
   const pathname = usePathname();
 
-  const pageTitle =
-    Object.entries(PAGE_TITLES).find(([key]) =>
-      key === pathname || pathname.startsWith(key + "/")
-    )?.[1] ?? "Dashboard";
+  const section: "tienda" | "soporte" = pathname.startsWith("/soporte-tecnico") ? "soporte" : "tienda";
+  const pageTitle = section === "tienda" ? tiendaPageTitle(pathname) : soportePageTitle(pathname);
 
   const initials = (session?.user?.name || "A")
     .split(" ")
@@ -55,7 +54,7 @@ export default function DashboardShell({
     <div className="min-h-screen bg-slate-50 flex">
       {/* Sidebar desktop */}
       <div className="hidden lg:flex sticky top-0 h-screen">
-        <Sidebar
+        <AdminSidebar
           collapsed={sidebarCollapsed}
           onToggle={() => setSidebarCollapsed((p) => !p)}
           repairsEnabled={repairsEnabled}
@@ -67,12 +66,9 @@ export default function DashboardShell({
       {/* Mobile drawer overlay */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden flex">
-          <div
-            className="absolute inset-0 bg-black/60"
-            onClick={() => setMobileOpen(false)}
-          />
+          <div className="absolute inset-0 bg-black/60" onClick={() => setMobileOpen(false)} />
           <div className="relative flex">
-            <Sidebar repairsEnabled={repairsEnabled} logo={logo} storeName={storeName} />
+            <AdminSidebar repairsEnabled={repairsEnabled} logo={logo} storeName={storeName} />
             <button
               onClick={() => setMobileOpen(false)}
               className="absolute top-4 right-4 text-slate-400 hover:text-white"
@@ -94,17 +90,40 @@ export default function DashboardShell({
             >
               <Menu className="w-5 h-5" />
             </button>
-            <h1 className="text-sm font-semibold text-gray-800">{pageTitle}</h1>
+
+            {/* En soporte técnico el logo reemplaza al título en mobile (sidebar oculto) */}
+            {section === "soporte" && (
+              <Link href="/" className="lg:hidden relative w-32 h-7 shrink-0">
+                {logo ? (
+                  <Image src={logo.src} alt={storeName || "Logo"} fill className="object-contain object-left" />
+                ) : (
+                  <span className="font-brand text-sm uppercase tracking-tight">{storeName}</span>
+                )}
+              </Link>
+            )}
+
+            <h1
+              className={cn(
+                "text-sm font-semibold text-gray-800",
+                section === "soporte" && "hidden lg:block",
+              )}
+            >
+              {pageTitle}
+            </h1>
           </div>
 
           <div className="flex items-center gap-2">
-            <Link
-              href="/"
-              className="hidden sm:flex items-center gap-1.5 text-xs text-gray-500 hover:text-(--tenant-primary) font-medium px-3 py-1.5 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors"
-            >
-              <Store className="w-3.5 h-3.5" />
-              Ver tienda
-            </Link>
+            {section === "tienda" ? (
+              <Link
+                href="/"
+                className="hidden sm:flex items-center gap-1.5 text-xs text-gray-500 hover:text-(--tenant-primary) font-medium px-3 py-1.5 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors"
+              >
+                <Store className="w-3.5 h-3.5" />
+                Ver tienda
+              </Link>
+            ) : (
+              <NotificationBell buttonClassName="relative p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100 transition-colors" />
+            )}
 
             <div className="flex items-center gap-2 pl-2 border-l border-gray-100">
               <div className="w-7 h-7 rounded-full bg-(--tenant-primary) flex items-center justify-center text-white text-[10px] font-bold">
@@ -114,7 +133,7 @@ export default function DashboardShell({
                 {session?.user?.name?.split(" ")[0]}
               </span>
               <button
-                onClick={() => signOut({ callbackUrl: "/" })}
+                onClick={() => signOut({ callbackUrl: section === "soporte" ? "/soporte-tecnico" : "/" })}
                 className="text-gray-400 hover:text-red-500 transition-colors"
                 title="Cerrar sesión"
               >
