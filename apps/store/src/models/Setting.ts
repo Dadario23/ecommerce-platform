@@ -24,6 +24,11 @@ export interface ISetting extends Document {
   modules_shipping: boolean;
   modules_coupons: boolean;
   modules_analytics: boolean;
+  modules_sizes: boolean;
+  modules_sizeGuide: boolean;
+  modules_quantityDiscounts: boolean;
+  modules_reels: boolean;
+  modules_faq: boolean;
   updatedAt: Date;
 }
 
@@ -51,6 +56,11 @@ const SettingSchema = new Schema(
     modules_shipping:      { type: Boolean, default: true },
     modules_coupons:       { type: Boolean, default: true },
     modules_analytics:     { type: Boolean, default: true },
+    modules_sizes:             { type: Boolean, default: false },
+    modules_sizeGuide:         { type: Boolean, default: false },
+    modules_quantityDiscounts: { type: Boolean, default: false },
+    modules_reels:             { type: Boolean, default: false },
+    modules_faq:               { type: Boolean, default: false },
   },
   { timestamps: true }
 );

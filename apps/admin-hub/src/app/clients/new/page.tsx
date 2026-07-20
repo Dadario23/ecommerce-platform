@@ -9,6 +9,11 @@ const MODULE_DEFAULTS: { key: string; label: string; defaultChecked: boolean }[]
   { key: "modules_shipping",  label: "Envíos",          defaultChecked: true },
   { key: "modules_coupons",   label: "Cupones",         defaultChecked: true },
   { key: "modules_analytics", label: "Analíticas",      defaultChecked: true },
+  { key: "modules_sizes",             label: "Talles y variantes",      defaultChecked: false },
+  { key: "modules_sizeGuide",         label: "Guía de talles",          defaultChecked: false },
+  { key: "modules_quantityDiscounts", label: "Descuentos por cantidad", defaultChecked: false },
+  { key: "modules_reels",             label: "Reels",                   defaultChecked: false },
+  { key: "modules_faq",               label: "Preguntas frecuentes",    defaultChecked: false },
 ];
 
 const CREDENTIAL_FIELDS: { key: string; label: string }[] = [

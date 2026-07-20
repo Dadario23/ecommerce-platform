@@ -15,6 +15,9 @@ async function getSettings() {
     modules_repairs: boolean; modules_budgets: boolean;
     modules_shipping: boolean; modules_coupons: boolean;
     modules_analytics: boolean;
+    modules_sizes: boolean; modules_sizeGuide: boolean;
+    modules_quantityDiscounts: boolean; modules_reels: boolean;
+    modules_faq: boolean;
   }>();
   if (!doc) {
     const created = await Setting.create({});
@@ -45,6 +48,8 @@ export async function PUT(req: Request) {
     "carouselImages", "homeFeaturedMode", "shippingEnabled",
     "modules_repairs", "modules_budgets", "modules_shipping",
     "modules_coupons", "modules_analytics",
+    "modules_sizes", "modules_sizeGuide", "modules_quantityDiscounts",
+    "modules_reels", "modules_faq",
   ];
   const update: Record<string, unknown> = {};
   for (const key of allowed) {

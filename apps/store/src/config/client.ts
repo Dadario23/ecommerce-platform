@@ -11,6 +11,11 @@ export interface ClientConfig {
     shipping: boolean;
     coupons: boolean;
     analytics: boolean;
+    sizes: boolean;
+    sizeGuide: boolean;
+    quantityDiscounts: boolean;
+    reels: boolean;
+    faq: boolean;
   };
   contact: {
     email: string;
@@ -29,6 +34,11 @@ const DEFAULT_MODULES: ClientConfig["modules"] = {
   shipping: true,
   coupons: true,
   analytics: true,
+  sizes: false,
+  sizeGuide: false,
+  quantityDiscounts: false,
+  reels: false,
+  faq: false,
 };
 
 const EMPTY_CONTACT: ClientConfig["contact"] = {
@@ -57,6 +67,11 @@ export async function getClientConfig(): Promise<ClientConfig> {
         shipping: Boolean(setting?.modules_shipping ?? DEFAULT_MODULES.shipping),
         coupons: Boolean(setting?.modules_coupons ?? DEFAULT_MODULES.coupons),
         analytics: Boolean(setting?.modules_analytics ?? DEFAULT_MODULES.analytics),
+        sizes: Boolean(setting?.modules_sizes ?? DEFAULT_MODULES.sizes),
+        sizeGuide: Boolean(setting?.modules_sizeGuide ?? DEFAULT_MODULES.sizeGuide),
+        quantityDiscounts: Boolean(setting?.modules_quantityDiscounts ?? DEFAULT_MODULES.quantityDiscounts),
+        reels: Boolean(setting?.modules_reels ?? DEFAULT_MODULES.reels),
+        faq: Boolean(setting?.modules_faq ?? DEFAULT_MODULES.faq),
       },
       contact: {
         email: (setting?.storeEmail as string) || "",

@@ -4,6 +4,11 @@ export type Modules = {
   modules_shipping: boolean;
   modules_coupons: boolean;
   modules_analytics: boolean;
+  modules_sizes: boolean;
+  modules_sizeGuide: boolean;
+  modules_quantityDiscounts: boolean;
+  modules_reels: boolean;
+  modules_faq: boolean;
 };
 
 export const MODULE_LIST: { key: keyof Modules; label: string; description: string }[] = [
@@ -12,6 +17,11 @@ export const MODULE_LIST: { key: keyof Modules; label: string; description: stri
   { key: "modules_shipping",  label: "Envíos",           description: "Cálculo y gestión de envíos" },
   { key: "modules_coupons",   label: "Cupones",          description: "Descuentos con código de cupón" },
   { key: "modules_analytics", label: "Analíticas",       description: "Reportes y métricas de la tienda" },
+  { key: "modules_sizes",             label: "Talles y variantes",      description: "Stock por talle en los productos (ropa/calzado)" },
+  { key: "modules_sizeGuide",         label: "Guía de talles",          description: "Tabla de medidas por categoría en la página de producto" },
+  { key: "modules_quantityDiscounts", label: "Descuentos por cantidad", description: "Escalones de precio por unidades del mismo producto" },
+  { key: "modules_reels",             label: "Reels",                   description: "Carrusel de videos de productos en el home" },
+  { key: "modules_faq",               label: "Preguntas frecuentes",    description: "Página pública de preguntas frecuentes editable" },
 ];
 
 export function ModulesCard({

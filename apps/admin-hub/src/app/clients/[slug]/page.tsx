@@ -35,6 +35,8 @@ async function getClientDetail(slug: string) {
         storeName: 1,
         modules_repairs: 1, modules_budgets: 1,
         modules_shipping: 1, modules_coupons: 1, modules_analytics: 1,
+        modules_sizes: 1, modules_sizeGuide: 1, modules_quantityDiscounts: 1,
+        modules_reels: 1, modules_faq: 1,
         mpAccessToken: 1, mpWebhookSecret: 1, fromEmail: 1,
         transferAlias: 1, transferCvu: 1, whatsappNumber: 1,
       },
@@ -48,6 +50,11 @@ async function getClientDetail(slug: string) {
     modules_shipping:  Boolean(setting?.modules_shipping ?? true),
     modules_coupons:   Boolean(setting?.modules_coupons ?? true),
     modules_analytics: Boolean(setting?.modules_analytics ?? true),
+    modules_sizes:             Boolean(setting?.modules_sizes ?? false),
+    modules_sizeGuide:         Boolean(setting?.modules_sizeGuide ?? false),
+    modules_quantityDiscounts: Boolean(setting?.modules_quantityDiscounts ?? false),
+    modules_reels:             Boolean(setting?.modules_reels ?? false),
+    modules_faq:               Boolean(setting?.modules_faq ?? false),
   };
 
   const credentials: CredentialField[] = CREDENTIAL_FIELDS.map(({ key, label, secret }) => {

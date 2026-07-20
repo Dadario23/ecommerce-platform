@@ -23,6 +23,11 @@ export async function saveModules(slug: string, formData: FormData) {
         modules_shipping:  formData.get("modules_shipping") === "on",
         modules_coupons:   formData.get("modules_coupons") === "on",
         modules_analytics: formData.get("modules_analytics") === "on",
+        modules_sizes:             formData.get("modules_sizes") === "on",
+        modules_sizeGuide:         formData.get("modules_sizeGuide") === "on",
+        modules_quantityDiscounts: formData.get("modules_quantityDiscounts") === "on",
+        modules_reels:             formData.get("modules_reels") === "on",
+        modules_faq:               formData.get("modules_faq") === "on",
       },
     },
     { upsert: true }
