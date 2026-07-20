@@ -7,7 +7,7 @@ import { sendOrderConfirmation } from "@/lib/email";
 import { sendOpsAlert } from "@/lib/ops-alert";
 import crypto from "crypto";
 import { getModels } from "@/lib/tenant-models";
-import { releaseStock } from "@/lib/stock";
+import { releaseStock, toStockLines } from "@/lib/stock";
 
 function verifyMercadoPagoSignature(request: NextRequest, secret: string): boolean {
   // Si no hay secret configurado en producción, rechazar
@@ -141,6 +141,7 @@ export async function POST(request: NextRequest) {
               name: i.name,
               quantity: i.quantity,
               price: i.price,
+              variant: i.variant?.value,
             })),
             total: order.total,
             paymentMethod: "mercadopago",
@@ -161,7 +162,7 @@ export async function POST(request: NextRequest) {
           { $set: { "payment.status": "failed", status: "cancelled", stockReserved: false } },
         );
         if (order?.stockReserved) {
-          await releaseStock(Product, order.items);
+          await releaseStock(Product, toStockLines(order.items));
         }
         if (!order && !(await Order.exists({ _id: orderId }))) {
           return NextResponse.json(

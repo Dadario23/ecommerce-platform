@@ -8,6 +8,7 @@ interface OrderItem {
   quantity: number;
   price: number;
   image?: string;
+  variant?: string;
 }
 
 type EmailContext = {
@@ -166,7 +167,8 @@ function buildOrderConfirmationHtml(data: OrderEmailData, ctx: EmailContext): st
       (item) => `
       <tr>
         <td style="padding:8px 0;border-bottom:1px solid #f0f0f0;">
-          <span style="font-size:14px;color:#333;">${item.name}</span>
+          <span style="font-size:14px;color:#333;">${item.name}</span>${item.variant ? `
+          <span style="font-size:12px;color:#888;"> · Talle ${item.variant}</span>` : ""}
           <span style="font-size:12px;color:#888;"> x${item.quantity}</span>
         </td>
         <td style="padding:8px 0;border-bottom:1px solid #f0f0f0;text-align:right;font-size:14px;color:#333;">

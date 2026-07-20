@@ -5,7 +5,7 @@ import { Preference } from "mercadopago";
 import { getMpClient } from "@/lib/mercadopago";
 import { getModels } from "@/lib/tenant-models";
 import { getBaseUrl } from "@/lib/base-url";
-import { MP_PREFERENCE_TTL_MS, releaseStock } from "@/lib/stock";
+import { MP_PREFERENCE_TTL_MS, releaseStock, toStockLines } from "@/lib/stock";
 import { CheckoutPayloadSchema, createCheckoutOrder } from "@/lib/checkout";
 
 export async function POST(request: NextRequest) {
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
           ]
         : authoritativeItems.map((item) => ({
             id: String(item.productId),
-            title: item.name,
+            title: item.variant ? `${item.name} (Talle ${item.variant.value})` : item.name,
             quantity: item.quantity,
             unit_price: item.price,
             currency_id: "ARS",
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
       // Sin preferencia no hay pago posible: liberar la reserva y cerrar la orden
       const { Order, Product } = await getModels();
       await Promise.all([
-        releaseStock(Product, authoritativeItems),
+        releaseStock(Product, toStockLines(authoritativeItems)),
         Order.findByIdAndUpdate(order._id, {
           $set: { status: "cancelled", "payment.status": "failed", stockReserved: false },
         }),

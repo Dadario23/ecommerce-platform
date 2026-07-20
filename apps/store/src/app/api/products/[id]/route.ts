@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getModels } from "@/lib/tenant-models";
+import { SizesSchema, computeTotalStock } from "@/lib/product-extras";
 
 function isAdmin(role: string | undefined) {
   return role === "admin" || role === "superadmin";
@@ -81,6 +82,25 @@ export async function PATCH(
     }
     const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
 
+    if (body.sizes != null) {
+      const parsed = SizesSchema.safeParse(body.sizes);
+      if (!parsed.success) {
+        return NextResponse.json({ error: "Talles inválidos" }, { status: 400 });
+      }
+      body.sizes = parsed.data;
+      body.stock = computeTotalStock(parsed.data);
+    } else if ("stock" in body) {
+      // En productos con talles el stock global es derivado: el quick-edit
+      // no puede pisarlo sin editar los talles
+      const current = await Product.findById(id).select("sizes").lean<{ sizes?: unknown[] }>();
+      if ((current?.sizes?.length ?? 0) > 0) {
+        return NextResponse.json(
+          { error: "Este producto tiene talles: editá el stock por talle" },
+          { status: 400 }
+        );
+      }
+    }
+
     const product = await Product.findByIdAndUpdate(
       id,
       { $set: body },
@@ -122,6 +142,15 @@ export async function PUT(
 
     if (body.category) {
       body.category = new mongoose.Types.ObjectId(body.category);
+    }
+
+    if (body.sizes != null) {
+      const parsed = SizesSchema.safeParse(body.sizes);
+      if (!parsed.success) {
+        return NextResponse.json({ error: "Talles inválidos" }, { status: 400 });
+      }
+      body.sizes = parsed.data;
+      body.stock = computeTotalStock(parsed.data);
     }
 
     const product = await Product.findByIdAndUpdate(id, body, {

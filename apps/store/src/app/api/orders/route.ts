@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
       orderId: String(order._id),
       customerEmail: session.user.email ?? "",
       customerName: session.user.name ?? undefined,
-      items: authoritativeItems.map((i) => ({ name: i.name, quantity: i.quantity, price: i.price })),
+      items: authoritativeItems.map((i) => ({ name: i.name, quantity: i.quantity, price: i.price, variant: i.variant?.value })),
       total,
       paymentMethod: orderData.paymentMethod,
       shippingAddress: orderData.shippingAddress,

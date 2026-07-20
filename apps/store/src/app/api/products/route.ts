@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getModels } from "@/lib/tenant-models";
+import { SizesSchema, computeTotalStock } from "@/lib/product-extras";
 
 function isAdmin(role: string | undefined) {
   return role === "admin" || role === "superadmin";
@@ -60,6 +61,16 @@ export async function POST(req: Request) {
         { error: "Nombre y precio son obligatorios" },
         { status: 400 },
       );
+    }
+
+    // Con talles, el stock global es derivado: siempre la suma de los talles
+    if (body.sizes != null) {
+      const parsed = SizesSchema.safeParse(body.sizes);
+      if (!parsed.success) {
+        return NextResponse.json({ error: "Talles inválidos" }, { status: 400 });
+      }
+      body.sizes = parsed.data;
+      body.stock = computeTotalStock(parsed.data);
     }
 
     // 👇 forzamos que category se guarde como ObjectId

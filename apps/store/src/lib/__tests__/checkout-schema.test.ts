@@ -57,6 +57,28 @@ describe("CheckoutPayloadSchema", () => {
       CheckoutPayloadSchema.safeParse({ items: validPayload.items }).success
     ).toBe(false);
   });
+
+  it("acepta size opcional y lo recorta", () => {
+    const parsed = CheckoutPayloadSchema.safeParse({
+      ...validPayload,
+      items: [{ id: "665f1c2e8b3e4a0012345678", quantity: 1, size: " M " }],
+    });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) expect(parsed.data.items[0].size).toBe("M");
+  });
+
+  it.each([
+    ["", "vacío"],
+    ["X".repeat(21), "demasiado largo"],
+    [{ $ne: null }, "inyección de operadores"],
+  ])("rechaza size inválido (%s: %s)", (size, _desc) => {
+    expect(
+      CheckoutPayloadSchema.safeParse({
+        ...validPayload,
+        items: [{ id: "665f1c2e8b3e4a0012345678", quantity: 1, size }],
+      }).success
+    ).toBe(false);
+  });
 });
 
 describe("computeCouponDiscount", () => {

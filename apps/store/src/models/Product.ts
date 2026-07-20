@@ -17,6 +17,8 @@ export interface IProduct extends Document {
   category: { _id: string; name: string } | string;
   brand?: string;
   stock?: number;
+  // Variantes de talle: si existe, stock es el total derivado (suma de sizes)
+  sizes?: { value: string; stock: number }[];
   sku?: string;
   condition?: "new" | "used";
   shippingTypes?: Array<"flex" | "standard" | "national">;
@@ -53,6 +55,16 @@ const ProductSchema: Schema = new Schema(
     brand: { type: String },
     sku: { type: String },
     stock: { type: Number, default: 0 },
+    sizes: {
+      type: [new Schema(
+        {
+          value: { type: String, required: true },
+          stock: { type: Number, default: 0, min: 0 },
+        },
+        { _id: false }
+      )],
+      default: undefined,
+    },
     condition:     { type: String, enum: ["new", "used"], default: "new" },
     shippingTypes:  { type: [String], default: ["flex", "standard"] },
     freeShipping:   { type: Boolean, default: false },

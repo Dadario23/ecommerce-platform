@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
 import { computeCouponDiscount } from "@/lib/coupon-discount";
-import { releaseExpiredReservations, releaseStock, reserveStock } from "@/lib/stock";
+import { releaseExpiredReservations, releaseStock, reserveStock, toStockLines } from "@/lib/stock";
 import type { IOrder } from "@/models/Order";
 
 export const OrderItemSchema = z.object({
@@ -11,6 +11,7 @@ export const OrderItemSchema = z.object({
   price: z.number().optional(),
   image: z.string().optional().default(""),
   quantity: z.number().int().positive(),
+  size: z.string().trim().min(1).max(20).optional(),
 });
 
 export const AddressSchema = z.object({
@@ -38,6 +39,7 @@ export type CheckoutItem = {
   price: number;
   image: string;
   quantity: number;
+  variant?: { name: string; value: string };
 };
 
 type CheckoutInput = z.infer<typeof CheckoutPayloadSchema> & {
@@ -71,8 +73,8 @@ export async function createCheckoutOrder(input: CheckoutInput): Promise<Checkou
   // la garantía real contra compras concurrentes está en reserveStock
   const productIds = items.map((item) => new mongoose.Types.ObjectId(item.id));
   const products = await Product.find({ _id: { $in: productIds } })
-    .select("_id name stock price isActive")
-    .lean<{ _id: mongoose.Types.ObjectId; name: string; stock: number; price: number; isActive?: boolean }[]>();
+    .select("_id name stock price isActive sizes")
+    .lean<{ _id: mongoose.Types.ObjectId; name: string; stock: number; price: number; isActive?: boolean; sizes?: { value: string; stock: number }[] }[]>();
 
   const productMap = new Map(products.map((p) => [String(p._id), p]));
   const stockErrors: string[] = [];
@@ -83,7 +85,22 @@ export async function createCheckoutOrder(input: CheckoutInput): Promise<Checkou
       stockErrors.push(`"${item.name}" ya no está disponible`);
       continue;
     }
-    if ((product.stock ?? 0) < item.quantity) {
+    // Producto con talles: el talle es obligatorio y el stock se valida por
+    // talle. Producto simple: el talle del payload se ignora.
+    if ((product.sizes?.length ?? 0) > 0) {
+      if (!item.size) {
+        stockErrors.push(`"${product.name}": elegí un talle`);
+        continue;
+      }
+      const sizeEntry = product.sizes!.find((s) => s.value === item.size);
+      if (!sizeEntry) {
+        stockErrors.push(`"${product.name}" no tiene el talle ${item.size}`);
+      } else if (sizeEntry.stock < item.quantity) {
+        stockErrors.push(
+          `"${product.name}" talle ${item.size} solo tiene ${sizeEntry.stock} unidades disponibles`
+        );
+      }
+    } else if ((product.stock ?? 0) < item.quantity) {
       stockErrors.push(
         `"${product.name}" solo tiene ${product.stock ?? 0} unidades disponibles`
       );
@@ -103,12 +120,14 @@ export async function createCheckoutOrder(input: CheckoutInput): Promise<Checkou
   // Nunca confiar en los montos que envía el cliente.
   const authoritativeItems: CheckoutItem[] = items.map((item) => {
     const product = productMap.get(item.id)!; // garantizado por la validación de stock
+    const hasSizes = (product.sizes?.length ?? 0) > 0;
     return {
       productId: new mongoose.Types.ObjectId(item.id),
       name: product.name,
       price: product.price,
       image: item.image,
       quantity: item.quantity,
+      ...(hasSizes && item.size ? { variant: { name: "Talle", value: item.size } } : {}),
     };
   });
 
@@ -141,13 +160,16 @@ export async function createCheckoutOrder(input: CheckoutInput): Promise<Checkou
   const total = Math.max(subtotal - discount, 0);
 
   // Reservar stock de forma atómica ANTES de crear la orden
-  const reservation = await reserveStock(Product, authoritativeItems);
+  const reservation = await reserveStock(Product, toStockLines(authoritativeItems));
   if (!reservation.ok) {
+    const failed = reservation.failed;
     return {
       ok: false,
       status: 409,
       error: "Problemas de stock",
-      details: [`"${reservation.failed.name}" no tiene stock suficiente`],
+      details: [
+        `"${failed.name}"${failed.size ? ` talle ${failed.size}` : ""} no tiene stock suficiente`,
+      ],
     };
   }
 
@@ -175,7 +197,7 @@ export async function createCheckoutOrder(input: CheckoutInput): Promise<Checkou
   try {
     await order.save();
   } catch (err) {
-    await releaseStock(Product, authoritativeItems);
+    await releaseStock(Product, toStockLines(authoritativeItems));
     throw err;
   }
 
