@@ -36,6 +36,7 @@ interface Product {
   brand?: string;
   sku?: string;
   stock?: number;
+  sizes?: { value: string; stock: number }[];
   condition?: "new" | "used";
   shippingTypes?: string[];
 }
@@ -102,6 +103,17 @@ export default function ProductForm({ product, loading, onSubmit, actionLabel }:
       freeShipping:      formData.get("freeShipping") === "true",
       shippingTypes:     (() => {
         try { return JSON.parse(formData.get("shippingTypes") as string); } catch { return ["flex", "standard"]; }
+      })(),
+      // Solo viaja si el módulo de talles está activo y el producto los usa
+      ...(() => {
+        const raw = formData.get("sizes");
+        if (typeof raw !== "string" || raw === "") return {};
+        try {
+          const parsed = JSON.parse(raw) as { value: string; stock: number }[];
+          return { sizes: parsed.filter((s) => s.value.trim() !== "") };
+        } catch {
+          return {};
+        }
       })(),
     });
   };

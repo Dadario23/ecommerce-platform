@@ -5,18 +5,11 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { safeImageSrc } from "@/lib/safe-image-src";
-import { useCartStore } from "@/store/useCartStore";
+import { useCartStore, type CartItem } from "@/store/useCartStore";
+import { cartLineKey } from "@/lib/cart-line";
 import { useSession } from "next-auth/react";
 import Spinner from "@/components/ui/Spinner";
 import { ArrowRight, ShoppingBag, Trash2 } from "lucide-react";
-
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  image: string;
-  quantity: number;
-}
 
 export default function OrderPage() {
   const router = useRouter();
@@ -79,7 +72,7 @@ export default function OrderPage() {
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-4">
           <ul className="divide-y divide-gray-50">
             {items.map((item: CartItem) => (
-              <li key={item.id} className="flex gap-4 p-4">
+              <li key={cartLineKey(item)} className="flex gap-4 p-4">
                 <div className="relative w-20 h-20 shrink-0 rounded-xl overflow-hidden border border-gray-100 bg-gray-50">
                   <Image
                     src={safeImageSrc(item.image, "/placeholder.png")}
@@ -95,6 +88,9 @@ export default function OrderPage() {
                     {item.name}
                   </p>
                   <p className="text-xs text-gray-400 mt-0.5">
+                    {item.size && (
+                      <span className="font-medium text-gray-500">Talle {item.size} · </span>
+                    )}
                     ${item.price.toLocaleString("es-AR")} c/u
                   </p>
 
@@ -104,8 +100,8 @@ export default function OrderPage() {
                       <button
                         onClick={() =>
                           item.quantity > 1
-                            ? updateQuantity(item.id, item.quantity - 1)
-                            : removeFromCart(item.id)
+                            ? updateQuantity(cartLineKey(item), item.quantity - 1)
+                            : removeFromCart(cartLineKey(item))
                         }
                         className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors font-semibold"
                       >
@@ -119,7 +115,7 @@ export default function OrderPage() {
                         {item.quantity}
                       </span>
                       <button
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        onClick={() => updateQuantity(cartLineKey(item), item.quantity + 1)}
                         className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors font-semibold"
                       >
                         +
@@ -133,7 +129,7 @@ export default function OrderPage() {
                 </div>
 
                 <button
-                  onClick={() => removeFromCart(item.id)}
+                  onClick={() => removeFromCart(cartLineKey(item))}
                   className="self-start text-gray-300 hover:text-red-400 transition-colors mt-0.5"
                 >
                   <Trash2 className="w-4 h-4" />

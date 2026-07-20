@@ -12,6 +12,7 @@ const CartBodySchema = z.object({
       price: z.number(),
       image: z.string().optional().default(""),
       quantity: z.number().int().min(1),
+      size: z.string().trim().min(1).max(20).optional(),
     })
   ),
 });

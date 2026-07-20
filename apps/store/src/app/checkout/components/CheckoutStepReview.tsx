@@ -66,7 +66,7 @@ export default function CheckoutStepReview({
         </div>
         <ul className="divide-y divide-gray-50 px-5">
           {items.map((item: CartItem) => (
-            <li key={item.id} className="flex items-center gap-3 py-3">
+            <li key={item.size ? `${item.id}::${item.size}` : item.id} className="flex items-center gap-3 py-3">
               <div className="relative w-14 h-14 shrink-0 rounded-xl overflow-hidden border border-gray-100 bg-gray-50">
                 <Image
                   src={safeImageSrc(item.image, "/placeholder-category.jpg")}
@@ -81,6 +81,9 @@ export default function CheckoutStepReview({
                   {item.name}
                 </p>
                 <p className="text-xs text-gray-400 mt-0.5">
+                  {item.size && (
+                    <span className="font-medium text-gray-500">Talle {item.size} · </span>
+                  )}
                   {item.quantity} × ${item.price.toLocaleString("es-AR")}
                 </p>
               </div>

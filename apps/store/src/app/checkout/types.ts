@@ -27,6 +27,7 @@ export interface CartItem {
   price: number;
   image: string;
   quantity: number;
+  size?: string;
 }
 
 export interface SavedAddress {

@@ -7,6 +7,7 @@ import { IProduct } from "@/models/Product";
 import { useCartStore } from "@/store/useCartStore";
 import { useWhatsAppNumber } from "@/hooks/use-whatsapp-number";
 import { cn } from "@/lib/utils";
+import SizeSelector from "@/components/products/SizeSelector";
 
 export default function ProductBuyActions({ product }: { product: IProduct }) {
   const addToCart = useCartStore((s) => s.addToCart);
@@ -17,7 +18,17 @@ export default function ProductBuyActions({ product }: { product: IProduct }) {
   // Origen del tenant activo — en el mount para no romper la hidratación
   const [origin, setOrigin] = useState("");
   useEffect(() => setOrigin(window.location.origin), []);
-  const isOutOfStock = (product.stock ?? 0) <= 0;
+
+  // Producto con talles: el stock relevante es el del talle elegido
+  const sizes = product.sizes ?? [];
+  const hasSizes = sizes.length > 0;
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [sizeError, setSizeError] = useState(false);
+  const selectedEntry = sizes.find((s) => s.value === selectedSize);
+
+  const isOutOfStock = hasSizes
+    ? sizes.every((s) => s.stock <= 0)
+    : (product.stock ?? 0) <= 0;
 
   const cartPayload = {
     id: String(product._id),
@@ -25,17 +36,26 @@ export default function ProductBuyActions({ product }: { product: IProduct }) {
     price: product.price,
     image: product.images?.[0] ?? "",
     quantity: 1,
+    ...(hasSizes && selectedSize ? { size: selectedSize } : {}),
+  };
+
+  const requireSize = () => {
+    if (hasSizes && !selectedEntry) {
+      setSizeError(true);
+      return false;
+    }
+    return true;
   };
 
   const handleAddToCart = () => {
-    if (isOutOfStock) return;
+    if (isOutOfStock || !requireSize()) return;
     addToCart(cartPayload);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
 
   const handleBuyNow = () => {
-    if (isOutOfStock) return;
+    if (isOutOfStock || !requireSize()) return;
     addToCart(cartPayload);
     router.push("/checkout");
   };
@@ -49,6 +69,22 @@ export default function ProductBuyActions({ product }: { product: IProduct }) {
 
   return (
     <div className="flex flex-col gap-3">
+      {hasSizes && !isOutOfStock && (
+        <div>
+          <SizeSelector
+            sizes={sizes}
+            selected={selectedSize}
+            onSelect={(value) => {
+              setSelectedSize(value);
+              setSizeError(false);
+            }}
+          />
+          {sizeError && (
+            <p className="mt-1 text-sm text-red-500">Elegí un talle para continuar</p>
+          )}
+        </div>
+      )}
+
       {/* Add to cart */}
       <button
         onClick={handleAddToCart}

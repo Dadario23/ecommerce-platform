@@ -10,8 +10,9 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
-import { useCartStore } from "@/store/useCartStore";
+import { useCartStore, type CartItem } from "@/store/useCartStore";
 import { useCartUI } from "@/store/useCartUI";
+import { cartLineKey } from "@/lib/cart-line";
 import { Trash2, ShoppingBag, ArrowRight } from "lucide-react";
 import AuthModal from "@/components/auth/AuthModal";
 import Image from "next/image";
@@ -43,11 +44,12 @@ export default function CartDrawer() {
     }
   };
 
-  const handleRemove = async (id: string) => {
-    removeFromCart(id);
+  const handleRemove = async (item: CartItem) => {
+    removeFromCart(cartLineKey(item));
     if (status !== "authenticated") return;
     try {
-      await fetch(`/api/cart/${id}`, { method: "DELETE", credentials: "include" });
+      const qs = item.size ? `?size=${encodeURIComponent(item.size)}` : "";
+      await fetch(`/api/cart/${item.id}${qs}`, { method: "DELETE", credentials: "include" });
     } catch {
       // silently ignore sync errors
     }
@@ -110,7 +112,7 @@ export default function CartDrawer() {
             ) : (
               <ul className="divide-y divide-gray-50 px-5 py-3">
                 {items.map((item) => (
-                  <li key={item.id} className="flex gap-3 py-4">
+                  <li key={cartLineKey(item)} className="flex gap-3 py-4">
                     {/* Image */}
                     <Link
                       href={`/products/${item.id}`}
@@ -135,6 +137,9 @@ export default function CartDrawer() {
                           {item.name}
                         </p>
                         <p className="text-xs text-gray-400 mt-0.5">
+                          {item.size && (
+                            <span className="font-medium text-gray-500">Talle {item.size} · </span>
+                          )}
                           ${item.price.toLocaleString("es-AR")} c/u
                         </p>
                       </div>
@@ -145,8 +150,8 @@ export default function CartDrawer() {
                           <button
                             onClick={() =>
                               item.quantity > 1
-                                ? updateQuantity(item.id, item.quantity - 1)
-                                : handleRemove(item.id)
+                                ? updateQuantity(cartLineKey(item), item.quantity - 1)
+                                : handleRemove(item)
                             }
                             className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors text-base font-semibold"
                           >
@@ -160,7 +165,7 @@ export default function CartDrawer() {
                             {item.quantity}
                           </span>
                           <button
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            onClick={() => updateQuantity(cartLineKey(item), item.quantity + 1)}
                             className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors text-base font-semibold"
                           >
                             +
@@ -176,7 +181,7 @@ export default function CartDrawer() {
 
                     {/* Delete */}
                     <button
-                      onClick={() => handleRemove(item.id)}
+                      onClick={() => handleRemove(item)}
                       className="self-start text-gray-300 hover:text-red-400 transition-colors mt-0.5"
                     >
                       <Trash2 className="w-4 h-4" />

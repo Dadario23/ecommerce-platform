@@ -7,6 +7,7 @@ export interface ICartItem {
   price: number;
   image: string;
   quantity: number;
+  size?: string;
 }
 
 export interface ICart extends Document {
@@ -22,6 +23,8 @@ const CartItemSchema = new Schema({
   price: { type: Number, required: true },
   image: { type: String, required: true },
   quantity: { type: Number, required: true, min: 1 },
+  // Sin esto el POST de /api/cart (replace completo) stripearía el talle
+  size: { type: String },
 });
 
 const CartSchema = new Schema(

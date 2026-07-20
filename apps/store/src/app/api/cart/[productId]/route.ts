@@ -16,10 +16,13 @@ export async function DELETE(
     }
 
     const { productId } = await context.params;
+    // Con ?size= borra solo la línea de ese talle; sin size, todas las
+    // líneas del producto (semántica original, cubre ítems sin talle)
+    const size = req.nextUrl.searchParams.get("size");
 
     const cart = await Cart.findOneAndUpdate(
       { userId: session.user.id },
-      { $pull: { items: { id: productId } } },
+      { $pull: { items: size ? { id: productId, size } : { id: productId } } },
       { new: true },
     );
 
