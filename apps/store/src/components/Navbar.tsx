@@ -171,7 +171,7 @@ export default function Navbar({
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button className={`flex items-center gap-1.5 text-sm font-medium px-2 py-1.5 rounded-lg transition-colors ${iconBtn}`}>
-                      <div className="w-7 h-7 rounded-full bg-(--tenant-accent) flex items-center justify-center text-white text-xs font-bold shrink-0">
+                      <div className="w-7 h-7 rounded-full bg-(--tenant-accent) minimal:bg-(--tenant-primary) flex items-center justify-center text-white text-xs font-bold shrink-0">
                         {(session.user?.name || "U")[0].toUpperCase()}
                       </div>
                       <span className="hidden md:inline max-w-25 truncate">
@@ -330,7 +330,7 @@ export default function Navbar({
                       onClick={() => goToCategory(cat)}
                       className={
                         light
-                          ? "px-3.5 py-3 whitespace-nowrap text-xs font-bold uppercase tracking-wider text-gray-900 hover:text-(--tenant-accent) transition-colors shrink-0"
+                          ? "px-3.5 py-3 whitespace-nowrap text-xs font-bold uppercase tracking-wider text-gray-900 hover:text-(--tenant-primary) transition-colors shrink-0"
                           : "px-3.5 py-2.5 whitespace-nowrap text-sm text-gray-600 hover:text-(--tenant-primary) hover:bg-(--tenant-tint) font-medium transition-colors rounded-md shrink-0"
                       }
                     >
@@ -376,7 +376,7 @@ export default function Navbar({
             <div className="bg-(--tenant-primary) px-4 py-5 flex items-center justify-between shrink-0">
               {session ? (
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-(--tenant-accent) flex items-center justify-center text-white font-bold text-base">
+                  <div className="w-10 h-10 rounded-full bg-(--tenant-accent) minimal:bg-white/20 flex items-center justify-center text-white font-bold text-base">
                     {(session.user?.name || "U")[0].toUpperCase()}
                   </div>
                   <div>

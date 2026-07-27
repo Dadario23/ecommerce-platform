@@ -177,7 +177,7 @@ export default function ReviewsSection({
       )}
       {!session && (
         <p className="text-sm text-gray-500 mb-6">
-          <a href="/auth/login" className="text-(--tenant-primary) hover:underline">
+          <a href="/auth/login" className="text-(--tenant-primary) hover:underline minimal:underline">
             Iniciá sesión
           </a>{" "}
           para dejar una reseña.

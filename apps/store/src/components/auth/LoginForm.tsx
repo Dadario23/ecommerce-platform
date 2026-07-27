@@ -137,13 +137,13 @@ export default function LoginForm({ fromCart = false }: LoginFormProps) {
       {/* Links */}
       <div className="text-center text-xs text-gray-500 space-y-1.5 pt-1">
         <p>
-          <Link href="/forgot-password" className="text-(--tenant-primary) font-semibold hover:underline">
+          <Link href="/forgot-password" className="text-(--tenant-primary) font-semibold hover:underline minimal:underline">
             ¿Olvidaste tu contraseña?
           </Link>
         </p>
         <p>
           ¿No tenés cuenta?{" "}
-          <Link href="/register" className="text-(--tenant-primary) font-semibold hover:underline">
+          <Link href="/register" className="text-(--tenant-primary) font-semibold hover:underline minimal:underline">
             Registrate aquí
           </Link>
         </p>

@@ -105,7 +105,7 @@ const THEMES: Record<string, TenantTheme> = {
       primaryHover: "#262626",
       onPrimary: "#FFFFFF",
       tint: "#F5F5F5",
-      accent: "#DB2777",
+      accent: "#B45309",
       background: "#FAF6EE",
     },
     radius: "0.125rem",

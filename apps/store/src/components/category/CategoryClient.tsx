@@ -198,7 +198,7 @@ export default function CategoryClient({ categoryName, initialProducts, shipping
                 <p className="text-gray-400 text-sm mb-4">Probá cambiando los criterios de búsqueda</p>
                 <button
                   onClick={() => handleFilterChange({ brands: [], minPrice: priceRange.min, maxPrice: priceRange.max, inStockOnly: false, condition: "all", shipping: "all" })}
-                  className="text-sm text-(--tenant-primary) font-medium hover:underline"
+                  className="text-sm text-(--tenant-primary) font-medium hover:underline minimal:underline"
                 >
                   Limpiar filtros
                 </button>

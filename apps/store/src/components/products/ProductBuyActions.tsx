@@ -107,10 +107,10 @@ export default function ProductBuyActions({ product }: { product: IProduct }) {
         onClick={handleBuyNow}
         disabled={isOutOfStock}
         className={cn(
-          "flex items-center justify-center gap-2 w-full py-3.5 rounded-xl font-semibold text-base transition-all",
+          "flex items-center justify-center gap-2 w-full py-3.5 rounded-xl minimal:rounded-t-none font-semibold text-base transition-all",
           isOutOfStock
             ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-            : "bg-(--tenant-primary) hover:bg-(--tenant-primary-hover) text-white shadow-md hover:shadow-lg"
+            : "bg-(--tenant-primary) hover:bg-(--tenant-primary-hover) text-white shadow-md hover:shadow-lg minimal:bg-(--tenant-accent) minimal:hover:bg-(--tenant-accent) minimal:hover:opacity-90"
         )}
       >
         <Zap className="w-5 h-5" />

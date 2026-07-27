@@ -41,7 +41,7 @@ export default function HomeProductCard({
       {/* Image */}
       <div className="relative w-full aspect-square bg-gray-50 overflow-hidden minimal:aspect-3/4 minimal:bg-gray-100">
         {hasDiscount && (
-          <span className="absolute top-2 left-2 z-10 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded minimal:bg-(--tenant-accent) minimal:rounded-none">
+          <span className="absolute top-2 left-2 z-10 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded minimal:rounded-none">
             -{discountPct}%
           </span>
         )}
