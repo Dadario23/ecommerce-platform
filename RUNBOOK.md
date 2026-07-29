@@ -31,7 +31,7 @@ tenant, intervalo 5 min, alertas al mismo email:
 |---------|-----|--------|
 | compumobile webhook | `https://www.compumobile.com.ar/api/payments/webhook` | activo |
 | bitm-cel webhook | `https://bitm-cel.com.ar/api/payments/webhook` | **pausado** — dominio sin comprar |
-| kameleba webhook | `https://kameleba.com.ar/api/payments/webhook` | **pausado** — dominio sin comprar |
+| kameleba webhook | `https://www.kameleba.com.ar/api/payments/webhook` | activo |
 
 Al comprar un dominio y hacer el cutover, reanudar su monitor desde el
 dashboard de UptimeRobot (o `POST /v3/monitors/<id>/start` de la API v3 con
