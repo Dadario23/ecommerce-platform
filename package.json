@@ -22,7 +22,6 @@
   },
   "overrides": {
     "next": {
-      "postcss": "^8.5.10",
       "sharp": "^0.35.0"
     },
     "next-auth": {
@@ -32,6 +31,7 @@
         "cookie": "^0.7.2"
       }
     },
-    "@auth/core": "^0.41.3"
+    "@auth/core": "^0.41.3",
+    "postcss": "^8.5.18"
   }
 }
