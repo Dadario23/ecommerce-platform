@@ -4,11 +4,13 @@ import CategoriesGrid from "@/components/home/CategoriesGrid";
 import HomeProductsSection from "@/components/home/HomeProductsSection";
 import HomeCategoriesSection from "@/components/home/HomeCategoriesSection";
 import SupportBanner from "@/components/home/SupportBanner";
+import HomeReelsCarousel from "@/components/reels/HomeReelsCarousel";
 import type { TenantTheme } from "@/config/tenant-themes";
 import type { HomeData } from "./types";
 
 type TechHomeProps = HomeData & {
   showSupport: boolean;
+  reelsEnabled: boolean;
   benefits: TenantTheme["benefits"];
 };
 
@@ -17,7 +19,9 @@ export default function TechHome({
   categoriesWithImages,
   carouselImages,
   homeFeaturedMode,
+  reels,
   showSupport,
+  reelsEnabled,
   benefits,
 }: TechHomeProps) {
   return (
@@ -34,6 +38,7 @@ export default function TechHome({
             <SupportBanner />
           </div>
         )}
+        {reelsEnabled && <HomeReelsCarousel items={reels} />}
         <CategoriesGrid categories={categories} />
 
         {homeFeaturedMode === "categories"

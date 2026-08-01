@@ -7,6 +7,14 @@ export interface IDescriptionBlock {
   caption?: string;
 }
 
+export interface IReel {
+  url: string;
+  publicId: string;
+  thumbnailUrl?: string;
+  duration?: number;
+  order: number;
+}
+
 export interface IProduct extends Document {
   name: string;
   slug: string;
@@ -30,6 +38,7 @@ export interface IProduct extends Document {
   homeDelivery?: boolean;
   featured?: boolean;
   descriptionBlocks?: IDescriptionBlock[];
+  reels?: IReel[];
 }
 
 const ProductSchema: Schema = new Schema(
@@ -85,6 +94,19 @@ const ProductSchema: Schema = new Schema(
         { _id: false }
       )],
       default: [],
+    },
+    reels: {
+      type: [new Schema(
+        {
+          url:          { type: String, required: true },
+          publicId:     { type: String, required: true },
+          thumbnailUrl: { type: String },
+          duration:     { type: Number },
+          order:        { type: Number, required: true },
+        },
+        { _id: false }
+      )],
+      default: undefined,
     },
   },
   { timestamps: true },

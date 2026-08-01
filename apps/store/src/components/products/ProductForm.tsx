@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import GeneralSection from "./sections/GeneralSection";
 import MediaSection from "./sections/MediaSection";
+import ReelsSection, { type ReelItem } from "./sections/ReelsSection";
 import PricingSection from "./sections/PricingSection";
 import StatusSection from "./sections/StatusSection";
 import ProductDetailsSection from "./sections/ProductDetailsSection";
@@ -14,6 +15,14 @@ interface ImageItem {
   file?: File;
   preview: string;
   existing?: boolean;
+}
+
+interface ProductReel {
+  url: string;
+  publicId: string;
+  thumbnailUrl?: string;
+  duration?: number;
+  order: number;
 }
 
 interface RawBlock {
@@ -39,6 +48,7 @@ interface Product {
   sizes?: { value: string; stock: number }[];
   condition?: "new" | "used";
   shippingTypes?: string[];
+  reels?: ProductReel[];
 }
 
 interface ProductFormProps {
@@ -57,12 +67,35 @@ export default function ProductForm({ product, loading, onSubmit, actionLabel }:
     (product?.descriptionBlocks ?? []).map((b) => ({ ...b, clientId: crypto.randomUUID() }))
   );
 
+  const [reels, setReels] = useState<ReelItem[]>(
+    (product?.reels ?? [])
+      .slice()
+      .sort((a, b) => a.order - b.order)
+      .map((r) => ({
+        id: crypto.randomUUID(),
+        preview: r.url,
+        existing: true,
+        publicId: r.publicId,
+        thumbnailUrl: r.thumbnailUrl,
+        duration: r.duration,
+      }))
+  );
+
   const uploadToCloudinary = async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
     const res = await fetch("/api/upload", { method: "POST", body: formData });
     const data = await res.json();
     return data.secure_url as string;
+  };
+
+  const uploadReelToCloudinary = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch("/api/upload/reel", { method: "POST", body: formData });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Error al subir el reel");
+    return data as { secure_url: string; public_id: string; thumbnail_url?: string; duration?: number };
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -76,6 +109,28 @@ export default function ProductForm({ product, loading, onSubmit, actionLabel }:
       } else if (img.file) {
         const url = await uploadToCloudinary(img.file);
         finalImageUrls.push(url);
+      }
+    }
+
+    const finalReels: ProductReel[] = [];
+    for (const reel of reels) {
+      if (reel.existing) {
+        finalReels.push({
+          url: reel.preview,
+          publicId: reel.publicId!,
+          thumbnailUrl: reel.thumbnailUrl,
+          duration: reel.duration,
+          order: finalReels.length,
+        });
+      } else if (reel.file) {
+        const uploaded = await uploadReelToCloudinary(reel.file);
+        finalReels.push({
+          url: uploaded.secure_url,
+          publicId: uploaded.public_id,
+          thumbnailUrl: uploaded.thumbnail_url,
+          duration: uploaded.duration,
+          order: finalReels.length,
+        });
       }
     }
 
@@ -97,6 +152,7 @@ export default function ProductForm({ product, loading, onSubmit, actionLabel }:
       sku:               formData.get("sku"),
       stock:             formData.get("stock") ? Number(formData.get("stock")) : 0,
       images:            finalImageUrls,
+      reels:             finalReels,
       isActive:          isActiveRaw === "true",
       featured:          formData.get("featured") === "true",
       condition:         formData.get("condition") || "new",
@@ -127,6 +183,7 @@ export default function ProductForm({ product, loading, onSubmit, actionLabel }:
           onChange={setDescriptionBlocks}
         />
         <MediaSection product={product} onImagesChange={setImages} />
+        <ReelsSection product={product} onReelsChange={setReels} />
         <PricingSection product={product} />
       </div>
 

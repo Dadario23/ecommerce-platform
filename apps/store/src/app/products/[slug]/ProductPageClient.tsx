@@ -6,6 +6,7 @@ import ProductBreadcrumb from "@/components/products/ProductBreadcrumb";
 import ProductGallery from "@/components/products/ProductGallery";
 import ProductInfo from "@/components/products/ProductInfo";
 import ProductBuyActions from "@/components/products/ProductBuyActions";
+import ProductReels from "@/components/products/ProductReels";
 import ProductShippingCalculator from "@/components/products/ProductShippingCalculator";
 import ProductTabs from "@/components/products/ProductTabs";
 import SimilarProducts from "@/components/products/SimilarProducts";
@@ -18,6 +19,7 @@ interface ProductPageClientProps {
   similarProducts: SimilarProduct[];
   initialReviews: SerializedReview[];
   shippingEnabled?: boolean;
+  reelsEnabled?: boolean;
 }
 
 export default function ProductPageClient({
@@ -25,6 +27,7 @@ export default function ProductPageClient({
   similarProducts,
   initialReviews,
   shippingEnabled = true,
+  reelsEnabled = false,
 }: ProductPageClientProps) {
   const homeDelivery = product.homeDelivery ?? true;
 
@@ -71,6 +74,11 @@ export default function ProductPageClient({
               )}
 
               <ProductBuyActions product={product} />
+
+              {reelsEnabled && product.reels && product.reels.length > 0 && (
+                <ProductReels reels={product.reels} />
+              )}
+
               <ProductShippingCalculator
                 shippingTypes={product.shippingTypes ?? ["flex", "standard"]}
                 freeShipping={product.freeShipping ?? false}

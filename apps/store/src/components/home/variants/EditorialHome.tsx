@@ -1,6 +1,7 @@
 import BenefitsBar from "@/components/BenefitsBar";
 import HomeProductsSection from "@/components/home/HomeProductsSection";
 import SupportBanner from "@/components/home/SupportBanner";
+import HomeReelsCarousel from "@/components/reels/HomeReelsCarousel";
 import EditorialHero from "./EditorialHero";
 import EditorialCategories from "./EditorialCategories";
 import type { TenantTheme } from "@/config/tenant-themes";
@@ -10,15 +11,18 @@ type EditorialHomeProps = HomeData & {
   storeName: string;
   logo: TenantTheme["logo"];
   showSupport: boolean;
+  reelsEnabled: boolean;
   benefits: TenantTheme["benefits"];
 };
 
 export default function EditorialHome({
   categoriesWithImages,
   carouselImages,
+  reels,
   storeName,
   logo,
   showSupport,
+  reelsEnabled,
   benefits,
 }: EditorialHomeProps) {
   return (
@@ -33,6 +37,8 @@ export default function EditorialHome({
             <SupportBanner />
           </div>
         )}
+
+        {reelsEnabled && <HomeReelsCarousel items={reels} />}
 
         <EditorialCategories categories={categoriesWithImages} />
 

@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getModels } from "@/lib/tenant-models";
-import { SizesSchema, computeTotalStock } from "@/lib/product-extras";
+import { SizesSchema, computeTotalStock, ReelsSchema } from "@/lib/product-extras";
 
 function isAdmin(role: string | undefined) {
   return role === "admin" || role === "superadmin";
@@ -151,6 +151,14 @@ export async function PUT(
       }
       body.sizes = parsed.data;
       body.stock = computeTotalStock(parsed.data);
+    }
+
+    if (body.reels != null) {
+      const parsedReels = ReelsSchema.safeParse(body.reels);
+      if (!parsedReels.success) {
+        return NextResponse.json({ error: "Reels inválidos" }, { status: 400 });
+      }
+      body.reels = parsedReels.data;
     }
 
     const product = await Product.findByIdAndUpdate(id, body, {

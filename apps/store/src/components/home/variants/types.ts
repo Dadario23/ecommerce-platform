@@ -7,9 +7,17 @@ export type HomeCategory = {
   bannerImage?: string;
 };
 
+export type HomeReelItem = {
+  productSlug: string;
+  productName: string;
+  url: string;
+  thumbnailUrl?: string;
+};
+
 export type HomeData = {
   categories: HomeCategory[];
   categoriesWithImages: HomeCategory[];
   carouselImages: string[];
   homeFeaturedMode: "products" | "categories";
+  reels: HomeReelItem[];
 };
