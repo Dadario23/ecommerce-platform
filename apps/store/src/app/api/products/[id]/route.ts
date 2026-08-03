@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getModels } from "@/lib/tenant-models";
-import { SizesSchema, computeTotalStock, ReelsSchema } from "@/lib/product-extras";
+import { SizesSchema, computeTotalStock, ReelsSchema, DescriptionImagesSchema, DescriptionTextSchema, sanitizeDescriptionText } from "@/lib/product-extras";
 
 function isAdmin(role: string | undefined) {
   return role === "admin" || role === "superadmin";
@@ -159,6 +159,22 @@ export async function PUT(
         return NextResponse.json({ error: "Reels inválidos" }, { status: 400 });
       }
       body.reels = parsedReels.data;
+    }
+
+    if (body.descriptionImages != null) {
+      const parsedImages = DescriptionImagesSchema.safeParse(body.descriptionImages);
+      if (!parsedImages.success) {
+        return NextResponse.json({ error: "Máximo 5 imágenes en la descripción enriquecida" }, { status: 400 });
+      }
+      body.descriptionImages = parsedImages.data;
+    }
+
+    if (body.descriptionText != null) {
+      const parsedText = DescriptionTextSchema.safeParse(body.descriptionText);
+      if (!parsedText.success) {
+        return NextResponse.json({ error: "Descripción enriquecida inválida" }, { status: 400 });
+      }
+      body.descriptionText = sanitizeDescriptionText(parsedText.data);
     }
 
     const product = await Product.findByIdAndUpdate(id, body, {

@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import ProductForm from "@/components/products/ProductForm";
 
 export default function EditarProductoPage() {
   const { id } = useParams();
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [product, setProduct] = useState<Record<string, unknown> | null>(null);
@@ -32,13 +31,16 @@ export default function EditarProductoPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       });
+      const data = await res.json();
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Error al actualizar el producto");
+        throw new Error(data.error || "Error al actualizar el producto");
       }
-      router.push("/dashboard/products");
+      setProduct(data);
+      return true;
     } catch (err) {
       setError((err as Error).message);
+      return false;
+    } finally {
       setLoading(false);
     }
   }
@@ -66,9 +68,9 @@ export default function EditarProductoPage() {
             <Loader2 className="w-5 h-5 animate-spin" />
             <span className="text-sm">Cargando producto...</span>
           </div>
-        ) : error ? (
+        ) : !product ? (
           <div className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-3">
-            {error}
+            {error || "No se pudo cargar el producto"}
           </div>
         ) : (
           <>

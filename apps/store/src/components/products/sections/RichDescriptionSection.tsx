@@ -2,27 +2,30 @@
 
 import { useState, useEffect } from "react";
 import imageCompression from "browser-image-compression";
-import { ImagePlus, X, GripVertical } from "lucide-react";
+import { ImagePlus, X, GripVertical, Loader2 } from "lucide-react";
+import RichTextEditor from "./RichTextEditor";
 
 const MAX_SIZE = 5 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const MAX_FILES = 15;
+const MAX_FILES = 5;
 
-interface ImageItem {
+export interface DescriptionImageItem {
   id: string;
   file?: File;
   preview: string;
   existing?: boolean;
+  uploading?: boolean;
 }
 
 interface Props {
-  product?: { images?: string[] };
-  onImagesChange: (images: ImageItem[]) => void;
+  product?: { descriptionImages?: string[]; descriptionText?: string };
+  onImagesChange: (images: DescriptionImageItem[]) => void;
+  onTextChange: (html: string) => void;
 }
 
-export default function MediaSection({ product, onImagesChange }: Props) {
-  const [images, setImages] = useState<ImageItem[]>(
-    product?.images?.map((url: string) => ({
+export default function RichDescriptionSection({ product, onImagesChange, onTextChange }: Props) {
+  const [images, setImages] = useState<DescriptionImageItem[]>(
+    product?.descriptionImages?.map((url) => ({
       id: crypto.randomUUID(),
       preview: url,
       existing: true,
@@ -30,6 +33,7 @@ export default function MediaSection({ product, onImagesChange }: Props) {
   );
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [text, setText] = useState(product?.descriptionText ?? "");
 
   useEffect(() => {
     onImagesChange(images);
@@ -45,35 +49,64 @@ export default function MediaSection({ product, onImagesChange }: Props) {
     };
   }, [images]);
 
+  const handleTextChange = (html: string) => {
+    setText(html);
+    onTextChange(html);
+  };
+
   const handleFiles = async (fileList: FileList) => {
+    setError(null);
+    const files = Array.from(fileList);
+
+    if (images.length + files.length > MAX_FILES) {
+      setError(`Máximo ${MAX_FILES} imágenes permitidas`);
+      return;
+    }
+    for (const file of files) {
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        setError("Solo se permiten JPG, PNG y WebP");
+        return;
+      }
+      if (file.size > MAX_SIZE) {
+        setError("Cada imagen debe pesar menos de 5 MB");
+        return;
+      }
+    }
+
+    // Placeholders con spinner: la compresión tarda unos segundos y sin esto
+    // parece que la imagen no se subió.
+    const placeholderIds = files.map(() => crypto.randomUUID());
+    const rawPreviews = files.map((file) => URL.createObjectURL(file));
+    setImages((prev) => [
+      ...prev,
+      ...files.map((_file, i) => ({
+        id: placeholderIds[i],
+        preview: rawPreviews[i],
+        uploading: true,
+      })),
+    ]);
+
     try {
-      setError(null);
-      const files = Array.from(fileList);
-
-      if (images.length + files.length > MAX_FILES) {
-        throw new Error(`Máximo ${MAX_FILES} imágenes permitidas`);
-      }
-      for (const file of files) {
-        if (!ALLOWED_TYPES.includes(file.type)) throw new Error("Solo se permiten JPG, PNG y WebP");
-        if (file.size > MAX_SIZE) throw new Error("Cada imagen debe pesar menos de 5 MB");
-      }
-
-      const newItems: ImageItem[] = [];
-      for (const file of files) {
-        const compressed = await imageCompression(file, {
+      for (let i = 0; i < files.length; i++) {
+        const compressed = await imageCompression(files[i], {
           maxSizeMB: 1,
           maxWidthOrHeight: 1200,
           useWebWorker: true,
         });
-        newItems.push({
-          id: crypto.randomUUID(),
-          file: compressed,
-          preview: URL.createObjectURL(compressed),
-        });
+        const finalPreview = URL.createObjectURL(compressed);
+        setImages((prev) =>
+          prev.map((img) =>
+            img.id === placeholderIds[i]
+              ? { ...img, file: compressed, preview: finalPreview, uploading: false }
+              : img
+          )
+        );
+        URL.revokeObjectURL(rawPreviews[i]);
       }
-      setImages((prev) => [...prev, ...newItems]);
     } catch (err) {
-      setError((err as Error).message);
+      setError((err as Error).message || "Error al procesar la imagen");
+      setImages((prev) => prev.filter((img) => !placeholderIds.includes(img.id)));
+      rawPreviews.forEach((url) => URL.revokeObjectURL(url));
     }
   };
 
@@ -99,12 +132,17 @@ export default function MediaSection({ product, onImagesChange }: Props) {
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-      <h2 className="text-sm font-semibold text-gray-700 mb-4">
-        Imágenes
-        <span className="ml-1.5 text-[10px] font-normal text-gray-400">
-          ({images.length}/{MAX_FILES})
-        </span>
-      </h2>
+      <div className="mb-5">
+        <h2 className="text-sm font-semibold text-gray-700">
+          Descripción enriquecida
+          <span className="ml-1.5 text-[10px] font-normal text-gray-400">
+            ({images.length}/{MAX_FILES} imágenes)
+          </span>
+        </h2>
+        <p className="text-xs text-gray-400 mt-0.5">
+          Se muestra en la página del producto además de la descripción simple.
+        </p>
+      </div>
 
       {images.length < MAX_FILES && (
         <label className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-gray-200 rounded-xl p-8 cursor-pointer hover:border-blue-300 hover:bg-blue-50/40 transition-colors">
@@ -129,7 +167,7 @@ export default function MediaSection({ product, onImagesChange }: Props) {
       )}
 
       {images.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mt-4">
           {images.map((img, i) => (
             <div
               key={img.id}
@@ -147,13 +185,16 @@ export default function MediaSection({ product, onImagesChange }: Props) {
               <img
                 src={img.preview}
                 alt={`imagen ${i + 1}`}
-                className="w-full h-full object-contain p-1.5"
+                className={`w-full h-full object-contain p-1.5 ${img.uploading ? "opacity-40" : ""}`}
               />
-              {i === 0 && (
-                <span className="absolute bottom-1 left-1 text-[10px] bg-(--tenant-primary) text-white px-1.5 py-0.5 rounded-md">
-                  Principal
-                </span>
+              {img.uploading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white/40">
+                  <Loader2 className="w-5 h-5 text-gray-500 animate-spin" />
+                </div>
               )}
+              <span className="absolute bottom-1 left-1 text-[10px] bg-gray-900/70 text-white px-1.5 py-0.5 rounded-md">
+                {i + 1}
+              </span>
               <button
                 type="button"
                 onClick={() => removeImage(i)}
@@ -172,6 +213,11 @@ export default function MediaSection({ product, onImagesChange }: Props) {
       {images.length > 1 && (
         <p className="text-xs text-gray-400 mt-2">Arrastrá las imágenes para cambiar el orden</p>
       )}
+
+      <div className="mt-5">
+        <label className="text-xs font-medium text-gray-600 mb-1.5 block">Texto</label>
+        <RichTextEditor value={text} onChange={handleTextChange} />
+      </div>
     </div>
   );
 }

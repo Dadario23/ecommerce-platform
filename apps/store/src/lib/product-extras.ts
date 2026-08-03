@@ -1,4 +1,5 @@
 import { z } from "zod";
+import sanitizeHtml from "sanitize-html";
 
 export const SizesSchema = z
   .array(
@@ -32,3 +33,20 @@ export const ReelsSchema = z
   .max(8);
 
 export type ProductReel = z.infer<typeof ReelsSchema>[number];
+
+export const DescriptionImagesSchema = z.array(z.string()).max(5);
+
+export const DescriptionTextSchema = z.string().max(20000);
+
+const DESCRIPTION_TEXT_ALLOWED_TAGS = ["p", "strong", "em", "u", "a", "h2", "h3", "ul", "ol", "li", "br"];
+
+export function sanitizeDescriptionText(html: string): string {
+  return sanitizeHtml(html, {
+    allowedTags: DESCRIPTION_TEXT_ALLOWED_TAGS,
+    allowedAttributes: { a: ["href", "target", "rel"] },
+    allowedSchemes: ["http", "https", "mailto"],
+    transformTags: {
+      a: sanitizeHtml.simpleTransform("a", { target: "_blank", rel: "noopener noreferrer" }),
+    },
+  });
+}

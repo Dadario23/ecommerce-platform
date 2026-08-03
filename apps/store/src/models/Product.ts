@@ -1,12 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-export interface IDescriptionBlock {
-  type: "text" | "heading" | "image";
-  content?: string;
-  imageUrl?: string;
-  caption?: string;
-}
-
 export interface IReel {
   url: string;
   publicId: string;
@@ -37,7 +30,8 @@ export interface IProduct extends Document {
   unitsSold?: number;
   homeDelivery?: boolean;
   featured?: boolean;
-  descriptionBlocks?: IDescriptionBlock[];
+  descriptionImages?: string[];
+  descriptionText?: string;
   reels?: IReel[];
 }
 
@@ -83,17 +77,12 @@ const ProductSchema: Schema = new Schema(
     isActive: { type: Boolean, default: true },
     homeDelivery: { type: Boolean, default: true },
     featured: { type: Boolean, default: false },
-    descriptionBlocks: {
-      type: [new Schema(
-        {
-          type:     { type: String, enum: ["text", "heading", "image"], required: true },
-          content:  { type: String },
-          imageUrl: { type: String },
-          caption:  { type: String },
-        },
-        { _id: false }
-      )],
-      default: [],
+    descriptionImages: {
+      type: [String],
+      default: undefined,
+    },
+    descriptionText: {
+      type: String,
     },
     reels: {
       type: [new Schema(

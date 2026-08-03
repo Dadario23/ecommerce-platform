@@ -23,9 +23,11 @@ export default function NuevoProductoPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Error al crear el producto");
       router.push("/dashboard/products");
+      return true;
     } catch (err) {
       setError((err as Error).message);
       setLoading(false);
+      return false;
     }
   }
 

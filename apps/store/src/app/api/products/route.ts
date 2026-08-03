@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getModels } from "@/lib/tenant-models";
-import { SizesSchema, computeTotalStock, ReelsSchema } from "@/lib/product-extras";
+import { SizesSchema, computeTotalStock, ReelsSchema, DescriptionImagesSchema, DescriptionTextSchema, sanitizeDescriptionText } from "@/lib/product-extras";
 
 function isAdmin(role: string | undefined) {
   return role === "admin" || role === "superadmin";
@@ -81,6 +81,22 @@ export async function POST(req: Request) {
       body.reels = parsedReels.data;
     }
 
+    if (body.descriptionImages != null) {
+      const parsedImages = DescriptionImagesSchema.safeParse(body.descriptionImages);
+      if (!parsedImages.success) {
+        return NextResponse.json({ error: "Máximo 5 imágenes en la descripción enriquecida" }, { status: 400 });
+      }
+      body.descriptionImages = parsedImages.data;
+    }
+
+    if (body.descriptionText != null) {
+      const parsedText = DescriptionTextSchema.safeParse(body.descriptionText);
+      if (!parsedText.success) {
+        return NextResponse.json({ error: "Descripción enriquecida inválida" }, { status: 400 });
+      }
+      body.descriptionText = sanitizeDescriptionText(parsedText.data);
+    }
+
     // 👇 forzamos que category se guarde como ObjectId
     if (body.category) {
       body.category = new mongoose.Types.ObjectId(body.category);
@@ -90,6 +106,9 @@ export async function POST(req: Request) {
 
     return NextResponse.json(populated, { status: 201 });
   } catch (error) {
+    if (error instanceof mongoose.Error.ValidationError) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
     console.error("Error al crear producto:", error);
     return NextResponse.json(
       { error: "Error al crear producto" },
