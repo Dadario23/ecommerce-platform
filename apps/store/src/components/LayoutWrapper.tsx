@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import WhatsAppFloatButton from "@/components/WhatsAppFloatButton";
 import type { PublicCategory } from "@/lib/getPublicCategories";
 import type { TenantTheme } from "@/config/tenant-themes";
 import type { ClientConfig } from "@/config/client";
@@ -32,6 +33,10 @@ export default function LayoutWrapper({
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/soporte-tecnico/admin");
 
+  // El soporte técnico tiene su propio chat flotante — evitar duplicarlo
+  const hideWhatsAppFloat =
+    pathname.startsWith("/dashboard") || pathname.startsWith("/soporte-tecnico");
+
   return (
     <>
       {!hideNavbar && (
@@ -54,6 +59,7 @@ export default function LayoutWrapper({
           contact={contact}
         />
       )}
+      {!hideWhatsAppFloat && <WhatsAppFloatButton whatsapp={contact.whatsapp} />}
     </>
   );
 }
