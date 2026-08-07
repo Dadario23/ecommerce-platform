@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Store, Mail, Phone, FileText, Truck, CheckCircle,
   AlertCircle, Instagram, Facebook, MessageCircle, User, Lock,
@@ -71,6 +72,7 @@ const INPUT =
   "w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 placeholder:text-gray-300 transition-colors";
 
 export default function SettingsClient({ initialSettings, adminName, adminEmail }: Props) {
+  const router = useRouter();
   const [data, setData] = useState<Settings>(initialSettings);
   const [saving, setSaving] = useState<string | null>(null);
   const [flash, setFlash] = useState<{ section: string; ok: boolean } | null>(null);
@@ -88,6 +90,10 @@ export default function SettingsClient({ initialSettings, adminName, adminEmail 
         body: JSON.stringify(payload),
       });
       setFlash({ section, ok: res.ok });
+      // El layout raíz (data-whatsapp, nombre de tienda, etc.) se rindió server-side
+      // en la última navegación completa y no se vuelve a ejecutar solo — sin esto,
+      // el cambio no se ve hasta un refresh manual del navegador.
+      if (res.ok) router.refresh();
     } catch {
       setFlash({ section, ok: false });
     } finally {
