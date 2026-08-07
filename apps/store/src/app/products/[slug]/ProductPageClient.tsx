@@ -11,6 +11,7 @@ import ProductShippingCalculator from "@/components/products/ProductShippingCalc
 import ProductTabs from "@/components/products/ProductTabs";
 import SimilarProducts from "@/components/products/SimilarProducts";
 import FavoriteButton from "@/components/ui/FavoriteButton";
+import ReviewsSection from "@/components/products/ReviewsSection";
 import type { SimilarProduct } from "@/components/products/SimilarProducts";
 import type { SerializedReview } from "@/components/products/ReviewsSection";
 
@@ -38,6 +39,11 @@ export default function ProductPageClient({
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
         <ProductBreadcrumb product={product} />
+
+        {/* Name (mobile only — desktop shows it inside ProductInfo) */}
+        <h1 className="lg:hidden mt-6 text-2xl font-bold text-gray-900 leading-snug">
+          {product.name}
+        </h1>
 
         {/* Main layout */}
         <div className="mt-6 flex flex-col lg:flex-row gap-10 xl:gap-14">
@@ -88,9 +94,22 @@ export default function ProductPageClient({
           </div>
         </div>
 
-        {/* Tabs: description + reviews */}
+        {/* Descripción */}
         <div className="mt-14">
-          <ProductTabs product={product} initialReviews={initialReviews} />
+          <ProductTabs product={product} />
+        </div>
+
+        {/* Reseñas */}
+        <div className="mt-14">
+          <h2 className="text-xl font-bold text-gray-900 mb-5">
+            Reseñas{(product.reviewCount ?? 0) > 0 ? ` (${product.reviewCount})` : ""}
+          </h2>
+          <ReviewsSection
+            productId={String(product._id)}
+            initialAvg={product.avgRating ?? 0}
+            initialCount={product.reviewCount ?? 0}
+            initialReviews={initialReviews}
+          />
         </div>
 
         {/* Productos similares */}

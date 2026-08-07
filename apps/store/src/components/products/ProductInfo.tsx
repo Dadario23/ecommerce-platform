@@ -52,8 +52,8 @@ export default function ProductInfo({ product }: { product: IProduct }) {
         </span>
       </div>
 
-      {/* Name */}
-      <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-snug">
+      {/* Name (mobile: shown above gallery in ProductPageClient) */}
+      <h1 className="hidden lg:block text-2xl md:text-3xl font-bold text-gray-900 leading-snug">
         {product.name}
       </h1>
 

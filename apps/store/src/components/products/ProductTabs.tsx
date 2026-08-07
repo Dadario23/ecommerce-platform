@@ -1,10 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { IProduct } from "@/models/Product";
 import { safeImageSrc } from "@/lib/safe-image-src";
-import ReviewsSection from "./ReviewsSection";
 
 function RichDescription({ images, html }: { images: string[]; html?: string }) {
   return (
@@ -36,48 +34,28 @@ function RichDescription({ images, html }: { images: string[]; html?: string }) 
   );
 }
 
-import type { SerializedReview } from "./ReviewsSection";
-
 interface ProductTabsProps {
   product: IProduct;
-  initialReviews?: SerializedReview[];
 }
 
-export default function ProductTabs({ product, initialReviews = [] }: ProductTabsProps) {
-  const productId  = String(product._id);
-  const avg        = product.avgRating  ?? 0;
-  const count      = product.reviewCount ?? 0;
+export default function ProductTabs({ product }: ProductTabsProps) {
   const descriptionImages = product.descriptionImages ?? [];
   const hasRichDescription = descriptionImages.length > 0 || !!product.descriptionText;
 
   return (
     <div className="mt-8">
-      <Tabs defaultValue="description" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="description">Descripción</TabsTrigger>
-          <TabsTrigger value="reviews">
-            Reseñas{count > 0 ? ` (${count})` : ""}
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="description" className="mt-6">
-          {hasRichDescription ? (
-            <RichDescription images={descriptionImages} html={product.descriptionText} />
+      <h2 className="text-xl font-bold text-gray-900 mb-5">Descripción</h2>
+      {hasRichDescription ? (
+        <RichDescription images={descriptionImages} html={product.descriptionText} />
+      ) : (
+        <div className="prose max-w-none text-gray-700 leading-relaxed">
+          {product.description ? (
+            <p>{product.description}</p>
           ) : (
-            <div className="prose max-w-none text-gray-700 leading-relaxed">
-              {product.description ? (
-                <p>{product.description}</p>
-              ) : (
-                <p className="text-gray-400">No hay descripción disponible.</p>
-              )}
-            </div>
+            <p className="text-gray-400">No hay descripción disponible.</p>
           )}
-        </TabsContent>
-
-        <TabsContent value="reviews" className="mt-4">
-          <ReviewsSection productId={productId} initialAvg={avg} initialCount={count} initialReviews={initialReviews} />
-        </TabsContent>
-      </Tabs>
+        </div>
+      )}
     </div>
   );
 }
