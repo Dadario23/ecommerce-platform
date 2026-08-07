@@ -29,14 +29,15 @@ export async function POST(request: NextRequest) {
       const { error, details, status } = result;
       return NextResponse.json({ error, ...(details && { details }) }, { status });
     }
-    const { order, authoritativeItems, discount, total } = result;
+    const { order, authoritativeItems, discount, shipping, total } = result;
 
     const preference = new Preference(await getMpClient());
 
-    // Con cupón aplicado, Mercado Pago cobra el total ya rebajado como un único
-    // concepto (Checkout Pro no admite líneas de descuento con precio negativo).
-    // El detalle por producto queda en el checkout de la tienda, igual que en
-    // Tiendanube o Shopify. Sin descuento se mantiene el detalle por producto.
+    // Con cupón aplicado, Mercado Pago cobra el total ya rebajado (producto +
+    // envío) como un único concepto (Checkout Pro no admite líneas de
+    // descuento con precio negativo). El detalle por producto queda en el
+    // checkout de la tienda, igual que en Tiendanube o Shopify. Sin descuento
+    // se mantiene el detalle por producto, con el envío como ítem aparte.
     const mpItems =
       discount > 0
         ? [
@@ -48,13 +49,26 @@ export async function POST(request: NextRequest) {
               currency_id: "ARS",
             },
           ]
-        : authoritativeItems.map((item) => ({
-            id: String(item.productId),
-            title: item.variant ? `${item.name} (Talle ${item.variant.value})` : item.name,
-            quantity: item.quantity,
-            unit_price: item.price,
-            currency_id: "ARS",
-          }));
+        : [
+            ...authoritativeItems.map((item) => ({
+              id: String(item.productId),
+              title: item.variant ? `${item.name} (Talle ${item.variant.value})` : item.name,
+              quantity: item.quantity,
+              unit_price: item.price,
+              currency_id: "ARS",
+            })),
+            ...(shipping > 0
+              ? [
+                  {
+                    id: "shipping",
+                    title: "Envío",
+                    quantity: 1,
+                    unit_price: shipping,
+                    currency_id: "ARS",
+                  },
+                ]
+              : []),
+          ];
 
     const baseUrl = await getBaseUrl();
 

@@ -199,6 +199,7 @@ export default function CheckoutClient({ shippingEnabled = true }: CheckoutClien
       total: shippingEnabled ? total : Math.max(0, subtotal - couponDiscount),
       paymentMethod,
       shippingMethod: shippingEnabled ? deliveryMethod : "retiro",
+      shippingType: shippingEnabled ? shippingType : undefined,
       notes: notesParts.join(" | "),
       shippingAddress: {
         firstName: address.firstName, lastName: address.lastName,

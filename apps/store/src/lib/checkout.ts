@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getModels } from "@/lib/tenant-models";
 import { computeCouponDiscount } from "@/lib/coupon-discount";
 import { releaseExpiredReservations, releaseStock, reserveStock, toStockLines } from "@/lib/stock";
+import { getShippingZones, findShippingZone } from "@/lib/shipping";
 import type { IOrder } from "@/models/Order";
 
 export const OrderItemSchema = z.object({
@@ -29,6 +30,7 @@ export const CheckoutPayloadSchema = z.object({
   items: z.array(OrderItemSchema).min(1),
   couponCode: z.string().optional(),
   shippingMethod: z.string().optional(),
+  shippingType: z.enum(["flex", "standard"]).optional(),
   notes: z.string().optional(),
   shippingAddress: AddressSchema,
 });
@@ -55,6 +57,7 @@ export type CheckoutResult =
       authoritativeItems: CheckoutItem[];
       subtotal: number;
       discount: number;
+      shipping: number;
       total: number;
       couponCode?: string;
     };
@@ -63,7 +66,7 @@ export type CheckoutResult =
 // valida stock y cupón contra la base, recalcula los montos del lado
 // servidor, reserva stock atómicamente y guarda la orden con rollback.
 export async function createCheckoutOrder(input: CheckoutInput): Promise<CheckoutResult> {
-  const { Coupon, Order, Product, User } = await getModels();
+  const { Coupon, Order, Product, ShippingConfig, User } = await getModels();
   const items = input.items;
 
   // Liberar reservas de checkouts MP abandonados antes de validar stock
@@ -157,7 +160,23 @@ export async function createCheckoutOrder(input: CheckoutInput): Promise<Checkou
     couponCode = coupon.code;
   }
 
-  const total = Math.max(subtotal - discount, 0);
+  // Recalcular el envío del lado servidor a partir de la zona detectada por
+  // ciudad/CP — nunca confiar en el shipping/total que manda el cliente.
+  // "retiro" (sin envío a domicilio) siempre cuesta 0, sin importar la dirección.
+  let shipping = 0;
+  if (input.shippingMethod !== "retiro") {
+    const zones = await getShippingZones(ShippingConfig);
+    const zone = findShippingZone(
+      input.shippingAddress.city,
+      input.shippingAddress.zipCode,
+      zones
+    );
+    if (zone) {
+      shipping = input.shippingType === "standard" ? zone.standard : zone.flex;
+    }
+  }
+
+  const total = Math.max(subtotal - discount + shipping, 0);
 
   // Reservar stock de forma atómica ANTES de crear la orden
   const reservation = await reserveStock(Product, toStockLines(authoritativeItems));
@@ -178,7 +197,7 @@ export async function createCheckoutOrder(input: CheckoutInput): Promise<Checkou
     customerEmail: input.customerEmail,
     items: authoritativeItems,
     subtotal,
-    shipping: 0,
+    shipping,
     tax: 0,
     discount,
     couponCode,
@@ -201,5 +220,5 @@ export async function createCheckoutOrder(input: CheckoutInput): Promise<Checkou
     throw err;
   }
 
-  return { ok: true, order, authoritativeItems, subtotal, discount, total, couponCode };
+  return { ok: true, order, authoritativeItems, subtotal, discount, shipping, total, couponCode };
 }
