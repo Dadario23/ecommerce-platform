@@ -45,10 +45,7 @@ export async function createTenantSetting(formData: FormData) {
   await db.collection("settings").insertOne({
     storeName,
     storeEmail: "",
-    storePhone: "",
     storeDescription: "",
-    shippingCost: 0,
-    freeShippingThreshold: 0,
     instagramUrl: "",
     facebookUrl: "",
     whatsappNumber: credentials.whatsappNumber,

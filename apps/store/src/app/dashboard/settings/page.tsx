@@ -1,7 +1,9 @@
+import { headers } from "next/headers";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getModels } from "@/lib/tenant-models";
+import { getTenantTheme } from "@/config/tenant-themes";
 import SettingsClient from "./SettingsClient";
 
 export const revalidate = 0;
@@ -10,11 +12,14 @@ export default async function SettingsPage() {
   const session = await getServerSession(authOptions);
   if (!session || session.user?.role !== "admin") redirect("/");
 
+  const h = await headers();
+  const slug = h.get("x-tenant-slug") ?? process.env.TENANT_SLUG ?? "store";
+  const showFeaturedModeToggle = getTenantTheme(slug).homeVariant === "tech";
+
   const { Setting } = await getModels();
   let doc = await Setting.findOne().lean<{
-    storeName: string; storeEmail: string; storePhone: string;
-    storeDescription: string; shippingCost: number;
-    freeShippingThreshold: number; instagramUrl: string;
+    storeEmail: string;
+    storeDescription: string; instagramUrl: string;
     facebookUrl: string; whatsappNumber: string;
     homeFeaturedMode?: "products" | "categories";
   }>();
@@ -24,12 +29,8 @@ export default async function SettingsPage() {
   }
 
   const settings = {
-    storeName:             doc?.storeName ?? "",
     storeEmail:            doc?.storeEmail ?? "",
-    storePhone:            doc?.storePhone ?? "",
     storeDescription:      doc?.storeDescription ?? "",
-    shippingCost:          doc?.shippingCost ?? 0,
-    freeShippingThreshold: doc?.freeShippingThreshold ?? 0,
     instagramUrl:          doc?.instagramUrl ?? "",
     facebookUrl:           doc?.facebookUrl ?? "",
     whatsappNumber:        doc?.whatsappNumber ?? "",
@@ -41,6 +42,7 @@ export default async function SettingsPage() {
       initialSettings={settings}
       adminName={session.user?.name ?? ""}
       adminEmail={session.user?.email ?? ""}
+      showFeaturedModeToggle={showFeaturedModeToggle}
     />
   );
 }

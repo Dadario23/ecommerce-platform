@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Instagram, Facebook, Mail, Phone, MessageCircle } from "lucide-react";
+import { Instagram, Facebook, Mail } from "lucide-react";
+import { RiWhatsappLine } from "react-icons/ri";
 import type { PublicCategory } from "@/lib/getPublicCategories";
 import type { TenantTheme } from "@/config/tenant-themes";
 import type { ClientConfig } from "@/config/client";
@@ -35,7 +36,7 @@ export default function Footer({
   contact: ClientConfig["contact"];
 }) {
   const hasContact = Boolean(
-    contact.whatsapp || contact.email || contact.phone || contact.instagram || contact.facebook,
+    contact.whatsapp || contact.email || contact.instagram || contact.facebook,
   );
 
   return (
@@ -111,7 +112,7 @@ export default function Footer({
                     rel="noopener noreferrer"
                     className={`${LINK} flex items-center gap-2`}
                   >
-                    <MessageCircle className="w-4 h-4 shrink-0" /> WhatsApp
+                    <RiWhatsappLine className="w-4 h-4 shrink-0" /> WhatsApp
                   </a>
                 </li>
               )}
@@ -119,13 +120,6 @@ export default function Footer({
                 <li>
                   <a href={`mailto:${contact.email}`} className={`${LINK} flex items-center gap-2`}>
                     <Mail className="w-4 h-4 shrink-0" /> {contact.email}
-                  </a>
-                </li>
-              )}
-              {contact.phone && (
-                <li>
-                  <a href={`tel:${contact.phone}`} className={`${LINK} flex items-center gap-2`}>
-                    <Phone className="w-4 h-4 shrink-0" /> {contact.phone}
                   </a>
                 </li>
               )}

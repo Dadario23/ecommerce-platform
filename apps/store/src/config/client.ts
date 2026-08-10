@@ -19,7 +19,6 @@ export interface ClientConfig {
   };
   contact: {
     email: string;
-    phone: string;
     whatsapp: string;
     instagram: string;
     facebook: string;
@@ -43,7 +42,6 @@ const DEFAULT_MODULES: ClientConfig["modules"] = {
 
 const EMPTY_CONTACT: ClientConfig["contact"] = {
   email: "",
-  phone: "",
   whatsapp: "",
   instagram: "",
   facebook: "",
@@ -75,7 +73,6 @@ export async function getClientConfig(): Promise<ClientConfig> {
       },
       contact: {
         email: (setting?.storeEmail as string) || "",
-        phone: (setting?.storePhone as string) || "",
         whatsapp: (setting?.whatsappNumber as string) || "",
         instagram: (setting?.instagramUrl as string) || "",
         facebook: (setting?.facebookUrl as string) || "",

@@ -3,19 +3,16 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Store, Mail, Phone, FileText, Truck, CheckCircle,
+  Store, Mail, FileText, CheckCircle,
   AlertCircle, Instagram, Facebook, MessageCircle, User, Lock,
   LayoutGrid, Tag,
 } from "lucide-react";
+import { RiWhatsappLine } from "react-icons/ri";
 import Link from "next/link";
 
 interface Settings {
-  storeName: string;
   storeEmail: string;
-  storePhone: string;
   storeDescription: string;
-  shippingCost: number;
-  freeShippingThreshold: number;
   instagramUrl: string;
   facebookUrl: string;
   whatsappNumber: string;
@@ -26,6 +23,7 @@ interface Props {
   initialSettings: Settings;
   adminName: string;
   adminEmail: string;
+  showFeaturedModeToggle: boolean;
 }
 
 function SectionTitle({
@@ -71,7 +69,7 @@ function Field({
 const INPUT =
   "w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 placeholder:text-gray-300 transition-colors";
 
-export default function SettingsClient({ initialSettings, adminName, adminEmail }: Props) {
+export default function SettingsClient({ initialSettings, adminName, adminEmail, showFeaturedModeToggle }: Props) {
   const router = useRouter();
   const [data, setData] = useState<Settings>(initialSettings);
   const [saving, setSaving] = useState<string | null>(null);
@@ -147,43 +145,18 @@ export default function SettingsClient({ initialSettings, adminName, adminEmail 
           description="Datos generales visibles en emails y la tienda"
         />
         <div className="space-y-4">
-          <Field label="Nombre de la tienda *">
+          <Field label="Email de contacto">
             <div className="relative">
-              <Store className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
               <input
-                value={data.storeName}
-                onChange={(e) => set("storeName", e.target.value)}
-                placeholder="Compumobile"
+                type="email"
+                value={data.storeEmail}
+                onChange={(e) => set("storeEmail", e.target.value)}
+                placeholder="info@tienda.com"
                 className={`${INPUT} pl-9`}
               />
             </div>
           </Field>
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Email de contacto">
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                <input
-                  type="email"
-                  value={data.storeEmail}
-                  onChange={(e) => set("storeEmail", e.target.value)}
-                  placeholder="info@tienda.com"
-                  className={`${INPUT} pl-9`}
-                />
-              </div>
-            </Field>
-            <Field label="Teléfono">
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                <input
-                  type="tel"
-                  value={data.storePhone}
-                  onChange={(e) => set("storePhone", e.target.value)}
-                  placeholder="+54 11 1234-5678"
-                  className={`${INPUT} pl-9`}
-                />
-              </div>
-            </Field>
-          </div>
           <Field label="Descripción breve">
             <div className="relative">
               <FileText className="absolute left-3 top-3.5 w-4 h-4 text-gray-300" />
@@ -200,65 +173,8 @@ export default function SettingsClient({ initialSettings, adminName, adminEmail 
         <SaveBtn
           section="store"
           payload={{
-            storeName: data.storeName,
             storeEmail: data.storeEmail,
-            storePhone: data.storePhone,
             storeDescription: data.storeDescription,
-          }}
-        />
-      </div>
-
-      {/* Shipping */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <SectionTitle
-          icon={Truck}
-          title="Configuración de envío"
-          description="Costos base y umbral de envío gratis"
-        />
-
-        <div className="grid grid-cols-2 gap-4">
-          <Field
-            label="Costo de envío ($)"
-            hint="0 para envío gratuito siempre"
-          >
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">
-                $
-              </span>
-              <input
-                type="number"
-                min={0}
-                value={data.shippingCost}
-                onChange={(e) => set("shippingCost", Number(e.target.value))}
-                className={`${INPUT} pl-7`}
-              />
-            </div>
-          </Field>
-          <Field
-            label="Envío gratis desde ($)"
-            hint="0 para desactivar"
-          >
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">
-                $
-              </span>
-              <input
-                type="number"
-                min={0}
-                value={data.freeShippingThreshold}
-                onChange={(e) =>
-                  set("freeShippingThreshold", Number(e.target.value))
-                }
-                className={`${INPUT} pl-7`}
-              />
-            </div>
-          </Field>
-        </div>
-        <SaveBtn
-          section="shipping"
-          payload={{
-            shippingCost: data.shippingCost,
-            freeShippingThreshold: data.freeShippingThreshold,
           }}
         />
       </div>
@@ -295,7 +211,7 @@ export default function SettingsClient({ initialSettings, adminName, adminEmail 
           </Field>
           <Field label="WhatsApp" hint="Solo número con código de país, sin espacios ni guiones">
             <div className="relative">
-              <MessageCircle className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+              <RiWhatsappLine className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
               <input
                 value={data.whatsappNumber}
                 onChange={(e) => set("whatsappNumber", e.target.value)}
@@ -316,6 +232,7 @@ export default function SettingsClient({ initialSettings, adminName, adminEmail 
       </div>
 
       {/* Home featured mode */}
+      {showFeaturedModeToggle && (
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <SectionTitle
           icon={LayoutGrid}
@@ -374,6 +291,7 @@ export default function SettingsClient({ initialSettings, adminName, adminEmail 
           payload={{ homeFeaturedMode: data.homeFeaturedMode }}
         />
       </div>
+      )}
 
       {/* Account */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">

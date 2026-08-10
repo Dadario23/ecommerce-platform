@@ -7,9 +7,8 @@ import { getModels } from "@/lib/tenant-models";
 async function getSettings() {
   const { Cart, Category, Coupon, Notification, Order, Presupuesto, Product, RepairCatalog, Reparacion, Review, Setting, ShippingConfig, User } = await getModels();
   const doc = await Setting.findOne().lean<{
-    storeName: string; storeEmail: string; storePhone: string;
-    storeDescription: string; shippingCost: number;
-    freeShippingThreshold: number; instagramUrl: string;
+    storeName: string; storeEmail: string;
+    storeDescription: string; instagramUrl: string;
     facebookUrl: string; whatsappNumber: string;
     shippingEnabled: boolean;
     modules_repairs: boolean; modules_budgets: boolean;
@@ -42,8 +41,7 @@ export async function PUT(req: Request) {
 
   const body = await req.json();
   const allowed = [
-    "storeName", "storeEmail", "storePhone", "storeDescription",
-    "shippingCost", "freeShippingThreshold",
+    "storeEmail", "storeDescription",
     "instagramUrl", "facebookUrl", "whatsappNumber",
     "carouselImages", "homeFeaturedMode", "shippingEnabled",
     "modules_repairs", "modules_budgets", "modules_shipping",
