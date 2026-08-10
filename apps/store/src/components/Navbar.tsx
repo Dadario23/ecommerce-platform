@@ -95,7 +95,7 @@ export default function Navbar({
 
   const light = navStyle === "light";
   const iconBtn = light
-    ? "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+    ? "text-gray-600 hover:text-gray-900 hover:bg-(--tenant-tint)"
     : "text-white/90 hover:text-white hover:bg-white/10";
 
   const goToCategory = (cat: Category) => {
@@ -261,7 +261,11 @@ export default function Navbar({
               )}
 
               {/* Notifications */}
-              {session && <NotificationBell />}
+              {session && (
+                <NotificationBell
+                  buttonClassName={`relative p-2 rounded-full transition-colors ${iconBtn}`}
+                />
+              )}
 
               {/* Cart */}
               <button
