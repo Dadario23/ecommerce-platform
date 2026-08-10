@@ -21,7 +21,7 @@ export default function EditorialHero({
   const slides = images.length ? images : ["/carousel-placeholder.png"];
 
   return (
-    <section className="relative w-full h-[60vh] min-h-105 overflow-hidden">
+    <section className="relative w-full aspect-4/3 sm:aspect-video lg:aspect-auto lg:h-[60vh] lg:min-h-105 overflow-hidden">
       <Swiper
         modules={[Autoplay, Pagination]}
         slidesPerView={1}
@@ -55,7 +55,7 @@ export default function EditorialHero({
               width={463}
               height={160}
               priority
-              className="w-64 md:w-96 h-auto drop-shadow-lg"
+              className="w-36 sm:w-56 md:w-72 lg:w-96 h-auto drop-shadow-lg"
             />
             <h1 className="sr-only">{storeName}</h1>
           </>
