@@ -24,7 +24,7 @@ export type TenantTheme = {
   backgroundPattern?: string; // PNG translúcido que se repite sobre el fondo
   radius: string;
   font: FontKey;
-  logo: { src: string; invert?: boolean } | null; // null → wordmark storeName en font-brand
+  logo: { src: string; invert?: boolean; height?: number } | null; // null → wordmark storeName en font-brand; height en px, default 38 (navbar)
   favicon: string | null; // null → /favicon.ico genérico
   navStyle: NavStyle; // solid → barra en primary; light → barra blanca con texto oscuro
   cardStyle: CardStyle; // boxed → card con borde y foto contain; minimal → sin borde, foto 3/4 cover (variante CSS `minimal:`)
@@ -67,7 +67,7 @@ const THEMES: Record<string, TenantTheme> = {
   "bitm-cel": {
     ...DEFAULT_THEME,
     storeName: "Bitm-Cel",
-    logo: { src: "/logo.svg", invert: true },
+    logo: { src: "/logo-bitm-cel.png" },
   },
   "compumobile": {
     storeName: "Compumobile",

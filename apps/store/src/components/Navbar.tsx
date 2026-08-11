@@ -124,9 +124,10 @@ export default function Navbar({
                   src={logo.src}
                   alt={storeName || "logo"}
                   width={160}
-                  height={38}
+                  height={logo.height ?? 38}
                   priority
-                  className={`h-9.5 w-auto ${logo.invert && !light ? "brightness-0 invert" : ""}`}
+                  style={{ height: `${logo.height ?? 38}px`, width: "auto" }}
+                  className={logo.invert && !light ? "brightness-0 invert" : ""}
                 />
               ) : (
                 <span
